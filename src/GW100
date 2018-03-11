@@ -1,0 +1,41 @@
+0100 REM "GW100 - 03/28/15 Broadcast Email Entry
+0110 SETESC DT_ERR; SETERR DT_ERR
+0120 CALL "CDW000",ROW$,"ds2",WASES.LEAGUENAME$
+0130 CALL "CDW000",TAB$,"r class='top'",ROW$
+0140 CALL "CDW000",ROW$,"ds2",Y5$
+0150 CALL "CDW000",TAB$,"r class='title'",ROW$
+0160 CALL "SW404",Y$,"XXGR04",RREC$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" and pos("" ""<>gr04.EMAIL$)",ALLG
+0170 CALL "SW404",Y$,"XXGR04",RREC$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" and pos("" ""<>gr04.EMAIL$) and GR04.SEQ",RECENT
+0180 CALL "SW404",Y$,"XXGR04",RREC$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" and pos("" ""<>gr04.EMAIL$) and GR04.PLAYTHISYEAR$=""Y""",YES
+0190 CALL "SW404",Y$,"XXGR04",RREC$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" and pos("" ""<>gr04.EMAIL$) and GR04.PLAYTHISYEAR$=""N""",NO
+0200 CALL "CDW000",ROW$,"d","Send to"
+0210 LET D$="<input type='radio' name='SENDTO' value='A'>All ("+STR(ALLG)+")"
+0220 LET D$=D$+"<br><input type='radio' name='SENDTO' value='R' checked>Recently played ("+STR(RECENT)+")"
+0230 LET D$=D$+"<br><input type='radio' name='SENDTO' value='Y'>Playing=Yes ("+STR(YES)+")"
+0240 LET D$=D$+"<br><input type='radio' name='SENDTO' value='N'>Playing=No ("+STR(NO)+")"
+0250 CALL "CDW000",ROW$,"d",D$
+0260 CALL "CDW000",TAB$,"r",ROW$
+0270 CALL "SW010","XXGR04",0,"","FIRSTNAME|LASTNAME|PHONE",NOEMA$," ","<br>","REC.LEAGUE$="""+WASES.LEAGUE$+""" and REC.ID$<>""open"" and POS("" ""<>REC.EMAIL$)=0"
+0280 IF LEN(NOEMA$)
+:       THEN
+:          CALL "CDW000",ROW$,"d","No email address";
+:          CALL "CDW000",ROW$,"d",NOEMA$;
+:          CALL "CDW000",TAB$,"r",ROW$
+0290 CALL "CDW000",ROW$,"d","Email Message"
+0300 CALL "CDS261",Y$,"XXGR02",WASES.LEAGUE$+"b","",0,"","",0,NOTEPAD$
+0310 CALL "CDW000",ROW$,"ds2","<textarea name='NOTE' cols='80' rows='15'>"+NOTEPAD$+"</textarea>"
+0320 CALL "CDW000",TAB$,"r",ROW$
+0330 CALL "CDW000",ROW$,"dcs2","[CANCEL] <input type='submit' value='Send Emails'>"
+0340 CALL "CDW000",TAB$,"r class='foot'",ROW$
+0350 CALL "CDW000",HTML$,"tc",TAB$
+0360 LET HTML$="<form method='post' action='[DSN]?p=GW101'>"+HTML$+"</form>"
+0370 GOTO EOJ
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 IF TCB(13) THEN EXIT
+9020 RUN "CDW999"

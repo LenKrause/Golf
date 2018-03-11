@@ -1,0 +1,26 @@
+0100 REM "LKS060 - 04/30/93 DISPLAY ASCII CHART
+0104 REM PRINT 'ES',"c@1C",; REM "SET FONT BANK 1 = GRAPHICS 1
+0110 FOR B=0 TO 128 STEP 128
+0111    PRINT 'CS',
+0115    LET X=0,C=0
+0120    FOR C0=0 TO 7
+0125       LET Y=0
+0130       FOR C1=0 TO 15
+0131          LET C2=B+C
+0135          IF 0
+:                THEN
+:                   IF C2<=31
+:                      THEN
+:                         LET Z$=""
+:                      ELSE
+:                         LET Z$='BO'+$1B$+"cE"+CHR(C2)+$1B$+"cD"+'EO'
+0136          IF C<=31 THEN LET Z$="" ELSE LET Z$=CHR(C2)
+0140          PRINT @(X,Y),C2:"##0B",HTA(CHR(C2))," ",Z$
+0150          LET Y=Y+1,C=C+1
+0160       NEXT C1
+0170       LET X=X+10
+0180    NEXT C0
+0190    CALL "CDS069",0,0,0,0,"HIT 'CR' TO REDISPLAY+"
+0195 NEXT B
+0200 IF CTL<>4 THEN GOTO 0105
+0210 RUN "CDS001"

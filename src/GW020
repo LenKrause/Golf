@@ -1,0 +1,171 @@
+0100 REM "GW020 - 09/23/15 Golfer Maintenance
+0110 SETESC DT_ERR; SETERR DT_ERR
+0120 CALL "CDS095",GR04,"XXGR04","YNY",GR04$,GR04K$
+0130 CALL "CDS095",GR05,"XXGR05","YNY",GR05$
+0140 LET RECS=NUM(FIELD(CGI$,"RECS",ERR=0150)); GOSUB SAVE
+0150 CALL "CDW000",ROW$,"dcs9",WASES.LEAGUENAME$
+0160 CALL "CDW000",TAB$,"r class='top'",ROW$
+0170 CALL "CDW000",ROW$,"dcs9","Golfer Maintenance"
+0180 CALL "CDW000",TAB$,"r class='title'",ROW$
+0190 CALL "CDW000",ROW$,"d","First Name"
+0200 CALL "CDW000",ROW$,"d","Last Name"
+0210 CALL "CDW000",ROW$,"d","Email"
+0220 CALL "CDW000",ROW$,"d","Phone#"
+0230 CALL "CDW000",ROW$,"dc","Initial<br>Handicap"
+0235 CALL "CDW000",ROW$,"dc","Preferred<br>Flight"
+0240 CALL "CDW000",ROW$,"dc","Play in "+DATE(0:"%Yl")
+0245 IF 0 THEN CALL "CDW000",ROW$,"dc","Preferred<br>Flight"
+0250 CALL "CDW000",ROW$,"dc","Last Round"
+0255 CALL "CDW000",ROW$,"dc","Scores"
+0260 CALL "CDW000",TAB$,"r class='head'",ROW$
+0270 LET IND=0
+0280 READ (GR04,KNUM=3,KEY=WASES.LEAGUE$,DOM=0290)
+0290 READ RECORD(GR04,END=0480)GR04$
+0300 IF GR04.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0480
+0310 LET IND=IND+1,IND$=STR(IND)
+0320 IF LEN(B$)
+:       THEN
+:          LET GR04.ID$=FNF$("ID"),GR04.FIRSTNAME$=FNF$("FIRSTNAME"),GR04.LASTNAME$=FNF$("LASTNAME"),GR04.PHONE$=FNF$("PHONE"),GR04.EMAIL$=FNF$("EMAIL"),GR04.PLAYTHISYEAR$=FNF$("PLAYTHISYEAR")
+0330 CALL "CDW000",ROW$,"d","<input type='hidden' name='ID"+IND$+"' value='"+GR04.ID$+"'>"+FNI$("FIRSTNAME")
+0340 CALL "CDW000",ROW$,"d",FNI$("LASTNAME")
+0350 CALL "CDW000",ROW$,"d",FNI$("EMAIL")
+0360 CALL "CDW000",ROW$,"d",FNI$("PHONE")
+0370 IF POS("HC"+IND$+"|"=B$)
+:       THEN
+:          LET VAL$=FNF$("HC"),OPT$=";background-color:#ffcccc"
+:       ELSE
+:          LET VAL$=STR(GR04.HC),OPT$="";
+:          IF VAL$="0"
+:             THEN
+:                LET VAL$=""
+0380 CALL "CDW000",ROW$,"dc","<input style='text-align:center"+OPT$+"' type='text' name='HC"+IND$+"' value='"+VAL$+"' size=2 maxlength=2>"
+0385 CALL "CDW000",ROW$,"dc","<input style='text-align:center' type='text' name='PREFLT"+IND$+"' value='"+CVS(GR04.PREFLT$,5)+"' size=1 maxlength=1>"
+0390 IF GR04.PLAYTHISYEAR$="Y" OR POS(" "<>GR04.ID$)=0
+:       THEN
+:          LET YSEL$="checked",NSEL$=""
+:       ELSE
+:          LET NSEL$="checked",YSEL$=""
+0400 CALL "CDW000",ROW$,"d","<input type='radio' name='PLAYTHISYEAR"+IND$+"' value='Y' "+YSEL$+">Yes &nbsp;<input type='radio' name='PLAYTHISYEAR"+IND$+"' value='N' "+NSEL$+">No"
+0403 IF 0 THEN LET PREA$="",PREB$="",PREBLK$=""
+0404 IF 0
+:       THEN
+:          IF GR04.PREFLT$="A"
+:             THEN
+:                LET PREA$="checked"
+:             ELSE
+:                IF GR04.PREFLT$="B"
+:                   THEN
+:                      LET PREB$="checked"
+:                   ELSE
+:                      LET PREBLK$="checked"
+0405 IF 0
+:       THEN
+:          CALL "CDW000",ROW$,"d","<input type='radio' name='PREFLT"+IND$+"' value=' ' "+PREBLK$+">None<br><input type='radio' name='PREFLT"+IND$+"' value='A' "+PREA$+">A<br><input type='radio' name='PREFLT"+IND$+"' value='B' "+PREB$+">B"
+0410 READ (GR05,KNUM=0,KEY=GR04.LEAGUE$+GR04.ID$+$FF$,DOM=0420)
+0420 LET LAST$=""
+0430 READ RECORD(GR05,END=0450)GR05$
+0440 IF GR05.LEAGUE$+GR05.ID$=GR04.LEAGUE$+GR04.ID$
+:       THEN
+:          IF GR05.SCORE
+:             THEN
+:                LET LAST$=DATE(GR05.DATE)
+:             ELSE
+:                GOTO 0430
+0450 CALL "CDW000",ROW$,"dc",LAST$
+0455 CALL "CDW000",ROW$,"dc","<input type='button' value='Edit' onclick='window.open(""[DSN]?p=GW041&id="+GR04.ID$+""")'>"
+0460 CALL "CDW000",TAB$,"r",ROW$
+0470 GOTO 0290
+0480 IF NEW<10 THEN LET NEW=NEW+1; DIM GR04$:FATTR(GR04$); GOTO 0310
+0490 CALL "CDW000",ROW$,"dcs9","[CANCEL] <input type='submit' value='Save Changes'>"
+0500 CALL "CDW000",TAB$,"r",ROW$
+0510 CALL "CDW000",HTML$,"tc",TAB$
+0520 LET HTML$=HTML$+"<input type='hidden' name='recs' value="+IND$+">"
+0530 LET HTML$="<form method='post' action='[DSN]?p=GW020'>"+HTML$+"</form>"
+0540 IF LEN(MSG$) THEN LET HTML$="<p class='msg'>"+MSG$+"</p>"+HTML$
+0550 GOTO EOJ
+0560 DEF FNI$(VBL$)
+0570 LET VAL$=FIELD(GR04$,VBL$),LGTH$=STR(LEN(VAL$))
+0580 IF POS(VBL$+IND$+"|"=B$)
+:       THEN
+:          LET OPT$=" style='background-color:#ffcccc' value='"+FNF$(VBL$)+"'"
+:       ELSE
+:          LET OPT$=" value='"+CVS(VAL$,2)+"'"
+0590 RETURN "<input type='text' name='"+VBL$+IND$+"' size="+LGTH$+" maxlength="+LGTH$+OPT$+">"
+0600 FNEND
+
+1000 SAVE:
+1010 LET B$=""
+1020 FOR IND=1 TO RECS
+1030    LET IND$=STR(IND)
+1040    LET EMAIL$=CVS(FNF$("EMAIL"),8)
+1050    IF POS(" "<>EMAIL$)
+:          THEN
+:             CALL "CDS275::VALIDATE",ERR=1060,EMAIL$,MSG$;
+:             GOTO 1070
+1060    IF POS(" "<>EMAIL$) THEN LET B$=FNB$("EMAIL")
+1070    LET PHONE$=CVS(FNF$("PHONE"),3)
+1080    IF LEN(PHONE$)
+:          THEN
+:             IF LEN(PHONE$)<>12 OR POS(PHONE$(1,1)="23456789")=0 OR POS(PHONE$(4,1)=".-")=0 OR POS(PHONE$(8,1)=".-")=0 OR MASK(PHONE$(2,2)+PHONE$(5,3)+PHONE$(9,4),"^[0123456789]+$")=0
+:                THEN
+:                   LET B$=FNB$("PHONE")
+1090    IF POS(" "<>EMAIL$+PHONE$)
+:          THEN
+:             IF POS(" "<>FNF$("LASTNAME"))=0
+:                THEN
+:                   LET B$=FNB$("LASTNAME")
+:             FI;
+:             IF POS(" "<>FNF$("FIRSTNAME"))=0
+:                THEN
+:                   LET B$=FNB$("FIRSTNAME")
+1100    LET HC=-1,HC=NUM(FNF$("HC"),ERR=1110)
+1110    IF HC<0 OR FPT(HC) THEN LET B$=FNB$("HC")
+1120 NEXT IND
+1130 IF LEN(B$) THEN LET MSG$="Correct problems shown in red!"; RETURN
+1140 FOR IND=1 TO RECS
+1150    LET IND$=STR(IND)
+1160    DIM GR04$:FATTR(GR04$)
+1170    LET GR04.LEAGUE$=WASES.LEAGUE$,ID$=FNF$("ID"),CHG=0
+1180    IF POS(" "<>ID$)
+:          THEN
+:             LET GR04.ID$=ID$;
+:             EXTRACT RECORD(GR04,KNUM=0,KEY=KGEN(GR04$,GR04K$,0))GR04$
+1190    IF POS(" "<>FNF$("FIRSTNAME"))
+:          THEN
+:             LET GR04.FIRSTNAME$=FNF$("FIRSTNAME"),CHG=1
+1200    IF POS(" "<>FNF$("LASTNAME"))
+:          THEN
+:             LET GR04.LASTNAME$=FNF$("LASTNAME"),CHG=1
+1210    LET GR04.EMAIL$=CVS(FNF$("EMAIL"),8)
+1220    LET GR04.PHONE$=CVS(FNF$("PHONE"),8)
+1230    IF NUM(FNF$("HC")) THEN LET GR04.HC=NUM(FNF$("HC"))
+1231    LET PREFLT$=CVS(PAD(FNF$("PREFLT"),1),4)
+1235    IF POS(PREFLT$=" ABCD") THEN LET GR04.PREFLT$=PREFLT$
+1240    IF POS(FNF$("PLAYTHISYEAR")="YN")
+:          THEN
+:             LET GR04.PLAYTHISYEAR$=FNF$("PLAYTHISYEAR")
+1250    IF POS(" "<>ID$) THEN WRITE RECORD(GR04)GR04$ ELSE IF CHG THEN GOSUB NEWID
+1260 NEXT IND
+1270 RUN "GW011"
+
+1300 NEWID:
+1310 LET GR04.ID$=CVS(GR04.LASTNAME$(1,3)+GR04.FIRSTNAME$(1,1),4)
+1320 LET Z=POS(" "=GR04.ID$); IF Z THEN LET GR04.ID$(Z,1)="_"; GOTO 1320
+1330 WRITE RECORD(GR04,DOM=1340)GR04$; RETURN
+1340 LET GR04.ID$(4,1)=CHR(1+ASC(GR04.ID$(4,1)))
+1350 GOTO 1330
+
+1400 FUNCTIONS:
+1410 DEF FNB$(FLD$)=B$+FLD$+IND$+"|"
+1420 DEF FNF$(FLD$)
+1430 LET VAL$="",VAL$=FIELD(CGI$,FLD$+IND$,ERR=1440)
+1440 RETURN VAL$
+1450 FNEND
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 RUN "CDW999"

@@ -1,0 +1,35 @@
+0100 REM "LKTST2 - 02/04/04 Test Melissa Data address verification
+0110 BEGIN
+0130 LET OUT$="<?xml version=""1.0""?>"
+0140 LET OUT$=OUT$+"<RecordSet>"
+0150 LET OUT$=OUT$+"<CustomerID>102251307</CustomerID>"
+0160 LET OUT$=OUT$+"<Record>"
+0170 LET OUT$=OUT$+"<FullName>NCDS</FullName>"
+0180 LET OUT$=OUT$+"<Address>7550 Lucerne Drive Suite #405</Address>"
+0190 LET OUT$=OUT$+"<City>Middleburg Heights</City>"
+0200 LET OUT$=OUT$+"<State>OH</State>"
+0210 LET OUT$=OUT$+"<Zip>44130</Zip>"
+0211 LET OUT$=OUT$+"<Plus4/>"
+0212 LET OUT$=OUT$+"<AddressErrorCode/>"
+0213 LET OUT$=OUT$+"<AddressErrorString/>"
+0214 LET OUT$=OUT$+"<CarrierRoute/>"
+0215 LET OUT$=OUT$+"<DeliveryPointCode/>"
+0216 LET OUT$=OUT$+"<CountyFips/>"
+0220 LET OUT$=OUT$+"</Record>"
+0230 LET OUT$=OUT$+"<ErrorString/>"
+0240 LET OUT$=OUT$+"</RecordSet>"
+0250 OPEN (1,MODE="O_CREATE,O_TRUNC")"/tmp/lek1"
+0260 WRITE (1)OUT$
+0270 CLOSE (1)
+0300 LET A=SCALL("curl -v -T /tmp/lek1 -o /tmp/lek2 --trace-ascii /tmp/lek5 -X POST -m 30 -H ""Content-Type: text/xml"" https://xml.melissadata.com/xml.asp")
+0310 PRINT 'LF',"Exit Code",A
+0320 ESCAPE
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 IF TCB(13) THEN EXIT
+9020 RUN "CDS001"

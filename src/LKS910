@@ -1,0 +1,14 @@
+0100 REM "LKS910 - 01/15/97 Rename files in home/pc directory to upper case
+0101 BEGIN
+0102 LET BASE$="/home/pc/"
+0103 LET DIR$="data/cdi/wp/lablship"
+0110 OPEN (1)BASE$+DIR$
+0120 READ RECORD(1)A$
+0125 PRINT A$
+0130 IF POS("."<>A$) AND CVS(A$,4)<>A$ AND A$(LEN(A$))<>"/" THEN GOSUB DO
+0140 GOTO 0120
+
+1000 DO:
+1010 IF A$(LEN(A$))="/" THEN LET A$=A$(1,LEN(A$)-1)
+1020 RENAME BASE$+DIR$+"/"+A$,BASE$+DIR$+"/"+CVS(A$,4)
+1030 RETURN

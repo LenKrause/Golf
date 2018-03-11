@@ -1,0 +1,41 @@
+0100 REM "LP201 - 06/10/00 Envelope Printing
+0110 SETERR DT_ERR; SETESC DT_ERR
+0120 ENTER Y$,VM01$,ATTN$,LP201$,ERR=0130
+0130 CALL "CDS084",ERR=EOJ,Y$,Y5$,0,S084$,0,Y6$
+0140 IF Y6.PCL=0
+:       THEN
+:          CALL "CDS069",0,0,0,0,"This option requires a PCL compatible printer such as laser or inkjet-";
+:          GOTO 0130
+0150 LET Z$=FATTR(LP201$,ERR=TPL)
+0160 IF LP201.FONTNO=0 THEN LET LP201.FONTNO=4148; REM "Univers
+0170 IF LP201.UPPERCASE THEN LET UC$="Y"
+0180 LET STARTCOL=1500,STARTROW=550
+0190 CALL "DIS481",UC$,VM01$,ADDR$[ALL]
+0200 PRINT (Y6.CH)'BO',$1B$,"&l4H",Y6.DEPTH85$,$1B$,"&l81a10C",'EO',;
+:    REM "Force feed from aux paper source - pull down tray - automatic, not manual, to eliminate need to touch printer button; then landscape, then COM10 envelope; 10/48" line spacing
+0210 CALL "CDS254",Y6$,"T "+STR(STARTCOL)+","+STR(STARTROW)+",0,0,14,,"+STR(LP201.FONTNO)
+0220 IF POS(" "<>ATTN$)
+:       THEN
+:          CALL "CDS254",Y6$,"T "+STR(STARTCOL),CVS(ATTN$,4*(UC$="Y"))+$0D0A$
+0230 IF POS(" "<>NAME$)
+:       THEN
+:          CALL "CDS254",Y6$,"T "+STR(STARTCOL),CVS(NAME$,4*(UC$="Y"))+$0D0A$
+0240 FOR I=0 TO 3
+0250    IF POS(" "<>ADDR$[I])
+:          THEN
+:             CALL "CDS254",Y6$,"T "+STR(STARTCOL),ADDR$[I]+$0D0A$
+0260 NEXT I
+0270 CALL "CDS094",Y6$,"E"
+0280 GOTO EOJ
+
+1000 TPL:
+1010 CALL "CDS041",ERR=EOJ,"LP201",LP201$
+1020 RETRY
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 EXIT

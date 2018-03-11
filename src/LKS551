@@ -1,0 +1,152 @@
+0100 REM "LKS551 - 12/12/99 Program Utility - Replace Error Routine/Search & Replace
+0110 SETERR DT_ERR; SETESC DT_ERR
+0120 LET TERMS$=STBL("!TERMS")
+0130 GOSUB OPENPIPE
+0135 DIM SRCH$:"ARG1:C(1*=92),ARG2:C(1*=92),ARG3:C(1*=)"
+0140 LET L3=3,L2=L3-1; REM "First Line
+0150 PRINT 'SB',@(0,2),"Currently Processing:",'CE',
+0160 READ (1,END=0280)F2$
+0170 LET F4$="",F9$="Skipped: "
+0180 CLOSE (6); OPEN (6,ERR=0190)F2$; GOTO 0210
+0190 IF ERR=12 THEN LET F9$=F9$+"Deleted"; GOTO 0240
+0200 LET F9$=F9$+"Error "+STR(ERR); GOTO 0240
+0210 CALL "CDS087",6,"",F2$,F3$,F4$,F[ALL],F5$
+0220 IF POS(F3$="PGMPG4",3)=0
+:       THEN
+:          LET F9$=F9$+F3$
+:       ELSE
+:          IF F[6]<10
+:             THEN
+:                LET F9$=F9$+"Empty"
+:             ELSE
+:                LET F9$=""
+0230 IF LEN(F4$)>3+LEN(F2$)
+:       THEN
+:          IF F4$(1,LEN(F2$)+3)=F2$+" - "
+:             THEN
+:                LET F4$=F4$(LEN(F2$)+4)
+0240 IF Y.TERMID$(1,1)="T"
+:       THEN
+:          IF L2<20
+:             THEN
+:                LET L2=L2+1
+:             ELSE
+:                PRINT @(0,L3),'LD',
+0250 IF Y.TERMID$(1,1)="T"
+:       THEN
+:          PRINT @(0,L2),F2$," ",F4$(1,MIN(LEN(F4$),57-LEN(F2$))),@(59,L2),F9$,
+0260 IF LEN(F9$)=0 THEN GOSUB PROCESS
+0270 GOTO 0160
+0280 CALL "CDS069",0,0,0,0,"Processing completed-"
+0290 GOTO EOJ
+
+1000 PROCESS:
+1010 LET SND$="LOAD """+F5$+""""; GOSUB WRITEPIPE
+1020 IF RES$<>$0A$+"READY" THEN LET F9$="Unable to LOAD"; GOTO 1040
+1030 GOSUB SEARCH
+1040 PRINT @(59,L2),F9$,
+1050 IF RESERR THEN GOSUB OPENPIPE
+1060 RETURN
+
+1700 SEARCH:
+1710 LET U5=-1,MODIFIED=0,MATCHCOUNT=0,F9$="Unable to process"
+1720 CALL "CDS093",ERR=1800,Y$,6,F5$,BUF$,VBTBL$,L$,U5,"",LINETYP
+1730 IF L$="END" THEN GOTO 1790
+1740 LET L0=POS(" "=L$),L4$=L$,H=L0+1
+1750 LET G7=POS(""""=L4$(H))
+1760 IF G7
+:       THEN
+:          LET H=H+G7-1,G8=POS(""""=L4$(H+1));
+:          IF G8=0
+:             THEN
+:                LET L4$(H)=""
+:             ELSE
+:                LET L4$(H,G8+1)="",H=H+G8+1;
+:                GOTO 1750
+1770 GOSUB SEARCH_LINE
+1780 GOTO 1720
+1790 IF MODIFIED=0
+:       THEN
+:          LET F9$="No matches found";
+:          ERASE F5$
+:       ELSE
+:          LET F9$=STR(MATCHCOUNT)+" replacement(s)",SND$="SAVE";
+:          GOSUB WRITEPIPE;
+:          IF RES$<>F5$
+:             THEN
+:                LET F9$="Unable to save"
+1800 RETURN
+
+1900 SEARCH_LINE:
+1910 LET LINEMODIFIED=0
+1920 FOR SEQ=1 TO ARGCOUNT
+1930    LET ARGS$=DATA$[SEQ]
+1940    IF ARGS.TYPE$="2" AND LEN(L$(L0+1))>4 AND L$(L0+1,4)="REM "
+:          THEN
+:             GOTO 1990;
+:             REM "Bypass search on remarks if excluding text between quotes (even if no quote on remark)
+1950    IF ARGS.TYPE$="2" THEN LET L5$=L4$ ELSE LET L5$=L$
+1960    LET H=L0,SRCH$=ARGS.SEARCHARG$+FILL(MAX(0,2-POS("\"=ARGS.SEARCHARG$,1,0)),"\")
+1970    LET Z1=POS(SRCH.ARG1$=L5$(H))
+1980    IF Z1
+:          THEN
+:             LET LINEMODIFIED=1,MATCHCOUNT=MATCHCOUNT+1,H=H+Z1-1,SARGL=LEN(SRCH.ARG1$),VBLLEN=POS(",2))"=L5$(H+SARGL))-1;
+:             IF VBLLEN<=0 OR VBLLEN>10 OR POS(","=L5$(H+SARGL,VBLLEN)) OR POS("$"=L5$(H+SARGL,VBLLEN),1,0)<>1
+:                THEN
+:                   ESCAPE
+:                ELSE
+:                   LET ARGS.REPLACEARG$="$(str(19+("+L5$(H+SARGL,VBLLEN)+",2)<""90""))+",L5$=L5$(1,H-1)+ARGS.REPLACEARG$+L5$(H+SARGL),L$=L$(1,H-1)+ARGS.REPLACEARG$+L$(H+SARGL),L4$=L4$(1,H-1)+ARGS.REPLACEARG$+L4$(H+SARGL),H=H+LEN(ARGS.REPLACEARG$);
+:                   GOTO 1970
+1990 NEXT SEQ
+2000 IF LINEMODIFIED
+:       THEN
+:          LET MODIFIED=1,SND$=L$;
+:          GOSUB WRITEPIPE;
+:          IF LEN(RES$)
+:             THEN
+:                CALL "CDS069",0,0,0,0,'RB'+"Warning: "+RES$+" compiling line "+L$(1,L0-1)+"-"
+2010 RETURN
+
+2100 WRITEPIPE:
+2110 LET SND$=SND$+$0A$,SND=LEN(SND$)
+2120 WRITE RECORD(PIPE)SND$
+2130 GOSUB READPIPE
+2140 IF LEN(RES$)>=SND AND RES$(1,SND)=SND$ THEN LET RES$=RES$(SND+1)
+2150 LET RES=LEN(RES$)
+2160 IF RES AND RES$(RES)=$0A$ THEN LET RES=RES-1,RES$=RES$(1,RES)
+2170 RETURN
+
+2200 READPIPE:
+2210 LET RES$="",RESERR=1,Z$=STBL("!TERMS",">"+$00$)
+2220 READ (PIPE,TIM=10,ERR=2250)Z$
+2230 LET RES$=RES$+Z$,Z=LEN(RES$),RESERR=0
+2240 IF Z AND RES$(Z)<>$0A$ THEN LET RES$=RES$+">"; GOTO 2220
+2250 LET Z$=STBL("!TERMS",TERMS$)
+2260 RETURN
+
+2300 NEWPAGE:
+2310 CALL "CDS094",Y6$
+2320 LET P=P+1,L=Y6+3
+2330 PRINT (Y6.CH)@(Y.AT80),Y.COMPNAME$,'LF',Y.DATE$,@(20),"Program Utility - Replace Error Routine",@(72),"Page",P,'LF'
+2340 RETURN
+
+2400 OPENPIPE:
+2410 IF PIPE THEN CLOSE (PIPE)
+2420 LET PIPE=UNT
+2430 OPEN (PIPE)"|BBTERM=G0 "+ARGV(0)+" -c${BBXDIR}/config.bbx -m512"
+2440 GOSUB READPIPE
+2450 IF RESERR OR RES$<>$0A$+"READY"+$0A$
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Unable to open pipe to bbx-";
+:          GOTO EOJ
+2460 RETURN
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9005 CALL "CDS094",Y6$,"E"
+9010 CLEAR
+9020 RUN "CDS001"

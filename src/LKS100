@@ -1,0 +1,53 @@
+0100 REM "LKS100 - 01/09/90 COPY MBF CWRITE TAPE & CONVERT TO STRING FILES
+0110 IF TCB(15)<255 THEN START 255,"LK/LKS100"
+0120 BEGIN
+0130 PRINT 'CS',
+0140 LET A=SCALL("rm baker/*"); REM "clear directory
+0150 PRINT "rewind tape...",
+0160 LET A=SCALL("dd if=/dev/mt/ctape0 of=/dev/null > /dev/null");
+:    REM "REWIND TAPE
+0170 LET A=SCALL("dd if=/dev/mt/ctape4 of=/dev/null > /dev/null");
+:    REM "skip tape label
+0180 GOSUB 1000; REM "copy tape directory
+0190 STRING "baker/dir"
+0200 OPEN (2)"baker/dir"
+0210 GOSUB 1100; REM "convert directory file to dir
+0211 OPEN (3)"baker/dir"
+0212 READ RECORD(3,SIZ=160)A$; REM "skip directory header
+0213 READ RECORD(3,SIZ=80,END=0300)F$; REM "file name
+0214 LET F$=F$(1,POS($00$=F$)-1)
+0220 LET I=I+1
+0221 PRINT "File",I," ",F$
+0230 GOSUB 1000; REM "copy tape to disc
+0250 STRING "baker/"+F$
+0260 OPEN (2)"baker/"+F$
+0270 GOSUB 1100; REM "convert file 1 to file 2
+0275 PRINT ""
+0280 GOTO 0213
+
+0300 REM "JOB COMPLETE"
+0310 ESCAPE
+
+1000 REM "COPY TAPE TO DISC
+1020 LET A=SCALL("dd if=/dev/mt/ctape4 of=baker/tape")
+1030 IF A<0 THEN ESCAPE
+1040 RETURN
+
+1100 REM "CONVERT FILE 1 to 2
+1101 OPEN (1)"baker/tape"
+1102 READ RECORD(1,SIZ=27)HDR$; REM "skip header
+1104 READ RECORD(1,SIZ=2)L$; REM "length bytes
+1105 IF L$<>$0000$ THEN GOSUB 1109; GOTO 1104
+1106 CALL "CDS075",1
+1107 CLOSE (2)
+1108 RETURN
+
+1109 REM "READ
+1110 LET L0=DEC(L$)-2
+1120 READ RECORD(1,SIZ=L0)A$
+1130 WRITE RECORD(2)A$
+1140 LET A0=LEN(A$)
+1150 IF L0<>A0 THEN ESCAPE
+1160 IF A$(A0)=$0A$ OR A$(A0)=$0C$ THEN LET A0=A0-1
+1170 IF I>0 AND POS(" ">A$(1,A0))>0 THEN ESCAPE
+1180 RETURN

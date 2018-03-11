@@ -1,0 +1,13 @@
+0100 BEGIN
+0110 FOR I=0 TO 33
+0120    OPEN (1)"|lsattr -E -l tty"+STR(I)+" -a flow_disp"
+0122    READ (1)A$
+0124    CLOSE (1)
+0125    IF POS(" xon "=A$) THEN GOSUB RTS
+0130 NEXT I
+0140 ESCAPE
+
+1000 RTS:
+1010 PRINT I
+1020 LET A=SCALL("pdisable tty"+STR(I)+"; chdev -l tty"+STR(I)+" -a flow_disp=rts")
+1030 RETURN

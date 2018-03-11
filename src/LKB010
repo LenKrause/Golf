@@ -1,0 +1,11 @@
+0100 REM "LKB010 - Display memory usage
+0105 ?'cs',
+0110 LET free=java.lang.Runtime.getRuntime().freeMemory()
+0120 LET total=java.lang.Runtime.getRuntime().totalMemory()
+0140 LET max=java.lang.Runtime.getRuntime().maxMemory()
+0150 LET used=total-free,mask$="-###,###,##0"
+0160 DEF FNsm$(txt$,x)=pad(txt$,20,".")+": "+STR(x/1024000:"-#,###.0")
+0170 PRINT FNsm$("Maximum Memory",max)
+0180 PRINT FNsm$("Total Memory",total)
+0190 PRINT FNsm$("Memory in use",used)
+0200 PRINT FNsm$("Free memory",free)

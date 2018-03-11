@@ -1,0 +1,13 @@
+0100 REM "LKT111 - 12/29/06 Error 18 in call
+0110 ENTER COUNT
+0120 DIM REC$:"AMT:N(5)"
+0130 LET REC.AMT=1
+0135 INPUT 'LF',COUNT+0," ",PGM(-1)," ",PGM(-2)," ",*
+0140 IF COUNT<5
+:       THEN
+:          IF MOD(COUNT,2)
+:             THEN
+:                CALL "LKT111",COUNT+1
+:             ELSE
+:                CALL "LKT110",COUNT+1
+0150 EXIT

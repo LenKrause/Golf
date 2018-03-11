@@ -1,0 +1,194 @@
+0100 REM "LKS660 - 11/18/00 CONVERT MBF BOSS/IX CWRITE FORMAT FILES
+0110 REM "FILE 6 - PRINTER
+0140 LET FRDIR$="conv/"
+0141 CALL "CDS069",1,20,0,10,"+directory where files have been copied from tape+","A",0,FRDIR$
+0142 IF FRDIR$(LEN(FRDIR$))<>"/"
+:       THEN
+:          LET FRDIR$=FRDIR$+"/";
+:          PRINT @(0,10),FRDIR$,
+0143 IF CTL=4 THEN GOTO EOJ
+0150 LET TODIR$="XX/"
+0151 CALL "CDS069",1,20,0,11,"+directory where converted files will be stored+","A",0,TODIR$
+0152 IF TODIR$(LEN(TODIR$))<>"/"
+:       THEN
+:          LET TODIR$=TODIR$+"/";
+:          PRINT @(0,11),TODIR$
+0153 IF CTL=4 THEN GOTO EOJ
+0160 LET I=2; REM "I=0 IS LABEL, I=1 IS TAPE DIRECTORY
+0180 LET F$=FRDIR$+STR(I:"0000")
+0190 CALL "CDS095",ERR=0230,1,F$,"D"
+0200 READ RECORD(1,SIZ=4096)A$
+0202 GOSUB 1000; REM "PROCESS FILE
+0215 IF 0 THEN CALL "CDS075",1
+0220 LET I=I+1
+0225 GOTO 0180
+0230 CALL "CDS069",0,0,0,0,"JOB COMPLETED, HIT 'CR'"
+0240 GOTO EOJ
+
+1000 REM "PROCESS FILE
+1005 LET S0=DEC(A$(1,2))+1
+1020 LET D$=A$(5,POS($00$<>A$(5,6),-1))
+1021 IF A$(11,1)=$FF$
+:       THEN
+:          LET Z=28+(A$(12,1)=$02$ OR A$(12,1)=$03$),D$=D$+A$(Z,S0-Z)
+1027 LET D0$=CVS(D$,19)
+1030 PRINT I," ",D0$
+1040 IF D$<>D0$
+:       THEN
+:          PRINT (6)"File",I," ",D0$," Invalid character replaced in file name"
+1044 LET Z=POS("\"=D0$);
+:    IF Z
+:       THEN
+:          LET D0$(Z,1)="_";
+:          PRINT (6)"File",I," ",CVS(D$,16)," renamed to ",D0$;
+:          GOTO 1045
+1045 LET Z=POS("/"=D0$);
+:    IF Z
+:       THEN
+:          LET D0$(Z,1)="_";
+:          PRINT (6)"File",I," ",CVS(D$,16)," renamed to ",D0$;
+:          GOTO 1045
+1046 LET Z=POS(""""=D0$);
+:    IF Z
+:       THEN
+:          LET D0$(Z,1)="_";
+:          PRINT (6)"File",I," ",CVS(D$,16)," renamed to ",D0$;
+:          GOTO 1046
+1047 LET Z=POS(" "=D0$);
+:    IF Z
+:       THEN
+:          LET D0$(Z,1)="_";
+:          PRINT (6)"File",I," ",CVS(D$,16)," renamed to ",D0$;
+:          GOTO 1047
+1059 IF A$(12,1)=$01$
+:       THEN
+:          IF 1 OR POS(A$(25,2)=$1D0207010426$)
+:             THEN
+:                LET A$(12,1)=$04$;
+:                REM "don't know how to identify programs, they are coded as serial files, PROGRAMS MAY HAVE $1D02$ OR $0701$ or $0426$ IN (25,2)
+1060 IF POS(A$(12,1)=$0001020304$)=0 THEN ESCAPE; REM "UNKNOWN FILE TYPE"
+1070 LET F0=ASC(A$(12,1)),F2=DEC(A$(15,3)),F3=DEC(A$(18,2)),F1=ASC(A$(28,1)),F4=DEC(A$(20,3))
+1080 LET D0A$=TODIR$+D0$,SFX=0
+1090 ON F0 GOSUB 1200,1400,1700,1900,2100; REM "PROG
+1095 IF SFX
+:       THEN
+:          PRINT (6)"File",I," ",D0$," on tape more than once, renamed to ",D0$,".",STR(SFX)
+1100 RETURN
+
+1200 REM "INDEXED
+1210 INDEXED D0A$,F2,F3,ERR=2400
+1220 OPEN (2)D0A$
+1230 LOCK (2)
+1240 FOR L1=1 TO F2
+1250    IF S0+F3-1>LEN(A$) THEN GOSUB 2300; REM "READ
+1260    LET C0A$=A$(S0,F3),S0=S0+F3
+1270    WRITE RECORD(2)C0A$
+1280 NEXT L1
+1290 CLOSE (2)
+1300 RETURN
+
+1400 REM "SERIAL DEFINE
+1410 SERIAL D0A$,ERR=2400
+1420 IF F4 THEN GOSUB 1500
+1430 RETURN
+
+1500 REM "SERIAL PROCESS
+1510 OPEN (2)D0A$
+1520 LOCK (2)
+1530 FOR L1=1 TO F4
+1540    IF S0+2>LEN(A$) THEN GOSUB 2300; REM "READ
+1550    LET L0=DEC(A$(S0,2))
+1560    IF S0+L0-1>LEN(A$) THEN GOSUB 2300; REM "READ
+1570    LET C0A$=A$(S0+2,L0-2),S0=S0+L0
+1575    ESCAPE
+1580    IF 0 THEN IF C0A$(1,1)=$7F$ THEN PRINT (6)'FF',; LET C0A$=C0A$(2)
+1590    IF 0
+:          THEN
+:             LET Z=POS($1B1C$=C0A$);
+:             IF Z>0
+:                THEN
+:                   LET C0A$=C0A$(1,Z-1)+C0A$(Z+2);
+:                   PRINT (6)"File",I," ",D0$,"removed $1B1C$ from serial fileó"GOTO 1590
+1600    IF 0
+:          THEN
+:             LET Z=POS($1B2F$=C0A$);
+:             IF Z>0
+:                THEN
+:                   LET C0A$=C0A$(1,Z-1)+FILL(ASC(C0A$(Z+2,1))-Z-1)+C0A$(Z+3);
+:                   GOTO 1600
+1610    WRITE RECORD(2)C0A$
+1620 NEXT L1
+1630 CLOSE (2)
+1640 RETURN
+
+1700 REM "DIRECT DEFINE
+1710 IF 0 THEN DIRECT D0A$,F1,F2,F3,ERR=2400
+1711 MKEYED D0A$,F1,0,F3,ERR=2400
+1720 IF F4 THEN GOSUB 1800
+1730 RETURN
+
+1800 REM "DIRECT PROCESS
+1810 OPEN (2)D0A$
+1820 LOCK (2)
+1830 FOR L1=1 TO F4
+1840    IF S0+F1+F3-1>LEN(A$) THEN GOSUB 2300; REM "READ
+1850    LET K$=A$(S0,F1),C0A$=A$(S0+F1,F3),S0=S0+F1+F3
+1860    WRITE RECORD(2,KEY=K$)C0A$
+1870 NEXT L1
+1880 CLOSE (2)
+1890 RETURN
+
+1900 REM "SORT DEFINE
+1910 IF 0 THEN SORT D0A$,F1,F2,ERR=2400
+1911 MKEYED D0A$,F1,0,0,ERR=2400
+1920 IF F4 THEN GOSUB 2000
+1930 RETURN
+
+2000 REM "SORT PROCESS
+2010 OPEN (2)D0A$
+2020 LOCK (2)
+2030 FOR L1=1 TO F4
+2040    IF S0+F1-1>LEN(A$) THEN GOSUB 2300; REM "READ
+2050    LET K$=A$(S0,F1),S0=S0+F1
+2060    WRITE (2,KEY=K$)
+2070 NEXT L1
+2080 CLOSE (2)
+2090 RETURN
+
+2100 REM "PROG
+2102 PROGRAM D0A$,ERR=2400
+2105 LET A=SCALL("echo "+D0$+" >>"+FRDIR$+"pgmerrs")
+2110 OPEN (2)"|$BBXDIR/pro5cpl >"+D0A$+" 2>>"+FRDIR$+"pgmerrs"
+2140 FOR L1=1 TO F4
+2150    IF S0+1>LEN(A$) THEN GOSUB 2300; REM "READ
+2160    LET L0=DEC(A$(S0,2))
+2165    IF L0=0 THEN ESCAPE; REM "NO LENGTH
+2170    IF L0<1
+:          THEN
+:             PRINT (6)"File",I," ",D0$," invalid program statement length after line ",C0A$(1,5);
+:             EXITTO 2250
+2180    IF S0+L0-1>LEN(A$) THEN GOSUB 2300; REM "READ
+2190    LET C0$=A$(S0+2,L0-2)
+2200    LET C0A$=CVS(C0$,16)
+2210    IF C0$<>C0A$
+:          THEN
+:             PRINT (6)"File",I," ",D0$," Invalid characters replaced with blanks in line ",C0A$
+2220    WRITE (2)C0A$
+2230    LET S0=S0+L0
+2240 NEXT L1
+2260 CLOSE (2)
+2280 RETURN
+
+2300 REM "READ NEXT
+2310 LET A$=A$(S0),S0=1
+2320 READ RECORD(1,SIZ=4096)Z$
+2330 LET A$=A$+Z$,Z$=""
+2340 RETURN
+
+2400 REM "ERROR DEFINING FILE
+2410 IF ERR<>12 THEN ESCAPE; REM "ERROR DEFINING FILE
+2420 LET SFX=SFX+1,D0A$=TODIR$+D0$+"."+STR(SFX)
+2430 RETRY
+
+9000 EOJ:
+9010 RUN "CDS001"

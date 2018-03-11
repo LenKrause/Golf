@@ -1,0 +1,154 @@
+0100 REM "LKS300 - 05/24/95 Define AIX devices
+0110 BEGIN
+0120 LET TERM$="wy160",SA=2
+0130 PRINT 'SB',@(0,2),"Function:",'SF',
+0140 CALL "CDS069",1,4,11,2,"+option#+","0{|,2,,R,,Y}1Define 16 terminals for a 16 port concentrator|2Remove a terminal and configure a printer|3Remove a printer and configure a terminal|4Remove 16 terminals from a 16 port concentrator",OPT
+0150 IF CTL=4 THEN GOTO EOJ
+0160 ON OPT-1 GOSUB MKTERM16,TERMTOPTR,PTRTOTERM,RMTERM16
+0170 PRINT @(0,3),'CE',
+0180 GOTO 0140
+
+1000 MKTERM16:
+1010 PRINT 'SB',@(0,3),"Serial Adapter# (sa):",'LF',"Terminal type:",'SF',
+1020 CALL "CDS069",2,14,22,3,"+serial adapter (sa#)+","##",SA
+1030 IF CTL=4 THEN RETURN
+1040 CALL "CDS069",4,10,22,4,"+terminal type","A",0,TERM$
+1050 LET Z$="Y"; CALL "CDS069",1,1,0,0,"Is data correct (Y/N)+","AYN",0,Z$
+1060 IF CTL=4 THEN RETURN
+1070 IF Z$="N" THEN GOTO 1020
+1080 FOR I=0 TO 15
+1090    LET TTY=(SA-2)*16+I
+1100    GOSUB VBLS
+1110    GOSUB MKTERM
+1120 NEXT I
+1130 CALL "CDS069"
+1140 PRINT @(0,5),'CE',
+1150 LET SA=SA+1
+1160 GOTO 1020
+
+1200 RMTERM16:
+1210 PRINT 'SB',@(0,3),"Serial Adapter# (sa):",'SF',
+1220 CALL "CDS069",2,14,22,3,"+serial adapter (sa#)+","##",SA
+1230 IF CTL=4 THEN RETURN
+1240 LET Z$="Y"; CALL "CDS069",1,1,0,0,"Is data correct (Y/N)+","AYN",0,Z$
+1250 IF CTL=4 THEN RETURN
+1260 IF Z$="N" THEN GOTO 1220
+1270 FOR I=0 TO 15
+1280    LET TTY=(SA-2)*16+I
+1290    GOSUB VBLS
+1300    GOSUB RMTERM
+1310 NEXT I
+1320 CALL "CDS069"
+1330 PRINT @(0,5),'CE',
+1340 RETURN
+
+1400 TERMTOPTR:
+1410 PRINT 'SB',@(0,3),"tty number to convert to printer:",'SF',
+1420 CALL "CDS069",0,99,34,3,"+tty number to convert to printer port+","00",TTY
+1430 IF CTL=4 THEN RETURN
+1440 GOSUB VBLS
+1450 GOSUB RMTERM
+1460 IF A=0 THEN GOSUB MKPTR
+1470 IF A=0 THEN GOSUB MKSPOOLER
+1480 CALL "CDS069"
+1490 PRINT @(0,5),'CE',
+1500 LET TTY=TTY+1
+1510 GOTO 1420
+
+1600 PTRTOTERM:
+1610 PRINT 'SB',@(0,3),"printer number to convert to terminal:",'SF',
+1620 CALL "CDS069",0,99,34,3,"+printer number to convert to terminal+","00",TTY
+1630 IF CTL=4 THEN RETURN
+1640 GOSUB VBLS
+1650 GOSUB RMSPOOLER
+1660 IF A=0 THEN GOSUB RMPTR
+1670 IF A=0 THEN GOSUB MKTERM
+1680 CALL "CDS069"
+1690 PRINT @(0,5),'CE',
+1700 GOTO 1620
+
+1800 MKTERM:
+1810 LET A=SCALL("mkdev -l "+TTY$+" -c tty -t 'tty' -s 'rs232' -p sa"+STR(SA)+" -w "+STR(PORT)+" -a speed='38400' -a term="+TERM$+" -a onstr='' -a offstr='' -a altpin='enable' -a login='enable' -a runmodes='hupcl,cread,brkint,icrnl,opost,tab3,onlcr,isig,icanon,echo,echoe,echok,echoctl,echoke,imaxbel,iexten,clocal'")
+1820 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed making "+TTY$+" on serial adpater sa"+STR(SA)+" at port "+STR(PORT)+"-"
+1830 LET A=SCALL("cat "+TTY$+">>$SMSDIR/bin/startup.rts; sort < $SMSDIR/bin/startup.rts > $SMSDIR/tmp/startup.$$; mv $SMSDIR/tmp/startup.$$ $SMSDIR/bin/startup.rts")
+1840 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed adding terminal "+TTY$+" to rts list-";
+:          RETURN
+1850 RETURN
+
+1900 RMTERM:
+1910 LET A=SCALL("pdisable "+TTY$)
+1920 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed disabling "+TTY$+"-";
+:          RETURN
+1930 LET A=SCALL("rmdev -l "+TTY$+" -d")
+1940 IF A THEN CALL "CDS069",0,0,0,0,"Command failed removing "+TTY$+"-"; RETURN
+1950 RETURN
+
+2000 MKPTR:
+2010 LET A=SCALL("mkdev -l "+PTR$+" -c printer -t 'osp' -s 'rs232' -p sa"+STR(SA)+" -w "+STR(PORT)+" -a altpin='enable' -a speed='19200' -a xon='no' -a tbc='64' -a col='255' -a plot='yes'")
+2020 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed defining printer "+PTR$+"-";
+:          RETURN
+2030 LET A=SCALL("cat "+PTR$+">>$SMSDIR/bin/startup.dcdpace; sort < $SMSDIR/bin/startup.dcdpace > $SMSDIR/tmp/startup.$$; mv $SMSDIR/tmp/startup.$$ $SMSDIR/bin/startup.dcdpace")
+2040 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed adding printer "+PTR$+" to dcdpace list-";
+:          RETURN
+2050 LET A=SCALL("/usr/lbin/tty/stty-cxma dcdpace "+PTR$)
+2060 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed setting dcdpace for printer "+PTR$+"-";
+:          RETURN
+2070 RETURN
+
+2100 RMPTR:
+2110 LET A=SCALL("rmdev -l "+PTR$)
+2120 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed removing printer "+PTR$+"-";
+:          RETURN
+2130 LET A=SCALL("grep -v ^"+PTR$+" $SMSDIR/bin/startup.dcdpace > $SMSDIR/tmp/startup.$$; mv $SMSDIR/tmp/startup.$$ $SMSDIR/bin/startup.dcdpace")
+2140 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed removing printer "+PTR$+" from dcdpace list-";
+:          RETURN
+2150 RETURN
+
+2200 MKSPOOLER:
+2210 IF 0 THEN LET A=SCALL("mkvirprt -n "+PTR$+" -q "+PTR$+" -s asc -t printer")
+2211 LET A=SCALL("mkvirprt")
+2220 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed defining print queue "+PTR$+"-";
+:          RETURN
+2230 LET A=SCALL("chvirprt -d "+PTR$+" -q "+PTR$+" -a Z='!' d=p")
+2240 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed changing print queue "+PTR$+"-";
+:          RETURN
+2250 RETURN
+
+2300 RMSPOOLER:
+2310 LET A=SCALL("rmvirprt -d "+PTR$+" -q "+PTR$)
+2320 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Command failed removing print queue "+PTR$+"-";
+:          RETURN
+2330 RETURN
+
+2400 VBLS:
+2410 PRINT @(0,10),'CE',
+2420 LET PORT=MOD(TTY,16)
+2430 LET SA=INT(TTY/16)+2
+2440 LET TTY$="tty"+STR(TTY)
+2450 LET PTR$="lp"+STR(TTY:"00")
+2460 RETURN
+
+9000 EOJ:
+9010 RUN "CDS001"

@@ -1,0 +1,19 @@
+0100 REM "LKC200 - 08/25/01 Convert error 54 files using mrebuild
+0120 INPUT (0,ERR=0120)'CS',"Convert error 54 files using mrebuild",'LF',"Filesytem /u",U$:("2"=0130,"3"=0130,"4"=0130)
+0130 OPEN (1)"|find /u"+U$+" -print"
+0140 READ (1,END=0900)FIL$
+0145 IF POS("."<>FIL$)=0 THEN GOTO 0140
+0150 CLOSE (2); OPEN (2,ERR=0160)FIL$; GOTO 0140
+0160 IF ERR<>54
+:       THEN
+:          PRINT "Error",ERR," trying to open file ",FIL$," (File skipped)";
+:          GOTO 0140
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 IF TCB(13) THEN EXIT
+9020 RUN "CDS001"

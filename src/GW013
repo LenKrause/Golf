@@ -1,0 +1,253 @@
+0100 REM "GW013 - 05/30/17 Dynaweb Play Date Maintenance
+0110 SETESC DT_ERR; SETERR DT_ERR
+0120 CALL "CDS095",GR03,"XXGR03","YUY",GR03$
+0130 LET WEEKS=NUM(FIELD(CGI$,"WEEKS",ERR=0140)); IF WEEKS THEN GOSUB STORE
+0140 LET WKS$=FIELD(CGI$,"WKS",ERR=0150); GOSUB ADDWKS
+0150 GOSUB SETUP
+0160 GOTO EOJ
+
+1000 SETUP:
+1010 IF LEN(MSG$) THEN LET HTML$="<p class='msg'>"+MSG$
+1020 CALL "CDW000",ROW$,"dcs4",WASES.LEAGUENAME$
+1030 CALL "CDW000",TAB$,"r class='top'",ROW$
+1040 CALL "CDW000",ROW$,"dcs4","Play Date Maintenance"
+1050 CALL "CDW000",TAB$,"r class='title'",ROW$
+1060 LET YEAR$="",YEAR$=FIELD(CGI$,"YEAR",ERR=1070)
+1070 ON LEN(YEAR$)=4 GOSUB YEARINPUT,ANYDATES
+1080 CALL "CDW000",ROW$,"dcs4","[HOME] <input type='submit' value='Next'>"
+1090 CALL "CDW000",TAB$,"r class='foot'",ROW$
+1100 CALL "CDW000",HTML$,"tc","<form method='post' action='[DSN]?p=GW013'>"+TAB$+"</form>"
+1110 IF DATESCRIPT THEN GOSUB DATESCRIPT
+1120 RETURN
+
+1200 YEARINPUT:
+1210 LET YEAR=NUM(DATE(0:"%Yl")),YEAR$="<select name='year'>"+$0A$
+1220 LET YEAR$=FNO$(YEAR)
+1230 IF NUM(DATE(0:"%M"))>9 THEN LET YEAR$=FNO$(YEAR+1)
+1240 LET YEAR=YEAR-1
+1250 READ (GR03,KNUM=0,KEY=WASES.LEAGUE$+BIN(JUL(YEAR,12,31),3),DIR=0,DOM=1260)
+1260 READ RECORD(GR03,END=1310)GR03$
+1270 IF GR03.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 1310
+1280 LET Y=NUM(DATE(GR03.DATE:"%Yl"))
+1290 IF Y<=YEAR THEN LET YEAR$=FNO$(Y),YEAR=Y-1
+1300 GOTO 1260
+1310 LET YEAR$=YEAR$+"</select>"
+1320 CALL "CDW000",ROW$,"dr","Year"
+1330 CALL "CDW000",ROW$,"ds3",YEAR$
+1340 CALL "CDW000",TAB$,"r",ROW$
+1350 RETURN
+
+1400 ANYDATES:
+1410 LET WEEKS=0
+1420 READ (GR03,KNUM=1,KEY=WASES.LEAGUE$+BIN(JUL(NUM(YEAR$),1,1),3),DIR=0,DOM=1430)
+1430 LET K$=KEY(GR03,END=1580)
+1435 IF K$(1,3)<>WASES.LEAGUE$ THEN GOTO 1580
+1440 READ RECORD(GR03)GR03$
+1450 IF DATE(GR03.DATE:"%Yl")<>YEAR$ THEN GOTO 1580
+1460 LET WEEKS=WEEKS+1
+1470 IF WEEKS=1
+:       THEN
+:          CALL "CDW000",ROW$,"dc","Date";
+:          CALL "CDW000",ROW$,"dc","Nine";
+:          CALL "CDW000",ROW$,"dc","Half";
+:          CALL "CDW000",ROW$,"dc","Scores";
+:          CALL "CDW000",TAB$,"r class='foot'",ROW$
+1480 CALL "CDW000",ROW$,"dc",DATE(GR03.DATE:"%Ds %Mz/%Dz/%Yz")+"<input type='hidden' name='DATE"+STR(WEEKS)+"' value='"+STR(GR03.DATE)+"'>"
+1490 IF GR03.NINE$="F"
+:       THEN
+:          LET FRONT$="Checked",BACK$=""
+:       ELSE
+:          LET FRONT$="",BACK$="Checked"
+1500 CALL "CDW000",ROW$,"dc","<input type='radio' name='NINE"+STR(WEEKS)+"' value='F' "+FRONT$+">Front &nbsp;&nbsp;<input type='radio' name='NINE"+STR(WEEKS)+"' value='B' "+BACK$+">Back"
+1505 LET FIRST$="",SECOND$="",TOURN$="",RAIN$=""
+1510 IF GR03.HALF=1
+:       THEN
+:          LET FIRST$="Checked"
+:       ELSE
+:          IF GR03.HALF=2
+:             THEN
+:                LET SECOND$="Checked"
+:             ELSE
+:                IF GR03.HALF=0
+:                   THEN
+:                      LET TOURN$="Checked"
+:                   ELSE
+:                      LET RAIN$="Checked"
+1520 CALL "CDW000",ROW$,"dc","<input type='radio' name='HALF"+STR(WEEKS)+"' value='1' "+FIRST$+">First &nbsp;&nbsp;<input type='radio' name='HALF"+STR(WEEKS)+"' value='2' "+SECOND$+">Second &nbsp;&nbsp;<input type='radio' name ='HALF"+STR(WEEKS)+"' value='0' "+TOURN$+">Tournament &nbsp;&nbsp;<input type='radio' name ='HALF"+STR(WEEKS)+"' value='3' "+RAIN$+">Rain Out"
+1530 CALL "SW404",Y$,"XXGR05",GR05$,"GR05.LEAGUE$="""+GR03.LEAGUE$+""" AND GR05.DATE$=$"+HTA(GR03.DATE$)+"$ AND GR05.SCORE",SCORES;
+:    REM CALL "SW004","XXGR05",1,GR03.LEAGUE$+GR03.DATE$,SCORES
+1540 IF SCORES
+:       THEN
+:          LET SCORES$=STR(SCORES)
+:       ELSE
+:          LET SCORES$="<input type='checkbox' name='DEL"+STR(WEEKS)+"' value='D'>Delete"
+1550 CALL "CDW000",ROW$,"dc",SCORES$
+1560 CALL "CDW000",TAB$,"r",ROW$
+1570 GOTO 1430
+1580 ON WEEKS GOSUB NEWYEAR,NEWWEEK
+1590 LET TAB$=TAB$+"<input type='hidden' name='weeks' value='"+STR(WEEKS)+"'>"
+1600 RETURN
+
+1700 NEWWEEK:
+1710 CALL "CDS265",S265$
+1720 LET WEEKS=WEEKS+1,EXC$="",DOW$=DATE(GR03.DATE:"%Ds")
+1730 FOR I=0 TO 6
+1740    IF S265.DAYS$[I+1]<>DOW$ THEN LET EXC$=EXC$+","+STR(I)
+1750 NEXT I
+1760 CALL "CDW000",ROW$,"dc",FND$("DATE"+STR(WEEKS),"",EXC$(2))
+1770 CALL "CDW000",ROW$,"dc","<input type='radio' name='NINE"+STR(WEEKS)+"' value='F'>Front &nbsp;&nbsp;<input type='radio' name='NINE"+STR(WEEKS)+"' value='B'>Back"
+1780 CALL "CDW000",ROW$,"dc","<input type='radio' name='HALF"+STR(WEEKS)+"' value='1'>First &nbsp;&nbsp;<input type='radio' name='HALF"+STR(WEEKS)+"' value='2'>Second &nbsp;&nbsp;<input type ='radio' name='HALF"+STR(WEEKS)+"' value='0'>Tournament"
+1790 CALL "CDW000",ROW$,"d",""
+1800 CALL "CDW000",TAB$,"r",ROW$
+1810 RETURN
+
+1900 NEWYEAR:
+1910 CALL "CDW000",ROW$,"dr","Year"
+1920 CALL "CDW000",ROW$,"ds3",YEAR$
+1930 CALL "CDW000",TAB$,"r",ROW$
+1940 CALL "CDW000",ROW$,"dr","Day of Week"
+1950 CALL "CDS265",S265$
+1960 LET DOW=0,DOW=NUM(FIELD(CGI$,"DOW",ERR=1970))
+1970 IF DOW
+:       THEN
+:          LET DOW$=S265.DAYL$[DOW]+"<input type='hidden' name='DOW' value='"+STR(DOW)+"'>"
+:       ELSE
+:          GOSUB DOWINPUT
+1980 LET DOW$=DOW$+"<input type='hidden' name='YEAR' value='"+YEAR$+"'>"
+1990 CALL "CDW000",ROW$,"d",DOW$
+2000 CALL "CDW000",TAB$,"r",ROW$
+2010 IF DOW THEN GOSUB FIRSTPLAY
+2020 RETURN
+
+2100 DOWINPUT:
+2110 DIM DOW$[1:7]
+2120 READ (GR03,KNUM=0,KEY=WASES.LEAGUE$+$FF$,DOM=2130)
+2130 READ RECORD(GR03,END=2150)GR03$
+2140 IF GR03.LEAGUE$=WASES.LEAGUE$
+:       THEN
+:          LET LDOW$=DATE(GR03.DATE:"%Ds");
+:          LET I=1;
+:          WHILE LDOW$<>S265.DAYS$[I];
+:             LET I=I+1;
+:          WEND;
+:          LET DOW$[I]=" checked"
+2150 FOR I=1 TO 7
+2160    LET DOW$=DOW$+"<br><input type='radio' name='DOW' value='"+STR(I)+"'"+DOW$[I]+">"+S265.DAYL$[I]+$0A$
+2170 NEXT I
+2180 RETURN
+
+2200 FIRSTPLAY:
+2210 CALL "CDW000",ROW$,"dr","First Date of Play"
+2220 LET EXC$=""
+2230 FOR I=0 TO 6
+2240    IF I+1<>DOW THEN LET EXC$=EXC$+","+STR(I)
+2250 NEXT I
+2260 CALL "CDW000",ROW$,"d",FND$("FIRSTPLAY","",EXC$(2))
+2270 CALL "CDW000",TAB$,"r",ROW$
+2280 CALL "CDW000",ROW$,"dr","Number of Weeks"
+2290 CALL "CDW000",ROW$,"d","<input type='text' name='WKS' value='20' size='2' maxlength='2'>"
+2300 CALL "CDW000",TAB$,"r",ROW$
+2310 CALL "CDW000",ROW$,"dr","Nine"
+2320 CALL "CDW000",ROW$,"d","<input type='radio' name='NINE' value='F'>Front<br><input type='radio' name='NINE' value='B'>Back"
+2330 CALL "CDW000",TAB$,"r",ROW$
+2340 RETURN
+
+2400 ADDWKS:
+2410 LET WKS=0,WKS=NUM(WKS$,ERR=2420)
+2420 IF WKS>52 OR FPT(WKS) OR WKS<2
+:       THEN
+:          LET MSG$="Invalid number of weeks.";
+:          GOTO MSG
+2430 LET FPD$="",FPD$=FIELD(CGI$,"FIRSTPLAY",ERR=2440)
+2440 IF LEN(FPD$)=0 THEN LET MSG$="Specify First Play Date."; GOTO MSG
+2450 CALL "CDW055",FPD$,DAT$[ALL]
+2455 IF LEN(DAT$[2])=0 THEN LET MSG$="Invalid First Play Date."; GOTO MSG
+2460 IF DATE(NUM(DAT$[2]):"%Yl")<>CGI.YEAR$
+:       THEN
+:          LET MSG$="First Play Date is not in "+CGI.YEAR$+".";
+:          GOTO MSG
+2461 LET DOW=NUM(CGI.DOW$,ERR=2462)
+2462 LET DOWS$="SunMonTueWedThuFriSat"
+2463 LET DOW$=DATE(NUM(DAT$[2]):"%Ds")
+2464 IF DOW$<>DOWS$(3*(DOW-1)+1,3)
+:       THEN
+:          LET MSG$="First Play Date is a "+DOW$+".";
+:          GOTO MSG
+2465 LET NINE$="",NINE$=FIELD(CGI$,"NINE",ERR=2466)
+2466 IF POS(NINE$="FB")=0
+:       THEN
+:          LET MSG$="Please indicate if you will be playing the Front or Back nine in the first week";
+:          GOTO MSG
+2470 LET HALF=1,DATE=NUM(DAT$[2])
+2480 FOR WK=1 TO WKS
+2490    DIM GR03$:FATTR(GR03$)
+2500    LET GR03.LEAGUE$=WASES.LEAGUE$
+2510    LET GR03.DATE=DATE
+2520    LET GR03.NINE$=CGI.NINE$
+2530    LET GR03.HALF=HALF
+2540    WRITE RECORD(GR03)GR03$
+2550    IF WK>=WKS/2 THEN LET HALF=2
+2560    IF CGI.NINE$="F" THEN LET CGI.NINE$="B" ELSE LET CGI.NINE$="F"
+2570    LET DATE=DATE+7
+2580 NEXT WK
+2590 RETURN
+
+2600 STORE:
+2610 FOR WEEK=1 TO WEEKS
+2620    LET WK$=STR(WEEK)
+2630    DIM GR03$:FATTR(GR03$)
+2640    LET GR03.LEAGUE$=WASES.LEAGUE$
+2650    LET DATE$=FIELD(CGI$,"DATE"+WK$)
+2655    IF LEN(DATE$)=0 THEN CONTINUE; REM "Row for new date not added
+2660    IF LEN(DATE$)=8 THEN CALL "CDS055",DATE$,DAT$[ALL]; LET DATE$=DAT$[2]
+2670    LET GR03.DATE=NUM(DATE$)
+2680    LET DEL$="",DEL$=FIELD(CGI$,"DEL"+WK$,ERR=2690)
+2690    IF DEL$="D"
+:          THEN
+:             CALL "CDS273",Y$,"XXGR05",1,GR03.LEAGUE$+GR03.DATE$;
+:             CALL "CDS273",Y$,"XXGR03",0,GR03.LEAGUE$+GR03.DATE$;
+:             CONTINUE
+2700    LET GR03.NINE$="",GR03.NINE$=FIELD(CGI$,"NINE"+WK$,ERR=2710)
+2710    IF POS(GR03.NINE$="FB")=0
+:          THEN
+:             LET MSG$="Specify Nine for "+DATE(GR03.DATE)+".";
+:             GOTO MSG
+2720    LET GR03.HALF$="",GR03.HALF$=FIELD(CGI$,"HALF"+WK$,ERR=2730)
+2730    IF POS(GR03.HALF$="1203")=0
+:          THEN
+:             LET MSG$="Specify Half for "+DATE(GR03.DATE)+".";
+:             GOTO MSG
+2740    WRITE RECORD(GR03)GR03$
+2750 NEXT WEEK
+2760 RETURN
+
+2800 DATESCRIPT:
+2810 LET HEAD$="",HEAD$=STBL("$otherhead",ERR=2820)
+2820 LET HEAD$=FNT$("<script type='text/JavaScript' src='/scripts/datepicker/jquery.js'></script>")
+2830 LET HEAD$=FNT$("<script type='text/JavaScript' src='/scripts/datepicker/zebra_datepicker.js'></script>")
+2840 LET HEAD$=FNT$("<link rel='stylesheet' href='/scripts/datepicker/zebra_datepicker.css' type='text/css'>")
+2850 LET TMP$=STBL("$otherhead",HEAD$)
+2860 RETURN
+
+2900 FUNCTIONS:
+2910 DEF FNO$(YR)=YEAR$+"<option value='"+STR(YR)+"'>"+STR(YR)+"</option>"+$0A$
+2920 DEF FND$(FLDNAM$,DOPTS$,DISABLED$)
+2930 LET DATESCRIPT=1
+2940 RETURN "<input class='datepicker' type='text' size='8' id='"+FLDNAM$+"' name='"+FLDNAM$+"'><script>$(document).ready(function() {$('#"+FLDNAM$+"').Zebra_DatePicker({"+DOPTS$+"inside:false,disabled_dates:['* * * "+DISABLED$+"'],format:'m/d/y',first_day_of_week:0});});</script>"
+2950 FNEND
+
+2960 DEF FNT$(TX$)=HEAD$+TX$+$0A$
+2970 RETURN
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+8100 MSG:
+8110 LET HTML$="<script>alert('"+MSG$+"');window.history.back(-1)</script>"
+8120 GOTO EOJ
+
+9000 EOJ:
+9010 IF TCB(13) THEN EXIT
+9020 RUN "CDW999"

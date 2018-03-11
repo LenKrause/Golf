@@ -1,0 +1,55 @@
+0100 REM "LKS640 - 11/18/00 COPY BOSS/IX CWRITE TAPE CARTRIDGE TO DISK
+0110 BEGIN
+0120 CALL "CDS069",0,0,0,0,"Insert tape cartridge in drive-+"
+0130 IF CTL=4 THEN GOTO EOJ
+0150 LET DIR$="conv/",DIR$=STBL("LKS640",ERR=0160)
+0160 CALL "CDS069",1,20,0,0,"+empty directory where files are to be copied+","A",0,DIR$
+0170 IF CTL=4 THEN GOTO EOJ
+0180 CALL "CDS095",ERR=0150,1,DIR$,"Y"
+0190 CLOSE (1)
+0195 IF DIR$(LEN(DIR$))<>"/" THEN LET DIR$=DIR$+"/"
+0200 OPEN (1)"|ls "+DIR$+" | wc -l"
+0201 READ (1,ERR=0150)A
+0202 IF A<>0 THEN CALL "CDS069",0,0,0,0,"Directory not empty-"; GOTO 0150
+0203 GOSUB 1000; REM "REWIND
+0204 LET TMP$=STBL("LKS640",DIR$)
+0210 LET F$=DIR$+STR(I:"0000")
+0220 PRINT "File",I
+0230 LET A=SCALL("dd if=/dev/rmt1.5 of="+F$+" >/dev/null 2>/dev/null")
+0240 IF A THEN ESCAPE; REM "Unable to execute dd command
+0250 CALL "CDS095",1,F$
+0260 DIM F[9]; CALL "CDS087",1,"","","","",F[ALL]
+0265 IF I=0 THEN GOSUB LABEL; IF Z$="N" THEN PRINT 'CS',; GOTO 0110
+0270 IF F[5] THEN PRINT F[5]; LET I=I+1; GOTO 0210
+0280 GOSUB REWIND
+0290 CALL "CDS069",0,0,0,0,"Copy completed-"
+0300 GOTO EOJ
+
+1000 REWIND:
+1005 PRINT @(0,23),"Rewinding...",
+1010 LET A=SCALL("tctl -f/dev/rmt1 rewind")
+1011 IF A
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Error rewinding tape, exit code "+STR(A)+"-";
+:          GOTO EOJ
+1015 PRINT @(0,23),'CL','RS',
+1020 RETURN
+
+1100 LABEL:
+1110 READ RECORD(1,SIZ=96)LAB$
+1115 CALL "CDS075",1
+1120 IF LEN(LAB$)<96 OR LAB$(1,4)<>"VOL "
+:       THEN
+:          CALL "CDS069",0,0,0,0,"Invalid label on tape-";
+:          GOTO EOJ
+1130 IF LAB$(6,1)<>"2"
+:       THEN
+:          CALL "CDS069",0,0,0,0,"This tape was not made using cwrite-";
+:          GOTO EOJ
+1140 PRINT 'SB',@(0,3),"Tape Set Name:",@(0,4),"Tape ID:",@(0,5),"Sequence#:",@(0,6),"Date first labelled:",@(0,7),"Date last written:",@(0,8),"Time written:",'SF',@(21,3),LAB$(7,8),@(21,4),LAB$(15,8),@(21,5),LAB$(23,2),@(21,6),FND$(37),@(21,7),FND$(43),@(21,8),LAB$(49,4),
+1150 LET Z$="Y"; CALL "CDS069",1,1,0,0,"Process this tape (Y/N)","AYN",0,Z$
+1160 RETURN
+2000 DEF FND$(Z)=LAB$(Z,2)+"/"+LAB$(Z+2,2)+"/"+LAB$(Z+4,2)
+
+9000 EOJ:
+9010 RUN "CDS001"

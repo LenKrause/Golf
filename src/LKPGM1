@@ -1,0 +1,6 @@
+0100 REM "LKPGM1 - 05/27/95 Test array argument passing
+0110 DIM ARRAY$[1:10](3,"abc")
+0120 CALL "LK/LKPGM2",ARRAY$[ALL]
+0130 FOR I=1 TO 10
+0140    PRINT I," ",ARRAY$[I]
+0150 NEXT I

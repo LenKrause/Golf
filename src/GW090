@@ -1,0 +1,96 @@
+0100 REM "GW090 - 05/04/14 Courses
+0110 SETESC DT_ERR; SETERR DT_ERR
+0120 CALL "CDS095",GR08,"XXGR08","YNY",GR08$,GR08K$
+0140 LET RECS=NUM(FIELD(CGI$,"RECS",ERR=0145)); GOSUB SAVE
+0150 CALL "CDW000",ROW$,"dcs8",WASES.LEAGUENAME$
+0160 CALL "CDW000",TAB$,"r class='top'",ROW$
+0170 CALL "CDW000",ROW$,"dcs8","Courses"
+0180 CALL "CDW000",TAB$,"r class='title'",ROW$
+0190 CALL "CDW000",ROW$,"dc","ID"
+0210 CALL "CDW000",ROW$,"d","Course"
+0220 CALL "CDW000",ROW$,"d","Address"
+0222 CALL "CDW000",ROW$,"d","City"
+0224 CALL "CDW000",ROW$,"d","State"
+0226 CALL "CDW000",ROW$,"d","Zip"
+0228 CALL "CDW000",ROW$,"d","Phone"
+0230 CALL "CDW000",ROW$,"d","Web Site"
+0260 CALL "CDW000",TAB$,"r class='head'",ROW$
+0270 LET IND=0
+0280 READ (GR08,KNUM=0,KEY="",DOM=0290)
+0290 READ RECORD(GR08,END=0480)GR08$
+0310 LET IND=IND+1,IND$=STR(IND)
+0330 CALL "CDW000",ROW$,"dc",FNI$("ID")
+0350 CALL "CDW000",ROW$,"d",FNI$("NAME")
+0360 CALL "CDW000",ROW$,"d",FNI$("ADDRESS")
+0362 CALL "CDW000",ROW$,"d",FNI$("CITY")
+0364 CALL "CDW000",ROW$,"d",FNI$("STATE")
+0366 CALL "CDW000",ROW$,"d",FNI$("ZIP")
+0368 CALL "CDW000",ROW$,"d",FNI$("PHONE")
+0370 CALL "CDW000",ROW$,"d",FNI$("URL")
+0460 CALL "CDW000",TAB$,"r",ROW$
+0470 GOTO 0290
+0480 IF NEW<5 THEN LET NEW=NEW+1; DIM GR08$:FATTR(GR08$); GOTO 0310
+0490 CALL "CDW000",ROW$,"dcs8","[HOME] <input type='submit' value='Save Changes'>"
+0500 CALL "CDW000",TAB$,"r",ROW$
+0510 CALL "CDW000",HTML$,"tc",TAB$
+0520 LET HTML$=HTML$+"<input type='hidden' name='recs' value="+IND$+">"
+0530 LET HTML$="<form method='post' action='[DSN]?p=GW090'>"+HTML$+"</form>"
+0540 IF LEN(MSG$) THEN LET HTML$="<p class='msg'>"+MSG$+"</p>"+HTML$
+0550 GOTO EOJ
+
+1000 SAVE:
+1010 FOR IND=1 TO RECS
+1015    LET IND$=STR(IND)
+1020    LET ID$=PAD(FNF$("ID"),3)
+1025    LET Z=POS(ID$=IDL$,3)
+1030    IF POS(" "<>ID$) AND Z
+:          THEN
+:             LET HTML$="<script>alert('Duplicate Course ID of "+ID$+"');window.history.back(-1)</script>";
+:             GOTO EOJ
+1032    LET IDL$=IDL$+ID$
+1033 NEXT IND
+1135 CALL "CDS273",Y$,"XXGR08",0,WASES.LEAGUE$; REM "Delete all
+1140 FOR IND=1 TO RECS
+1150    LET IND$=STR(IND)
+1160    DIM GR08$:FATTR(GR08$)
+1180    IF POS(" "<>FNF$("ID")) AND POS(" "<>FNF$("NAME"))
+:          THEN
+:             LET GR08.ID$=FNF$("ID"),GR08.NAME$=FNF$("NAME"),GR08.ADDRESS$=FNF$("ADDRESS"),GR08.CITY$=FNF$("CITY"),GR08.STATE$=FNF$("STATE"),GR08.ZIP$=FNF$("ZIP"),GR08.PHONE$=FNF$("PHONE"),GR08.URL$=FNF$("URL");
+:             WRITE RECORD(GR08)GR08$
+1260 NEXT IND
+1270 RETURN
+
+1400 FUNCTIONS:
+1410 DEF FNB$(FLD$)=B$+FLD$+IND$+"|"
+1420 DEF FNF$(FLD$)
+1430 LET VAL$="",VAL$=FIELD(CGI$,FLD$+IND$,ERR=1440)
+1440 RETURN VAL$
+1450 FNEND
+
+1460 DEF FNI$(VBL$)
+1470 LET VAL$=FIELD(GR08$,VBL$),LGTH$=STR(LEN(VAL$))
+1480 IF POS(VBL$+IND$+"|"=B$)
+:       THEN
+:          LET OPT$=" style='background-color:#ffcccc' value='"+FNF$(VBL$)+"'"
+:       ELSE
+:          LET OPT$=" value='"+CVS(VAL$,2)+"'"
+1490 RETURN "<input type='text' name='"+VBL$+IND$+"' size="+LGTH$+" maxlength="+LGTH$+OPT$+">"
+1500 FNEND
+
+2900 FUNCTIONS:
+2910 DEF FNO$(YR)=YEAR$+"<option value='"+STR(YR)+"'>"+STR(YR)+"</option>"+$0A$
+2920 DEF FND$(FLDNAM$,DOPTS$,VAL$)
+2930 LET DATESCRIPT=1
+2940 RETURN "<input class='datepicker' type='text' size='11' id='"+FLDNAM$+"' name='"+FLDNAM$+"', value='"+VAL$+"'><script>$(document).ready(function() {$('#"+FLDNAM$+"').Zebra_DatePicker({"+DOPTS$+"inside:false,format:'m/d/y',first_day_of_week:0});});</script>"
+2950 FNEND
+
+2960 DEF FNT$(TX$)=HEAD$+TX$+$0A$
+2970 RETURN
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 RUN "CDW999"

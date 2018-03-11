@@ -1,0 +1,40 @@
+0100 REM "LKTST1 - 02/04/04 Test Melissa Data address verification
+0110 BEGIN
+0130 LET OUT$="<?xml version=""1.0""?>"
+0140 LET OUT$=OUT$+"<RecordSet>"
+0150 LET OUT$=OUT$+"<CustomerID>102251307</CustomerID>"
+0160 LET OUT$=OUT$+"<Record>"
+0170 LET OUT$=OUT$+"<FullName>NCDS</FullName>"
+0180 LET OUT$=OUT$+"<Address>7550 Lucerne Drive Suite #405</Address>"
+0190 LET OUT$=OUT$+"<City>Middleburg Heights</City>"
+0200 LET OUT$=OUT$+"<State>OH</State>"
+0210 LET OUT$=OUT$+"<Zip>44130</Zip>"
+0211 LET OUT$=OUT$+"<Plus4/>"
+0212 LET OUT$=OUT$+"<AddressErrorCode/>"
+0213 LET OUT$=OUT$+"<AddressErrorString/>"
+0214 LET OUT$=OUT$+"<CarrierRoute/>"
+0215 LET OUT$=OUT$+"<DeliveryPointCode/>"
+0216 LET OUT$=OUT$+"<CountyFips/>"
+0220 LET OUT$=OUT$+"</Record>"
+0230 LET OUT$=OUT$+"<ErrorString/>"
+0240 LET OUT$=OUT$+"</RecordSet>"
+0242 OPEN (1)"|curl -q -v -T - -X POST -m 10 --trace-ascii /tmp/lek4 -H ""Transfer-Encoding:"" -H ""Content-Type: text/xml"" -H ""Content-Length: "+STR(LEN(OUT$)+1)+""" https://xml.melissadata.com/xml.asp"
+0245 WRITE (1,IND=0)OUT$
+0247 DIM REC$[100]
+0250 READ (1,END=0300)A$
+0260 LET RECS=RECS+1,REC$[RECS]=A$
+0280 GOTO 0250
+0300 CLOSE (1)
+0305 FOR I=1 TO RECS
+0306    PRINT 'LF',I,'LF',REC$[I]
+0307 NEXT I
+0310 ESCAPE
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 IF TCB(13) THEN EXIT
+9020 RUN "CDS001"

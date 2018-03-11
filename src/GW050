@@ -1,0 +1,58 @@
+0100 REM "GW050 - 07/13/14 Golf Select Year and Half for Point Ranking
+0110 SETESC DT_ERR; SETERR DT_ERR
+0120 CALL "CDS095",GR03,"XXGR03","YNY",GR03$
+0130 CALL "CDW000",ROW$,"ds3",WASES.LEAGUENAME$
+0140 CALL "CDW000",TAB$,"r class='top'",ROW$
+0150 CALL "CDW000",ROW$,"dcs3","Point Ranking"
+0160 CALL "CDW000",TAB$,"r class='title'",ROW$
+0170 READ (GR03,KNUM=0,KEY=WASES.LEAGUE$+$FF$,DOM=0180)
+0180 READ RECORD(GR03,END=0230)GR03$
+0190 IF GR03.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0230
+0200 LET YR$=DATE(GR03.DATE:"%Yl")
+0210 IF POS(YR$=YRS$,4)=0
+:       THEN
+:          CALL "SW404",Y$,"XXGR05",GR05$,"GR05.LEAGUE$="""+WASES.LEAGUE$+""" AND GR05.DATE="+STR(GR03.DATE)+" AND GR05.SCORE",RECS,1;
+:          IF RECS
+:             THEN
+:                LET YRS$=YRS$+YR$
+0220 GOTO 0180
+0230 IF LEN(YRS$)
+:       THEN
+:          GOSUB PROCESS
+:       ELSE
+:          LET MSG$="No Data Available";
+:          RUN "GW011"
+0235 LET HTML$="<form method='post' action='[DSN]?p=GW051'>"
+0240 CALL "CDW000",ROW$,"dcs3","<input type='submit' value='Submit'>[HOME]"
+0250 CALL "CDW000",TAB$,"r class='foot'",ROW$
+0260 CALL "CDW000",HTML$,"tc",TAB$
+0270 GOTO EOJ
+
+1000 PROCESS:
+1010 CALL "CDW000",ROW$,"dr","Period"
+1020 CALL "CDW000",ROW$,"d","<input type='radio' name='period' value='1' checked>1st half<br><input type='radio' name='period' value='2'>2nd half<br><input type='radio' name='period' value='3'>Entire year"
+1030 CALL "CDW000",TAB$,"r",ROW$
+1040 CALL "CDW000",ROW$,"dr","Format"
+1050 CALL "CDW000",ROW$,"d","<input type='radio' name='format' value='P' checked>PDF<br><input type='radio' name='format' value='E'>Email"
+1060 CALL "CDW000",TAB$,"r",ROW$
+1070 CALL "CDW000",ROW$,"dr","Drop round<br>with lowest points"
+1080 CALL "CDW000",ROW$,"d","<input type='radio' name='drop' value='Y' checked>Yes<br><input type='radio' name='drop' value='N'>No"
+1090 CALL "CDW000",TAB$,"r",ROW$
+1100 CALL "CDW000",ROW$,"dcs2","Year"
+1110 CALL "CDW000",TAB$,"r class='head'",ROW$
+1115 LET CHECKED$=" checked"
+1120 FOR I=1 TO LEN(YRS$) STEP 4
+1130    CALL "CDW000",ROW$,"dcs2","<input type='radio' name='year' value='"+YRS$(I,4)+"'"+CHECKED$+">"+YRS$(I,4)
+1135    LET CHECKED$=""
+1140    CALL "CDW000",TAB$,"r",ROW$
+1150 NEXT I
+1160 RETURN
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 IF TCB(13) THEN EXIT
+9020 RUN "CDW999"

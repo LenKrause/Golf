@@ -1,0 +1,41 @@
+0100 REM "GW046 - 05/04/14 HTML for Putts and Points Entry
+0110 SETESC DT_ERR; SETERR DT_ERR
+0120 ENTER Y$,GR05$,GW046$
+0130 IF GR05.SCORE THEN LET SCORE$=STR(GR05.SCORE)
+0140 LET GW046.SCORE$="<input type='text' size='2' maxlength='2' value='"+SCORE$+"' "+FNSTYLE$("score","","if (document.form1.score"+GR05.ID$+".value.length == 0) {document.form1.net"+GR05.ID$+".value=""""; document.form1.putts"+GR05.ID$+".value=""""; document.form1.points"+GR05.ID$+".value="""";} else {if (numrange(this,30,79)) {document.form1.net"+GR05.ID$+".value=eval(document.form1.score"+GR05.ID$+".value-"+STR(GR05.HC)+")}}")
+0150 IF GR05.NET THEN LET NET$=STR(GR05.NET)
+0160 LET GW046.NET$="<input type='text' tabindex='-1' name='net"+GR05.ID$+"' size='2' maxlength='2' value='"+NET$+"'>"
+0170 LET OUT$=FNS$("putts")
+0175 LET OUT$=OUT$+"<option></option>"
+0180 FOR PUTTS=9 TO 27
+0185    IF GR05.PUTTS=PUTTS THEN LET SEL$=" selected" ELSE LET SEL$=""
+0190    LET OUT$=OUT$+"<option"+SEL$+">"+STR(PUTTS)+"</option>"
+0200 NEXT PUTTS
+0210 LET OUT$=OUT$+"</select>"
+0220 LET GW046.PUTTS$=OUT$
+0230 LET OUT$=FNS$("points")
+0235 LET OUT$=OUT$+"<option></option>"
+0240 FOR POINTS=0 TO NUM(STBL("MAXPTS")) STEP .5
+0245    IF GR05.POINTS>0 AND GR05.POINTS=POINTS
+:          THEN
+:             LET SEL$=" selected"
+:          ELSE
+:             LET SEL$=""
+0250    LET OUT$=OUT$+"<option"+SEL$+">"+STR(POINTS)+"</option>"
+0260 NEXT POINTS
+0270 LET OUT$=OUT$+"</select>"
+0280 LET GW046.POINTS$=OUT$
+0290 EXIT
+
+7000 FUNCTIONS:
+7010 DEF FNS$(FLD$)="<select"+FNSTYLE$(FLD$,"if (document.form1.score"+GR05.ID$+".value == """") {adv(this)} else ","")+">"
+7020 DEF FNSTYLE$(FLD$,FOCUS$,BLUR$)=" name='"+FLD$+GR05.ID$+"' onFocus='"+FOCUS$+"{document.form1."+FLD$+GR05.ID$+".style.cssText = ""background-color:#ffff99""}' onBlur='document.form1."+FLD$+GR05.ID$+".style.cssText = ""background-color:#fff"";"+BLUR$+"'"
+
+8000 DT_ERR:
+8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+8030 RETRY
+
+9000 EOJ:
+9010 IF TCB(13) THEN EXIT
+9020 RUN "CDS001"
