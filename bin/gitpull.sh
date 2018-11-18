@@ -13,7 +13,7 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-cd /u/CDI/LK/gitrepo
+cd /u/CDI/LK/gitrepo/Golf
 unset SSH_ASKPASS
 
 git fetch
