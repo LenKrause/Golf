@@ -1,0 +1,768 @@
+REM "GW112.bbj - 11/18/18 Tee Time Manager Menu
+SETESC DT_ERR; SETERR DT_ERR
+
+gosub INIT
+
+html$ = ""
+
+rem  Retreive player record via access
+access = 1; rem  cgi error
+repeat
+  call "utcgi.wbb", ENV$, CGI$, ERRMSG$
+  IF LEN(ERRMSG$) THEN break
+  tmp$ = stbl("SMSDIR", "/u/CDI/")
+  access = 2;  rem  missing cgi.access
+  access$ = field(cgi$, "access", err=*break)
+  if len(access$) <> 16 access = 3; break; rem  Invalid cgi.access length
+  access = 4, access1$ = ath(access$, err=*break); rem  Invalid cgi.access value
+  if hsh(access1$(1,6)) <> access1$(7) then
+    access = 5; rem  Invalid cgi.access hash
+    break
+  fi
+  call "CDS095", gr12, "XXGR12", "YNY", gr12$, gr12k$
+  if pos(" " <> access$(4,3) then
+    call "CDS095", gr13, "XXGR13", "YNY", gr13$, gr13k$
+    gr13.gr13id$ = access1$(4,3)
+    access = 6; rem  Group no longer on file
+    readrecord (gr13, knum=0, key=gr13.gr13id$, dom=*break)gr13$
+  fi
+  gr12.gr12id$ = access1$(1,3)
+  access = 7; rem  Player no longer on file
+  readrecord (gr12, knum=0, key=gr12.gr12id$, dom=*break)gr12$
+  access = 0; rem  No issues
+until 1
+
+if access then
+  msg$ = "Unauthorized, code=" + str(access)
+else
+  gosub PLAYER
+fi
+
+IF LEN(MSG$) HTML$ = "<p class='msg'>" + MSG$ + "</p>" + HTML$
+HTML$ = "<center>"  + HTML$ + "</center>"
+RUN "CDW999"
+
+PLAYER:
+if gr12.gr12id$ = gr13.admin$ then
+  func$ = field(cgi$, "f", err=*endif)
+fi
+
+dim gr09a$:fattr(gr09$)
+dim rec09$:fattr(gr09$)
+CALL "CDS095", GR08, "XXGR08", "YNY", GR08$
+CALL "CDS095", GR10, "XXGR10", "YNY", GR10$, gr10k$
+call "CDS095", gr11, "XXGR11", "YNY", gr11$
+dsn$ = "/LK/cgi-bin/ttm.cgi?access=" + access$
+
+rem  Process claim spot
+repeat
+  declare BBjString claims!
+  declare BBjVector claimsV!
+  claims! = field(cgi$,"claim", err=*break)
+  claimsV! = DT.split(claims!, $01$)
+  if claimsV!.size() then
+    for claim = 0 to claimsV!.size() - 1
+      claim$ = cast(BBjString, claimsV!.get(claim))
+      z = pos("-" = claim$)
+      if z = 0 continue
+      gr10.ttid = num(claim$(1, z - 1), err=*continue)
+      seq = num(claim$(z + 1), err=*continue)
+      if seq < 1 or seq > 4 or fpt(seq) continue
+      extract record (gr10, knum=0, key=gr10.ttid$, err=*continue)gr10$
+      if pos(" " <> gr10.id$[seq]) then
+        msg$ = msg$ + "The tee time on " + date(gr10.date:"%Dl, %Ml %D") + "<br>has already been claimed<br>"
+      else
+        gr10.id$[seq] = gr09.id$
+        write record (gr10)gr10$
+        msg$ = msg$ + "You are now scheduled to play<br>on " + date(gr10.date:"%Dl, %Ml %D") + "<br>"
+      fi
+    next claim
+  fi
+until 1
+
+rem  Process cancel spot
+repeat
+  declare BBjString cancels!
+  declare BBjVector cancelsV!
+  cancels! = field(cgi$,"cancel", err=*break)
+  cancelsV! = DT.split(cancels!, $01$)
+  if cancelsV!.size() then
+    for cancel = 0 to cancelsV!.size() - 1
+      cancel$ = cast(BBjString, cancelsV!.get(cancel))
+      z = pos("-" = cancel$)
+      if z = 0 continue
+      gr10.ttid = num(cancel$(1, z - 1), err=*continue)
+      seq = num(cancel$(z + 1), err=*continue)
+      if seq < 1 or seq > 4 or fpt(seq) continue
+      extract record (gr10, knum=0, key=gr10.ttid$, err=*continue)gr10$
+      if pos(" " <> gr10.id$[seq]) = 0 then
+        msg$ = msg$ + "Your tee time on " + date(gr10.date:"%Dl, %Ml %D") + "<br>has already been cancelled<br>"
+      else
+        for i = seq to 4
+          if i = 4 then
+            gr10.id$[i] = ""
+          else
+            gr10.id$[i] = gr10.id$[i + 1]
+          fi
+        next i
+        write record (gr10)gr10$
+        msg$ = msg$ + "Your tee time on " + date(gr10.date:"%Dl, %Ml %D") + "<br>has been cancelled<br>"
+      fi
+    next cancel
+  fi
+until 1
+
+rem  Process courses
+repeat
+  declare BBjString courses!
+  declare BBjVector coursesV!
+  courses! = field(cgi$, "play", err=*break)
+  coursesV! = DT.split(courses!, $01$)
+  if coursesV!.size() then
+    call "CDS273", y$, "XXGR11", 0, gr09.aid$
+    gr11.aid$ = gr09.aid$
+    for course = 0 to coursesV!.size() - 1
+      course$ = cast(BBjString, coursesV!.get(course))
+      gr11.state$ = course$(1,2)
+      gr11.id$ = course$(3)
+      writerecord (gr11)gr11$
+    next course
+  fi
+until 1
+
+rem  Process Tee Times
+repeat
+  declare BBjString ttid!
+  declare BBjVector ttidV!
+  
+  ttid! = field(cgi$, "ttid", err=*break)
+  ttidV! = DT.split(ttid!, $01$)
+  
+  if ttidV!.size() then
+    for tt = 0 to ttidV!.size() - 1
+      redim gr10$
+      ttid = num(cast(BBjString, ttidV!.get(tt)))
+      gr10.ttid = ttid
+      ttid$ = "_" + str(ttid)
+      if ttid then extract record (gr10, knum=0, key=gr10.ttid$, dom=*continue)gr10$
+        
+      cancel$ = ""
+      cancel$ = field(cgi$, "cancel" + ttid$, err=*next)
+      if cancel$ = "y" then
+        remove (gr10, key=gr10.ttid$, dom=*continue)
+        msg$ = msg$ + "<br>Tee Time on " + date(gr10.date, gr10.time:"%Ds %Mz/%Dz/%Yz at %hz:%mz %p") + "<br>has been cancelled"
+      else
+        gr10.date = num(field(cgi$, "date" + ttid$))
+        hour      = num(field(cgi$, "hour" + ttid$))
+        minute    = num(field(cgi$, "minute" + ttid$))
+        precision 6
+        time$ = str(hour:"00") + str(minute:"00")
+        time = hour + minute / 60
+        timeout$ = date(0, time:"%hz%mz")
+        while timeout$ <> time$
+          time = time + .000001
+          timeout$ = date(0, time:"%hz%mz")
+        wend
+        precision 2
+        if int(time) = 12 or int(time) < 7 then time = time + 12
+        gr10.time = time
+  
+        gr10.gr08id$ = field(cgi$, "course" + ttid$, err=*continue)
+        if ttid then
+          writerecord (gr10)gr10$
+        else
+          gr10.aid$ = gr09.aid$
+          ttid = dec($00$ + keyl(gr10, end=*next))
+          repeat
+            ttid = ttid + 1
+            gr10.ttid = ttid
+            writerecord (gr10, dom=*continue)gr10$; break
+          until 0
+        fi
+      fi
+    next tt
+  fi
+until 1
+
+rem  Process My Buddies
+repeat
+  declare BBjString gr09id!
+  declare BBjVector gr09idV!
+    
+  gr09id! = field(cgi$, "gr09id", err=*break)
+  gr09idV! = DT.split(gr09id!, $01$)
+  
+  if gr09idV!.size() then
+    msg$ = ""
+    ids$ = ""
+    deletedIds$ = ""
+    for player = 0 to gr09idV!.size() - 1
+      redim gr09a$
+      gr09a.aid$ = gr09.aid$
+      gr09id$ = cast(BBjString, gr09idV!.get(player))
+      delete$ = ""
+      delete$ = field(cgi$, "delete" + gr09id$, err=*next)
+      if delete$ = "Y" then
+        deletedIds$ = deletedIds$ + gr09id$
+        remove (gr09, key=gr09.aid$ + gr09id$, dom=*endif)
+        msg$ = msg$ + "<br>Deleted " + field(cgi$, "firstname" + gr09id$, err=*endif) + " " + field(cgi$, "lastname" + gr09id$, err=*endif)
+      else
+        gr09a.firstname$ = field(cgi$, "firstname" + gr09id$, err=*continue)
+        gr09a.lastname$  = field(cgi$, "lastname"  + gr09id$, err=*continue)
+        gr09a.email$     = cvs(field(cgi$, "email" + gr09id$, err=*continue),8)
+        if pos(" " = gr09a.firstname$(1,1) + gr09a.lastname$(1,1) + gr09a.email$(1,1)) continue
+        gr09a.phone$     = field(cgi$, "phone"     + gr09id$, err=*continue)
+        active$ = ""
+        active$ = field(cgi$, "active" + gr09id$, err=*next)
+        gr09a.active$ = active$
+        
+        if gr09id$(1, 3) = "new" then
+          gr09id$ = cvs(gr09a.firstname$(1,1) + gr09a.lastname$(1,1), 8) + "01"
+          while pos(gr09id$ = ids$, 4)
+            gr09id$(3) = str(num(gr09id$(3)) + 1:"00")
+          wend
+        fi
+        
+        gr09a.id$ = gr09id$
+        writerecord (gr09)gr09a$
+        ids$ = ids$ + gr09id$
+      fi
+    next player
+    if len(deletedIds$) then
+      read (gr10, knum=1, key=gr09.aid$, dom=*next)
+      repeat
+        readrecord (gr10, end=*break)gr10$
+        if gr10.aid$ <> gr09.aid$ break
+        del = 0
+        for i = 1 to 4
+          if pos(gr10.id$[i] = deletedIds$, 4) then
+            if i < 4 then
+              for j = i to 3
+                gr10.id$[j] = gr10.id$[j + 1]
+              next j
+            fi
+            gr10.id$[4] = ""
+            del = del + 1
+          fi
+        next i
+        if del writerecord (gr10)gr10$
+      until 0
+    fi  
+  fi
+until 1
+
+rem  Process Menu Selection
+switch func$
+  case "teetime";      gosub TT_SETUP;      break
+  case "emailSetup";   gosub EMAIL_SETUP;   break
+  case "players";      gosub PLAYERS_SETUP; break
+  case "coursesSetup"; gosub COURSES_SETUP; break
+swend
+
+rem  Show my tee times
+repeat
+  declare BBjString ems!
+  declare BBjVector emsV!
+  ems! = field(cgi$,"em", err=*break)
+  emsV! = DT.split(ems!, $01$)
+  if emsV!.size() then
+    call "CDS041", "CDS084", s084$, "YP"
+    s084.mode$ = "N"
+    s084.name$ = "MAIL"
+    s084.subject$ = "Tee Times"
+    tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
+    s084.fromname$ = fnn$(gr09$)
+    s084.fromemail$ = cvs(gr09.email$, 2)
+    s084.emailtype$ = "H"
+    emc = 0
+    for em = 0 to emsV!.size() - 1
+      em$ = cast(BBjString, emsV!.get(em))
+      readrecord (gr09, knum=0, key=gr09.aid$ + pad(em$, 4), dom=*continue)gr09a$
+      s084.toname$ = fnn$(gr09a$)
+      s084.toemail$ = cvs(gr09a.email$, 2)
+      call "CDS084", y$, y5$, u0, s084$, y6, y6$
+      print (y6.ch)"<style>body{color:green;}</style>"
+      print (y6.ch)"<body>"
+      print (y6.ch)cvs(gr09a.firstname$, 2) + "-<br><br>"
+      print (y6.ch)"Tee Times have been made.<br><br>"
+      link$ = "http://www.scoresandcharts.com/LK/cgi-bin/ttm.cgi?code=" + hta(gr09a.aid$ + gr09a.id$ + hsh(gr09a.aid$ + gr09a.id$))
+      print (y6.ch)"Click <a href='" + link$ + "'>here</a> to sign up<br><br>"
+      print (y6.ch)"-" + cvs(gr09.firstname$, 2)
+      call "CDS094", y6$, "E"
+      emc = emc + 1
+    next em
+    msg$ = str(emc) + " emails sent"
+  fi
+until 1
+
+REM IF LEN(FIELD(CGI$, "FIRSTNAME", ERR=*next)) >= 0 GOSUB STORE
+gosub TTM
+return
+
+STORE:
+IF POS(" " <> CGI.FIRSTNAME$) AND FND("FIRSTNAME") GR04.FIRSTNAME$ = CGI.FIRSTNAME$, MSG$ = "First Name changed to " + GR04.FIRSTNAME$; GOSUB ACTIVITY
+IF POS(" " <> CGI.LASTNAME$)  AND FND("LASTNAME")  GR04.LASTNAME$  = CGI.LASTNAME$,  MSG$ = "Last Name changed to " + GR04.LASTNAME$; GOSUB ACTIVITY
+IF POS(" " <> CGI.EMAIL$) GOSUB EMAIL
+IF POS(" " <> CGI.PHONE$) GOSUB PHONE
+IF POS(" " <> CGI.PASSWORD$) AND FND("PASSWORD")   GR04.PASSWORD$  = CGI.PASSWORD$,  MSG$ = "Password Changed"; GOSUB ACTIVITY
+IF POS(FIELD(CGI$, "PLAYTHISYEAR", ERR=*next) = "YN") AND FND("PLAYTHISYEAR") GR04.PLAYTHISYEAR$ = CGI.PLAYTHISYEAR$, MSG$ = "Play this year set to " + FNYN$(GR04.PLAYTHISYEAR$); GOSUB ACTIVITY
+WRITE RECORD(GR04)GR04$
+MSG$ = ALLMSG$, ALLMSG$ = ""
+RETURN
+
+INFOFORM:
+HTML$ = HTML$ + "<br><form>"
+GOSUB TOPROW
+CALL "CDW000", ROW$, "dcs3", "Golfer Information"
+CALL "CDW000", TAB$, "r class='title'", ROW$
+CALL "CDW000", ROW$, "d class='head'", ""
+CALL "CDW000", ROW$, "dc class='head'", "Current"
+CALL "CDW000", ROW$, "dc class='head'", "Revised"
+CALL "CDW000", TAB$, "r class='head'", ROW$
+TXT$ = "First Name", FLD$ = "FIRSTNAME"; GOSUB ROW
+TXT$ = "Last Name",  FLD$ = "LASTNAME";  GOSUB ROW
+TXT$ = "Email",      FLD$ = "EMAIL";     GOSUB ROW
+TXT$ = "Telephone",  FLD$ = "PHONE";     GOSUB ROW
+TXT$ = "Password",   FLD$ = "PASSWORD";  GOSUB ROW
+if wases.league$ <> "TTM" then
+  CALL "CDW000", ROW$, "dr class='head'", "Play in " + DATE(0:"%Yl")
+  IF GR04.PLAYTHISYEAR$ = "Y" VAL$ = "Yes", YES$ = " Checked", NO$ = "" ELSE VAL$ = "No", YES$ = "", NO$ = " Checked"
+  FLD$ = "PLAYTHISYEAR"
+  CALL "CDW000", ROW$, "d", VAL$
+  CALL "CDW000", ROW$, "d", "<input type='radio' name='" + FLD$ + "' value='Y'" + YES$ + ">Yes<br><input type='radio' name='" + FLD$ + "' value='N'" + NO$ + ">No"
+  CALL "CDW000", TAB$, "r", ROW$
+fi
+CALL "CDW000", ROW$, "dcs3", "<input type='submit' value='Save Changes' onclick='window.location=""[DSN]?p=GW011""'> <input type='button' value='Cancel & Logout' onclick='window.location=""[DSN]?p=GW999""'>"
+CALL "CDW000", TAB$, "r class='foot'", ROW$
+CALL "CDW000", HTML$, "tc", TAB$
+HTML$ = HTML$ + "</form>"
+RETURN
+
+ROW:
+CALL "CDW000", ROW$, "dr class='head'", TXT$
+CALL "CDW000", ROW$, "d",FIELD(GR04$, FLD$)
+LGTH = LEN(FIELD(GR04$, FLD$))
+IF FLD$ = "EMAIL" AND 0 VAL$ = " value='" + BADEMAIL$ + "'" ELSE VAL$ = ""
+CALL "CDW000", ROW$, "d", "<input type='text' size=" + STR(LGTH + 2) + " maxlength=" + STR(LGTH) + " name='" + FLD$ + "'" + VAL$ + ">"
+CALL "CDW000", TAB$, "r", ROW$
+RETURN
+
+EMAIL:
+BADEMAIL$ = CGI.EMAIL$, EMAIL$ = CVS(CGI.EMAIL$, 8)
+CALL "CDS275::VALIDATE", EMAIL$, MSG$
+IF LEN(MSG$) = 0 BADEMAIL$ = "", CGI.EMAIL$ = EMAIL$; IF FND("EMAIL") GR04.EMAIL$ = EMAIL$, MSG$ = "Email Address Changed to " + EMAIL$
+IF LEN(MSG$) GOSUB ACTIVITY
+RETURN
+ 
+PHONE:
+PHONE$ = ""
+FOR I = 1 TO LEN(CGI.PHONE$)
+  IF CGI.PHONE$(I, 1) >= "0" AND CGI.PHONE$(I, 1) <= "9" PHONE$ = PHONE$ + CGI.PHONE$(I, 1)
+NEXT I
+IF LEN(PHONE$) = 11 AND PHONE$(1, 1) = "1" PHONE$ = PHONE$(2)
+IF LEN(PHONE$) <> 10 MSG$ = "Phone Number must contain 10 digits" ELSE CGI.PHONE$ = PHONE$(1, 3) + "-" + PHONE$(4, 3) + "-" + PHONE$(7); IF FND("PHONE") GR04.PHONE$ = CGI.PHONE$, MSG$ = "Phone# changed to " + GR04.PHONE$
+IF LEN(MSG$) GOSUB ACTIVITY
+RETURN
+
+TOPROW:
+CALL "CDW000", ROW$, "dcs3", WASES.LEAGUENAME$
+CALL "CDW000", TAB$, "r class='top'", ROW$
+RETURN
+
+ACTIVITY:
+return
+IF GR07 = 0 CALL "CDS095", GR07, "XXGR07", "YNY", GR07$
+GR07.LEAGUE$ = GR04.LEAGUE$
+GR07.ID$ = GR04.ID$
+GR07.DATE = JUL(0,0,0)
+GR07.SEQ = 0
+GR07.MSG$ = MSG$
+repeat
+  GR07.SEQ = GR07.SEQ + 1
+  WRITE RECORD(GR07, DOM=*continue)GR07$; break
+until 0
+IF LEN(ALLMSG$) ALLMSG$ = ALLMSG$ + "<br>"
+ALLMSG$ = ALLMSG$ + MSG$
+RETURN
+
+TTM:
+GOSUB TEETIMES
+REM GOSUB INFOFORM
+RETURN
+
+TEETIMES:
+call "CDW000", row$, "dc", "Tee Time Manager"
+call "CDW000", tab$, "r class='top'", row$
+
+call "CDW000", row$, "dc", fnn$(gr09$)
+call "CDW000", tab$, "r class='head'", row$
+
+if len(msg$) then
+  if pad(msg$, 4) = "<br>" then msg$ = msg$(5)
+  call "CDW000", row$, "dc class='note'", msg$
+  call "CDW000", tab$, "r", row$
+  msg$ = ""
+fi
+  
+gids$ = ""
+ldate = 0
+gr10.aid$ = gr09.aid$
+gr10.date = y.jdate
+gr10.time = tim
+read (gr10, knum=1, key=kgen(gr10$, gr10k$, 1), dom=*next)
+repeat
+  readrecord (gr10, end=*break)gr10$
+  if gr10.aid$ <> gr09.aid$ break
+  if len(tab$) = 0 then
+    call "CDW000", row$, "dc", "Tee Times"
+    call "CDW000", tab$, "r class='head'", row$
+  fi
+  if ldate <> gr10.date then
+    ldate = gr10.date
+    gids$ = ""
+  fi
+  redim gr08$
+  readrecord (gr08, knum=0, key=gr10.gr08id$, dom=*next)gr08$
+  if pos(" " <> gr08.name$) = 0 gr08.name$ = "Course code " + gr10.gr08id$ + " not on file"
+  
+  call "CDW000", row$, "dc class='course'", date(gr10.DATE, gr10.TIME:"%Ds %Mz/%Dz/%Yz %hz:%mz %p") + "<br>" + gr08.name$
+  call "CDW000", tab$, "r", row$
+
+  col1$ = ""
+  col2$ = ""
+  for i = 1 to 4
+    redim gr09a$
+    if pos(" " <> gr10.id$[i]) then
+      gids$ = gids$ + gr10.id$[i]
+      readrecord (gr09, knum=0, key=gr09.aid$ + gr10.id$[i], dom=*next)gr09a$
+    fi
+    switch 1
+      case gr10.id$[i] = gr09.id$
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='window.location=""" + dsn$ + "&cancel=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col2$ = "<span class='head'>" + fnn$(gr09$) + "</span>"
+        break
+      case gr10.id$[i] = "    " and pos(gr09.id$ = gids$, 4) = 0
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col2$ = "Check this box to play"
+        gids$ = gids$ + gr09.id$
+        break
+      case gr10.id$[i] <> "    "
+        col1$ = ""
+        col2$ = fnn$(gr09a$)
+        break
+      case default
+        col1$ = ""
+        col2$ = "Available"
+        break
+    swend
+    call "CDW000", player_row$, "dr class='playercheck'", col1$
+    call "CDW000", player_row$, "d", col2$
+    call "CDW000", player_tab$, "r", player_row$
+  next i
+  call "CDW000", player_html$, "t class='players'", player_tab$
+  call "CDW000", row$, "d", player_html$
+  player_html$ = ""
+  call "CDW000", tab$, "r", row$
+until 0
+if ldate = 0 then
+  call "CDW000", row$, "dc", "No Tee Times have been made"
+  call "CDW000", tab$, "r", row$
+fi
+
+if gr09.aid$ = gr09.id$ then
+  call "CDW000", row$, "dc", "<a class='dw_link' href='" + dsn$ + "&f=teetime'>Setup Tee Times</a>"
+  call "CDW000", tab$, "r", row$
+  call "CDW000", row$, "dc", "<a class='dw_link' href='" + dsn$ + "&f=emailSetup'>Send Emails</a>"
+  call "CDW000", tab$, "r", row$
+  call "CDW000", row$, "dc", "<a class='dw_link' href='" + dsn$ + "&f=players'>My Golf Buddies</a>"
+  call "CDW000", tab$, "r", row$
+  call "CDW000", row$, "dc", "<a class='dw_link' href='" + dsn$ + "&f=coursesSetup'>My Courses</a>"
+  call "CDW000", tab$, "r", row$
+fi
+
+call "CDW000", html$, "t", tab$
+return
+
+EMAIL_SETUP:
+call "CDW000", row$, "dcs2", "Tee Time Manager"
+call "CDW000", tab$, "r class='top'", row$
+
+call "CDW000", row$, "dcs2", "Send Emails"
+call "CDW000", tab$, "r class='title'", row$
+
+call "CDW000", row$, "d", "Name"
+call "CDW000", row$, "d", "Send Email"
+call "CDW000", tab$, "r class='head'", row$
+
+read (gr09, knum=0, key=gr09.aid$, dom=*next)
+repeat
+  readrecord (gr09, end=*break)gr09a$
+  if gr09a.aid$ <> gr09.aid$ break
+  call "CDW000", row$, "d", fnn$(gr09a$)
+  checked$ = iff(gr09a.active$ = "Y", " checked", "")
+  call "CDW000", row$, "dc", "<input type='checkbox' name='em' value='" + gr09a.id$ + "'" + checked$ + ">"
+  call "CDW000", tab$, "r", row$
+until 0
+btn1$ = "<button type='submit' onclick='submit();'>Send Emails</button>"
+btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+call "CDW000", row$, "dcs2", btn1$ + " " + btn2$
+call "CDW000", tab$, "r", row$
+call "CDW000", html$, "t", tab$
+html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+goto EOJ
+
+TT_SETUP:
+REM def fnh$(txt$) = head$ + txt$ + $0a$
+REM head$ = "", head$ = stbl("$otherhead", err=*next)
+REM head$ = fnh$("<link rel='stylesheet' href='/LK/css/jquery.timeentry.css'>")
+REM head$ = fnh$("<style>")
+REM head$ = fnh$("body > iframe { display: none;}")
+REM head$ = fnh$("input:focus, select:focus, input[type='checkbox']:focus, button:focus {background-color: #F0E68C;}")
+REM head$ = fnh$("</style>")
+REM head$ = fnh$("<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'></script>")
+REM head$ = fnh$("<script src='/LK/js/jquery.plugin.js'></script>")
+REM head$ = fnh$("<script src='/LK/js/jquery.timeentry.js'></script>")
+REM head$ = fnh$("<script>")
+REM head$ = fnh$("$(function () {")
+REM head$ = fnh$("  $(""[name='timeEntry']"").timeEntry({ampmPrefix: ' ', noSeparatorEntry: true, spinnerImage: ''});")
+REM head$ = fnh$("});")
+REM head$ = fnh$("</script>")
+REM head$ = stbl("$otherhead", head$)
+
+call "CDW000", row$, "dcs5", "Tee Time Manager"
+call "CDW000", tab$, "r class='top'", row$
+
+call "CDW000", row$, "dcs5", "Tee Times"
+call "CDW000", tab$, "r class='title'", row$
+
+call "CDW000", row$, "dc", "Date"
+call "CDW000", row$, "dc", "Time"
+call "CDW000", row$, "d", "Course"
+call "CDW000", row$, "dc", "Players"
+call "CDW000", row$, "dc", "Cancel"
+call "CDW000", tab$, "r class='head'", row$
+
+call "SW010", "XXGR11", 0, gr09.aid$, "state|id", mycourses$
+call "CDS041", "CDW069", w069$
+w069.file$ = "LKGR08"
+w069.entfld$ = "id"
+w069.disfld$ = "name"
+w069.where$ = "pos(rec.state$ + rec.id$ = """ + mycourses$ + """, 5)"
+ldate = 0
+
+read (gr10, knum=1, key=gr09.aid$ + y.jdate$, dom=*next)
+repeat
+  readrecord (gr10, end=*break)gr10$
+  if gr10.aid$ <> gr09.aid$ break
+
+  ldate = gr10.date
+  call "CDW000", row$, "dr", fnttid$(gr10$) + fndate$(gr10$, "")
+
+  hour = num(date(0, gr10.time:"%h"))
+  hour$ = ""
+  for hr = 6 to 12
+    hour$ = fnopt$(hour$, hr, hour)
+  next hr
+  for hr = 1 to 5
+    hour$ = fnopt$(hour$, hr, hour)
+  next hr
+  hour$ = "<select name='hour_" + str(gr10.ttid) + "'>" + $0a$ + hour$ + "</select>" + $0a$
+
+  minute = num(date(0, gr10.time:"%m"))
+  minute$ = ""
+  for min = 0 to 59
+    minute$ = fnopt$(minute$, min, minute)
+  next min
+  minute$ = "<select name='minute_" + str(gr10.ttid) + "'>" + $0a$ + minute$ + "</select>" + $0a$
+
+  call "CDW000", row$, "dr", hour$ + minute$
+  
+  redim gr08$
+  readrecord (gr08, knum=0, key=gr10.gr08id$, dom=*next)gr08$
+  
+  w069.formfld$ = "course_" + str(gr10.ttid)
+  w069.defaultval$ = gr08.id$
+  call "CDW069", w069$, course$
+  call "CDW000", row$, "d", course$
+  
+  players = 0
+  for i = 1 to 4
+    if pos(" " <> gr10.id$[i]) players = players + 1
+  next i
+  call "CDW000", row$, "dc", str(players)
+  
+  call "CDW000", row$, "dc", "<input type='checkbox' name='cancel_" + str(gr10.ttid) + "' value='y'>"
+  call "CDW000", tab$, "r", row$
+until 0
+redim gr10$
+
+if ldate then
+  gr10.date = ldate
+  minute = minute + 9
+  if minute >= 60 then hour = hour + 1, minute = minute - 60
+else
+  gr10.date = y.jdate + 1
+  hour = 8
+  minute = 0
+fi
+
+call "CDW000", row$, "dr", fnttid$(gr10$) + fndate$(gr10$, "autofocus ")
+
+hour$ = ""
+for hr = 6 to 12
+  hour$ = fnopt$(hour$, hr, hour)
+next hr
+for hr = 1 to 5
+  hour$ = fnopt$(hour$, hr, hour)
+next hr
+hour$ = "<select name='hour_" + str(gr10.ttid) + "'>" + $0a$ + hour$ + "</select>" + $0a$
+
+minute$ = ""
+for min = 0 to 59
+  minute$ = fnopt$(minute$, min, minute)
+next min
+minute$ = "<select name='minute_" + str(gr10.ttid) + "'>" + $0a$ + minute$ + "</select>" + $0a$
+
+call "CDW000", row$, "dr", hour$ + minute$
+
+w069.formfld$ = "course-0"
+w069.defaultval$ = ""
+call "CDW069", w069$, course$
+
+call "CDW000", row$, "d", course$
+call "CDW000", row$, "ds2", ""
+call "CDW000", tab$, "r", row$
+
+btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
+btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+call "CDW000", row$, "dcs5", btn1$ + " " + btn2$
+call "CDW000", tab$, "r", row$
+call "CDW000", html$, "t", tab$
+html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+goto EOJ
+
+def fndate$(gr10$, af$)
+  date$ = ""
+  jdate = y.jdate
+  for i = 1 to 28
+    selected$ = iff(jdate = gr10.date, " selected", "")
+    date$ = date$ + "<option value='" + str(jdate) + "'" + selected$ + ">"+ date(jdate:"%Ds %Mz/%Dz/%Yz") + "</option>" + $0a$
+    jdate = jdate + 1    
+  next i
+  date$ = "<select " + af$ + "dir='rtl' name='date_" + str(gr10.ttid) + "'>" + $0a$ + date$ + "</select>" + $0a$
+  return date$
+fnend
+
+def fnttid$(gr10$)
+  return "<input type='hidden' name='ttid' value='" + str(gr10.ttid) + "'>"
+fnend
+
+def fnopt$(string$, number, value) = string$ + "<option value='" + str(number) + "'" + iff(number = value, " selected", "") + ">" + str(number:"00") + "</option>"+ $0a$
+
+PLAYERS_SETUP:
+call "CDW000", row$, "dcs5", "Tee Time Manager"
+call "CDW000", tab$, "r class='top'", row$
+
+call "CDW000", row$, "dcs6", "My Golf Buddies"
+call "CDW000", tab$, "r class='title'", row$
+
+call "CDW000", row$, "d", "First Name"
+call "CDW000", row$, "d", "Last Name"
+call "CDW000", row$, "d", "Email Address"
+call "CDW000", row$, "d", "Phone"
+call "CDW000", row$, "d", "Active"
+call "CDW000", row$, "d", "Delete"
+call "CDW000", tab$, "r class='head'", row$
+
+read (gr09, knum=0, key=gr09.aid$, dom=*next)
+repeat
+  readrecord (gr09, end=*break)gr09a$
+  if gr09a.aid$ <> gr09.aid$ break
+  id$ = "<input type='hidden' name='gr09id' value='" + gr09a.id$ + "'>"
+  call "CDW000", row$, "d", id$ + fni$("firstname", 10)
+  call "CDW000", row$, "d", fni$("lastname", 20)
+  call "CDW000", row$, "d", fni$("email", 50)
+  call "CDW000", row$, "d", fni$("phone", 12) 
+  checked$ = iff(gr09a.active$ = "Y", " checked", "")
+  call "CDW000", row$, "dc", "<input type='checkbox' name='active" + gr09a.id$ + "' value='Y'" + checked$ + ">"
+  call "CDW000", row$, "dc", "<input type='checkbox' name='delete" + gr09a.id$ + "' value='Y'>"
+  call "CDW000", tab$, "r", row$
+until 0
+
+redim gr09a$
+for i = 1 to 5
+  gr09a.id$="new" + str(i)
+  id$ = "<input type='hidden' name='gr09id' value='" + gr09a.id$ + "'>"
+  call "CDW000", row$, "d", id$ + fni$("firstname", 10)
+  call "CDW000", row$, "d", fni$("lastname", 20)
+  call "CDW000", row$, "d", fni$("email", 50)
+  call "CDW000", row$, "d", fni$("phone", 12) 
+  checked$ = iff(gr09a.active$ = "Y", " checked", "")
+  call "CDW000", row$, "dc", "<input type='checkbox' name='active" + gr09a.id$ + "' value='Y'" + checked$ + ">"
+  call "CDW000", row$, "d", ""
+  call "CDW000", tab$, "r", row$
+next i
+
+btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
+btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+call "CDW000", row$, "dcs6", btn1$ + " " + btn2$
+call "CDW000", tab$, "r", row$
+
+call "CDW000", html$, "t", tab$
+html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+run "CDW999"
+
+COURSES_SETUP:
+call "CDW000", row$, "dcs3", "Tee Time Manager"
+call "CDW000", tab$, "r class='top'", row$
+
+call "CDW000", row$, "dcs3", "My Courses"
+call "CDW000", tab$, "r class='title'", row$
+
+call "CDW000", row$, "d", "State"
+call "CDW000", row$, "d", "Name"
+call "CDW000", row$, "d", "Play"
+call "CDW000", tab$, "r class='head'", row$
+
+read (gr08, knum=1, dir=0, end=*next)
+repeat
+  readrecord (gr08, end=*break)gr08$
+  call "CDW000", row$, "dc", gr08.state$
+  call "CDW000", row$, "d", gr08.name$
+  checked$ = ""
+  readrecord (gr11, knum=0, key=gr09.aid$ + gr08.state$ + gr08.id$, dom=*next)gr11$; checked$ = " checked"  
+  call "CDW000", row$, "dc", "<input type='checkbox' name='play' value='" + gr08.state$ + gr08.id$ + "'" + checked$ + ">"
+  call "CDW000", tab$, "r", row$
+until 0
+btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
+btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+call "CDW000", row$, "dcs3", btn1$ + " " + btn2$
+call "CDW000", tab$, "r", row$
+call "CDW000", html$, "t", tab$
+html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+goto EOJ
+
+INIT:
+Y.COMPNAME$ = "ScoresAndCharts.com"
+RETURN
+
+FUNCTIONS:
+DEF FNYN$(VAL$)
+IF VAL$ = "Y" OUT$="Yes" ELSE OUT$ = "No"
+RETURN OUT$
+FNEND
+
+DEF FND(FLDNAM$) = (CVS(FIELD(CGI$, FLDNAM$), 2) <> CVS(FIELD(GR04$, FLDNAM$), 2))
+
+def fnn$(rec09$) = cvs(field(rec09$,"firstname"), 2) + " " + cvs(field(rec09$,"lastname"), 2)
+
+def fni$(fldnam$, size) = "<input type='" + iff(fldnam$ = "email", "email", "text") + "' name='" + fldnam$ + gr09a.id$ + "' size=" + str(size) + " maxlength=" + str(size) + " value='" + cvs(field(gr09a$, fldnam$), 2) + "'>"
+
+DT_ERR:
+CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
+IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
+RETRY
+
+EOJ:
+RUN "CDW999"
+
