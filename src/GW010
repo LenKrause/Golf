@@ -1,4 +1,4 @@
-0100 REM "GW010 - 02/04/18 Dynaweb Golf
+0100 REM "GW010 - 11/18/18 Dynaweb Golf
 0110 SETESC 8000; SETERR 8000
 0120 GOSUB INIT
 0130 IF PROG$="GW999" THEN RUN PROG$; REM "Need to do this even if not yet logged in
@@ -37,6 +37,7 @@
 1260 IF LEN(LOGINMSG$)=0 THEN LET LOGINMSG$="Email Address is not on file, please contact your league secretary."
 1270 LET GR04.EMAIL$=EMAIL$,EMAIL$=""
 1280 BREAK
+1285 case recs=1 and gr04.LEAGUE$="TTM"; gosub sendttmlink; break
 1290 CASE LEN(PWDL$)=0 OR PWD; GOSUB SENDPWD; BREAK
 1300 CASE LEN(PASSWORD$) AND POS(PASSWORD$=PWDL$,8)=0; LET LOGINMSG$="Incorrect Password"; BREAK
 1310 CASE LEN(PASSWORD$) AND POS(PASSWORD$=PWDL$,8)
@@ -49,7 +50,7 @@
 1380 GOTO EOJ
 
 1400 SINGLE:
-1410 CALL "CDS041","CDW550",W550$,"YY"
+1410 CALL "CDS041","CDW550",W550$,"YP"
 1420 LET W550.FILNAM$="GR04",W550.SUBMITPROG$="GW011"
 1430 IF POS(" "<>EMAIL$) THEN LET GR04.EMAIL$=EMAIL$,W550.VIEW$="M",W550.INCPIPE$="N",W550.EXTRAFOOT$=" <input type='button' onclick='window.location=""[DSN]?p=GW011&pwd=send&email="+CVS(EMAIL$,3)+"""' value='Forgot Password'>" ELSE LET W550.VIEW$="L",W550.INCBACK$="N"
 1440 LET W550.INCCONAME$="Y",W550.INCHOME$="N",W550.INCCLOSE$="N"
@@ -60,22 +61,21 @@
 1480 RETURN
 
 1500 MULTI:
-1510 CALL "CDW000",ROW$,"dcs2",Y.COMPNAME$
+1510 CALL "CDW000",ROW$,"dc",Y.COMPNAME$
 1520 CALL "CDW000",TAB$,"r class='top'",ROW$
-1530 CALL "CDW000",ROW$,"dcs2","League Selection"
+1530 CALL "CDW000",ROW$,"dc","League Selection"
 1540 CALL "CDW000",TAB$,"r class='title'",ROW$
-1550 CALL "CDW000",ROW$,"dcs2",EMAIL$
+1550 CALL "CDW000",ROW$,"dc",EMAIL$
 1560 CALL "CDW000",TAB$,"r",ROW$
 1570 FOR I=1 TO LEN(GR04L$) STEP LEN(GR04$)
 1580 LET GR04$=GR04L$(I,LEN(GR04$))
 1590 CALL "SW001","XXGR01",0,GR04.LEAGUE$,GR01$,SW001$
-1600 CALL "CDW000",ROW$,"d","<input type='radio' onclick='window.location=""[DSN]?p=GW011&mls="+HTA(GR04.LEAGUE$+GR04.ID$)+"""'>"+CVS(GR01.NAME$,2)
-1610 CALL "CDW000",ROW$,"d",CVS(GR04.FIRSTNAME$,2)+" "+CVS(GR04.LASTNAME$,2)
+1600 CALL "CDW000",ROW$,"d","<a href='[DSN]?p=GW011&mls="+HTA(GR04.LEAGUE$+GR04.ID$)+"'>"+CVS(GR01.NAME$,2)+"</a>"
 1620 CALL "CDW000",TAB$,"r",ROW$
 1630 NEXT I
-1640 CALL "CDW000",ROW$,"dcs2","<input type='button' onclick='window.location=""[DSN]?p=GW999""' value='Logout'"
+1640 CALL "CDW000",ROW$,"dc","<input type='button' onclick='window.location=""[DSN]?p=GW999""' value='Logout'"
 1650 CALL "CDW000",TAB$,"r class='foot'",ROW$
-1660 CALL "CDW000",HTML$,"tc",TAB$
+1660 CALL "CDW000",HTML$,"tc class='menu'",TAB$
 1670 RETURN
 
 1700 GETGR04S:
@@ -95,7 +95,7 @@
 1840 LET GR04.PASSWORD$=PWD$
 1850 WRITE RECORD(GR04)GR04$
 1860 NEXT I
-1870 CALL "CDS041","CDS084",S084$,"YY"
+1870 CALL "CDS041","CDS084",S084$,"YP"
 1880 LET S084.NAME$="MAIL",S084.METHOD$="N",S084.SUBJECT$="ScoresAndCharts.com Golfer Password"
 1890 LET S084.TOEMAIL$=EMAIL$,S084.EMAILBCC$="webmaster@scoresandcharts.com"
 1900 CALL "SW001","XXGR01",0,GR04.LEAGUE$,GR01$,SW001$
@@ -131,7 +131,7 @@
 2300 INIT:
 2310 LET Y.COMPNAME$="ScoresAndCharts.com"
 2320 CALL "CDS091","","",SM08$
-2330 CALL "CDS041","WASES",WASES$,"YY"
+2330 CALL "CDS041","WASES",WASES$,"YP"
 2340 LET TMP$=STBL("$sestpl",FATTR(WASES$))
 2350 CALL "SW005",Y$,"WA",WA00$
 2360 GOSUB BBWEB
@@ -230,6 +230,19 @@
 3620 LET TMP$="",TMP$=STBL("$otherhead",ERR=3630)
 3630 LET TMP$=STBL("$otherhead",TMP$+"<script type='text/javascript'>window.open('/"+TRFILNAM$+"','trace','status=0,menubar=0,scrollbars=1,toolbar=0,location=0,direction=0')</script>"+$0A$)
 3640 RETURN
+
+3700 SENDTTMLINK:
+3770 CALL "CDS041","CDS084",S084$,"YP"
+3780 LET S084.NAME$="MAIL",S084.METHOD$="N",S084.SUBJECT$="Tee Time Manager Access Link"
+3790 LET S084.TOEMAIL$=EMAIL$,S084.EMAILBCC$="webmaster@scoresandcharts.com"
+3800 CALL "SW001","XXGR01",0,GR04.LEAGUE$,GR01$,SW001$
+3810 LET S084.FROMNAME$="Tee Time Manager",S084.FROMEMAIL$="webmaster@scoresandcharts.com"
+3820 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
+3830 PRINT (Y6.CH)CVS(GR01.NAME$,2)
+3840 PRINT (Y6.CH)"Tee Time Manager Access Link: http://www.scoresandcharts.com/cgi-bin/ttm.cgi"
+3850 CALL "CDS094",Y6$,"E"
+3860 LET LOGINMSG$="Check your email (and spam folder) for Tee Time Manager Access Link"
+3870 RETURN
 
 8000 REM "Call Error/Escape Routine
 8010 CALL "CDS063",STR(TCB(5)),Y$,PGM(-2)
