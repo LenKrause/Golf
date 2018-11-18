@@ -7,4 +7,7 @@ echo Setting program permissions...
 
 echo Compiling programs...
 umask 005
-/u/basis/bbj/bin/bbjcpl -d/u/CDI/LK/pg6 ./$(dirname $0)/../src/*
+/u/basis/bbj/bin/bbjcpl -d/u/CDI/LK/pg6 ./$(dirname $0)/../src/* 2>/u/CDI/tmp/$$
+if [ -s /u/CDI/tmp/$$ ]; then
+  cat /u/CDI/tmp/$$ | mail -s "Golf compile errors" len@excellware.OM
+fi
