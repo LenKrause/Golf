@@ -1,23 +1,23 @@
-0100 REM "LKS222 - 10/01/00 HTML Email test
-0110 SETESC DT_ERR; SETERR DT_ERR
-0115 CALL "CDS091",Y$
-0120 CALL "CDW279",Y$,HTML$
-0130 CALL "CDS041","CDS084",S084$
-0140 LET S084.MODE$="E",S084.NAME$="MAIL",S084.TONAME$="len@gocdi.com",S084.FROMNAME$="escds@safeguardproperties.com",S084.SUBJECT$="test html document",S084.EMAILTYPE$="H"
-0150 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
-0195 IF 0 THEN PRINT (PIPE)$09$,"charset=""iso-8859-1"""
-0196 IF 0 THEN PRINT (PIPE)"Content-Transfer-Encoding: quoted-printable"
-0200 PRINT (Y6.CH)'BO',HTML$,'EO'
-0210 PRINT (Y6.CH)'FF',
-0220 PRINT (Y6.CH)'BO',HTML$,'EO'
-0240 CLOSE (Y6.CH)
-0250 RUN "CDS001"
+0100 rem "LKS222 - 10/01/00 HTML Email test
+0110 setesc 8000; seterr 8000
+0115 call "CDS091", y$
+0120 call "CDW279", y$, html$
+0130 call "CDS041", "CDS084", s084$
+0140 s084.mode$ = "E", s084.name$ = "MAIL", s084.toname$ = "len@gocdi.com", s084.fromname$ = "escds@safeguardproperties.com", s084.subject$ = "test html document", s084.emailtype$ = "H"
+0150 call "CDS084", y$, y5$, u0, s084$, y6, y6$
+0195 if 0 then print (pipe)$09$, "charset=""iso-8859-1"""
+0196 if 0 then print (pipe)"Content-Transfer-Encoding: quoted-printable"
+0200 print (y6.ch)'bo', html$, 'eo'
+0210 print (y6.ch)'ff', 
+0220 print (y6.ch)'bo', html$, 'eo'
+0240 close (y6.ch)
+0250 run "CDS001"
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

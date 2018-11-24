@@ -1,28 +1,28 @@
-0100 REM "LKNPT - 06/05/14 Display Notepad Text
-0110 BEGIN
-0120 PRINT 'CS',
-0130 CALL "CDS069",1,40,0,0,"+Notepad text file name+","A",0,FILENAME$
-0140 IF CTL=4 THEN GOTO EOJ
-0150 CALL "CDS095",ERR=0130,CHAN,FILENAME$
-0155 CALL "CDS187",CHAN,S187$,KEYDEF$
-0160 LET K$=KEY(CHAN,END=0200)
-0165 READ (CHAN)
-0170 IF K$(S187.KEYSIZE)=$00$
-:       THEN
-:          CALL "CDS069",0,0,0,0,FILENAME$,"W{"+FILENAME$+","+K$(1,S187.KEYSIZE-1)+",D}";
-:          CALL "CDS069",0,0,0,0,"-+";
-:          IF CTL=4
-:             THEN
-:                GOTO 0200
-0180 GOTO 0160
-0200 CLOSE (CHAN)
-0210 GOTO 0130
+0100 rem "LKNPT - 06/05/14 Display Notepad Text
+0110 begin
+0120 print 'cs', 
+0130 call "CDS069", 1, 40, 0, 0, "+Notepad text file name+", "A", 0, filename$
+0140 if ctl = 4 then goto eoj
+0150 call "CDS095", err=0130, chan, filename$
+0155 call "CDS187", chan, s187$, keydef$
+0160 k$ = key(chan, end=0200)
+0165 read (chan)
+0170 if k$(s187.keysize) = $00$ then
+:      call "CDS069", 0, 0, 0, 0, filename$, "W{" + filename$ + "," + k$(1, s187.keysize - 1) + ",D}";
+:      call "CDS069", 0, 0, 0, 0, "-+";
+:      if ctl = 4 then
+:        goto 0200
+:      fi
+:    fi
+0180 goto 0160
+0200 close (chan)
+0210 goto 0130
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

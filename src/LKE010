@@ -1,8 +1,8 @@
-0100 REM "LKE010 - 01/29/01 Demonstration of problem with SELECT
-0110 BEGIN
-0120 DIM SM90$:"REQID:U(3),DEST:C(8),QDATE:U(3),QTIME:B,FILENAME:C(20),FAXNO:C(21),CSI:C(20),OPERID:C(10),RESOLUTION:C(3),STATUS:C(1),TOCOMP:C(40),TONAME:C(40),JOBTITLE:C(40),SUBJECT:C(40)"
-0130 LET SM90=UNT
-0140 SELECT (SM90)SM90$ FROM "SM90" WHERE SM90.STATUS$="U" AND SM90.OPERID$="len       " SORTBY NOT(SM90.QDATE$)+ADJN(-SM90.QTIME)
-0150 READ RECORD(SM90)SM90$
-0160 PRINT DATE(SM90.QDATE,SM90.QTIME:"%Mz/%Dz/%Yz %hz:%mz"),SM90.QDATE," ",HTA(NOT(SM90.QDATE$))
-0170 GOTO 0150
+0100 rem "LKE010 - 01/29/01 Demonstration of problem with SELECT
+0110 begin
+0120 dim sm90$:"REQID:U(3),DEST:C(8),QDATE:U(3),QTIME:B,FILENAME:C(20),FAXNO:C(21),CSI:C(20),OPERID:C(10),RESOLUTION:C(3),STATUS:C(1),TOCOMP:C(40),TONAME:C(40),JOBTITLE:C(40),SUBJECT:C(40)"
+0130 sm90 = unt
+0140 select (sm90)sm90$ from "SM90" where sm90.status$ = "U" and sm90.operid$ = "len       " sortby not(sm90.qdate$) + adjn(-sm90.qtime)
+0150 read record(sm90)sm90$
+0160 print date(sm90.qdate, sm90.qtime:"%Mz/%Dz/%Yz %hz:%mz"), sm90.qdate, " ", hta(not(sm90.qdate$))
+0170 goto 0150

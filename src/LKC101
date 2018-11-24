@@ -1,14 +1,14 @@
-0100 REM "LKC101 - 05/08/99 Convert string to dimensioned array
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 ENTER FLDS$,FLDS
-0130 LET SEP$=FLDS$(LEN(FLDS$))
-0140 LET FLDS=POS(SEP$=FLDS$,1,0)
-0150 LET FLDSA$=FLDS$
-0160 DIM FLDS$:"NO["+STR(FLDS)+"]:C(1*="+STR(ASC(SEP$))+")"
-0170 LET FLDS$=FLDSA$
-0180 EXIT
+0100 rem "LKC101 - 05/08/99 Convert string to dimensioned array
+0110 setesc 8000; seterr 8000
+0120 enter flds$, flds
+0130 sep$ = flds$(len(flds$))
+0140 flds = pos(sep$ = flds$, 1, 0)
+0150 fldsa$ = flds$
+0160 dim flds$:"NO[" + str(flds) + "]:C(1*=" + str(asc(sep$)) + ")"
+0170 flds$ = fldsa$
+0180 exit
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry

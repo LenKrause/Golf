@@ -1,40 +1,40 @@
-0100 REM "GW016 - 05/04/14 League Information Maintenance
-0110 SETESC DT_ERR; SETERR DT_ERR
-0115 IF LEN(FIELD(CGI$,"NAME",ERR=0120))>=0 THEN GOSUB SAVEFLDS; GOTO EOJ
-0120 CALL "CDS041","CDW550",W550$,"YY"
-0130 LET W550.FILNAM$="GR01",W550.VIEW$="C",W550.SUBMITPROG$="GW016",W550.INCCANCEL$="Y",W550.INCBACK$="N",W550.INCHOME$="N",W550.INCCLOSE$="N",W550.INCPIPE$="N",W550.INCTABLE$="Y",W550.INCCONAME$="Y",W550.SINGLEFOOTERROW$="Y",W550.SUBMITTEXT$="Save Changes"
-0140 LET Y.COMPNAME$=WASES.LEAGUENAME$
-0150 CALL "SW001","XXGR01",0,WASES.LEAGUE$,GR01$,SW001$
-0160 CALL "CDW550",Y$,GR01$,W550$,HTML$
-0170 RUN "CDW999"
+0100 rem "GW016 - 05/04/14 League Information Maintenance
+0110 setesc 8000; seterr 8000
+0115 if len(field(cgi$, "NAME", err=0120)) >= 0 then gosub saveflds; goto eoj
+0120 call "CDS041", "CDW550", w550$, "YY"
+0130 w550.filnam$ = "GR01", w550.view$ = "C", w550.submitprog$ = "GW016", w550.inccancel$ = "Y", w550.incback$ = "N", w550.inchome$ = "N", w550.incclose$ = "N", w550.incpipe$ = "N", w550.inctable$ = "Y", w550.incconame$ = "Y", w550.singlefooterrow$ = "Y", w550.submittext$ = "Save Changes"
+0140 y.compname$ = wases.leaguename$
+0150 call "SW001", "XXGR01", 0, wases.league$, gr01$, sw001$
+0160 call "CDW550", y$, gr01$, w550$, html$
+0170 run "CDW999"
 
-1000 SAVEFLDS:
-1010 CALL "CDS095",GR01,"XXGR01","YUY",GR01$
-1020 READ RECORD(GR01,KNUM=0,KEY=WASES.LEAGUE$)GR01$
-1030 IF POS(" "<>CGI.NAME$)
-:       THEN
-:          LET GR01.NAME$=CGI.NAME$,WASES.LEAGUENAME$=GR01.NAME$
-1040 CALL "CDS234",CGI$,GR01$,S234$
-1060 WRITE RECORD(GR01)GR01$
-1070 RETURN
-1100 DEF FNP$(PH$)
-1110 LET PHN$="",H=1
-1120 WHILE H<=LEN(PH$)
-1130    IF POS(PH$(H,1)="0123456789") THEN LET PHN$=PHN$+PH$(H,1)
-1140    LET H=H+1
-1150 WEND
-1160 IF LEN(PHN$)=10
-:       THEN
-:          RETURN PHN$(1,3)+"-"+PHN$(4,3)+"-"+PHN$(7)
-:       ELSE
-:          RETURN ""
-1170 FNEND
+1000 saveflds:
+1010 call "CDS095", gr01, "XXGR01", "YUY", gr01$
+1020 read record(gr01, knum=0, key=wases.league$)gr01$
+1030 if pos(" " <> cgi.name$) then
+:      gr01.name$ = cgi.name$, wases.leaguename$ = gr01.name$
+:    fi
+1040 call "CDS234", cgi$, gr01$, s234$
+1060 write record(gr01)gr01$
+1070 return
+1100 def fnp$(ph$)
+1110 phn$ = "", h = 1
+1120 while h <= len(ph$)
+1130   if pos(ph$(h, 1) = "0123456789") then phn$ = phn$ + ph$(h, 1)
+1140   h = h + 1
+1150 wend
+1160 if len(phn$) = 10 then
+:      return phn$(1,3) + "-" + phn$(4,3) + "-" + phn$(7)
+:    else
+:      return ""
+:    fi
+1170 fnend
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "GW011"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "GW011"

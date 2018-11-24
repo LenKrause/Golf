@@ -1,40 +1,40 @@
-0100 REM "LKTST1 - 02/04/04 Test Melissa Data address verification
-0110 BEGIN
-0130 LET OUT$="<?xml version=""1.0""?>"
-0140 LET OUT$=OUT$+"<RecordSet>"
-0150 LET OUT$=OUT$+"<CustomerID>102251307</CustomerID>"
-0160 LET OUT$=OUT$+"<Record>"
-0170 LET OUT$=OUT$+"<FullName>NCDS</FullName>"
-0180 LET OUT$=OUT$+"<Address>7550 Lucerne Drive Suite #405</Address>"
-0190 LET OUT$=OUT$+"<City>Middleburg Heights</City>"
-0200 LET OUT$=OUT$+"<State>OH</State>"
-0210 LET OUT$=OUT$+"<Zip>44130</Zip>"
-0211 LET OUT$=OUT$+"<Plus4/>"
-0212 LET OUT$=OUT$+"<AddressErrorCode/>"
-0213 LET OUT$=OUT$+"<AddressErrorString/>"
-0214 LET OUT$=OUT$+"<CarrierRoute/>"
-0215 LET OUT$=OUT$+"<DeliveryPointCode/>"
-0216 LET OUT$=OUT$+"<CountyFips/>"
-0220 LET OUT$=OUT$+"</Record>"
-0230 LET OUT$=OUT$+"<ErrorString/>"
-0240 LET OUT$=OUT$+"</RecordSet>"
-0242 OPEN (1)"|curl -q -v -T - -X POST -m 10 --trace-ascii /tmp/lek4 -H ""Transfer-Encoding:"" -H ""Content-Type: text/xml"" -H ""Content-Length: "+STR(LEN(OUT$)+1)+""" https://xml.melissadata.com/xml.asp"
-0245 WRITE (1,IND=0)OUT$
-0247 DIM REC$[100]
-0250 READ (1,END=0300)A$
-0260 LET RECS=RECS+1,REC$[RECS]=A$
-0280 GOTO 0250
-0300 CLOSE (1)
-0305 FOR I=1 TO RECS
-0306    PRINT 'LF',I,'LF',REC$[I]
-0307 NEXT I
-0310 ESCAPE
+0100 rem "LKTST1 - 02/04/04 Test Melissa Data address verification
+0110 begin
+0130 out$ = "<?xml version=""1.0""?>"
+0140 out$ = out$ + "<RecordSet>"
+0150 out$ = out$ + "<CustomerID>102251307</CustomerID>"
+0160 out$ = out$ + "<Record>"
+0170 out$ = out$ + "<FullName>NCDS</FullName>"
+0180 out$ = out$ + "<Address>7550 Lucerne Drive Suite #405</Address>"
+0190 out$ = out$ + "<City>Middleburg Heights</City>"
+0200 out$ = out$ + "<State>OH</State>"
+0210 out$ = out$ + "<Zip>44130</Zip>"
+0211 out$ = out$ + "<Plus4/>"
+0212 out$ = out$ + "<AddressErrorCode/>"
+0213 out$ = out$ + "<AddressErrorString/>"
+0214 out$ = out$ + "<CarrierRoute/>"
+0215 out$ = out$ + "<DeliveryPointCode/>"
+0216 out$ = out$ + "<CountyFips/>"
+0220 out$ = out$ + "</Record>"
+0230 out$ = out$ + "<ErrorString/>"
+0240 out$ = out$ + "</RecordSet>"
+0242 open (1)"|curl -q -v -T - -X POST -m 10 --trace-ascii /tmp/lek4 -H ""Transfer-Encoding:"" -H ""Content-Type: text/xml"" -H ""Content-Length: " + str(len(out$) + 1) + """ https://xml.melissadata.com/xml.asp"
+0245 write (1, ind=0)out$
+0247 dim rec$[100]
+0250 read (1, end=0300)a$
+0260 recs = recs + 1, rec$[recs] = a$
+0280 goto 0250
+0300 close (1)
+0305 for i = 1 to recs
+0306   print 'lf', i, 'lf', rec$[i]
+0307 next i
+0310 escape
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

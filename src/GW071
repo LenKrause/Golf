@@ -1,61 +1,61 @@
-0100 REM "GW071 - 09/30/15 Post Season Email Entry
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS095",GR06,"XXGR06","YUY",GR06$
-0121 CALL "CDS095",GR08,"XXGR08","YUY",GR08$
-0130 CALL "CDW000",ROW$,"ds4",WASES.LEAGUENAME$
-0140 CALL "CDW000",TAB$,"r class='top'",ROW$
-0150 CALL "CDW000",ROW$,"ds4",Y5$
-0160 CALL "CDW000",TAB$,"r class='title'",ROW$
-0170 CALL "CDW000",ROW$,"dc","Date"
-0180 CALL "CDW000",ROW$,"dc","Time"
-0190 CALL "CDW000",ROW$,"d","Course"
-0200 CALL "CDW000",ROW$,"d","Address"
-0210 CALL "CDW000",TAB$,"r class='head'",ROW$
-0220 LET DATES=0
-0230 READ RECORD(GR06,KNUM=0,KEY=WASES.LEAGUE$+Y.JDATE$,DOM=0240)GR06$;
-:    GOTO 0253
-0240 READ RECORD(GR06,END=0380)GR06$
-0250 IF GR06.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0380
-0253 DIM GR08$:FATTR(GR08$)
-0254 LET GR08.NAME$="*** Course ID "+GR06.ID$+" is not on file ***"
-0255 READ RECORD(GR08,KNUM=0,KEY=GR06.ID$,DOM=0256)GR08$
-0260 CALL "CDW000",ROW$,"dc",DATE(GR06.DATE:"%Ds %Mz/%Dz/%Yz")
-0270 CALL "CDW000",ROW$,"dc",GR06.TIME$
-0280 LET COURSE$=CVS(GR08.NAME$,3),URL$=CVS(GR08.URL$,3)
-0290 IF LEN(URL$) AND POS("http://"=CVS(URL$,8))=0 THEN LET URL$="http://"+URL$
-0300 IF LEN(URL$)
-:       THEN
-:          LET COURSE$="<a href='"+URL$+"' target='_blank'>"+COURSE$+"</a>"
-0310 CALL "CDW000",ROW$,"d",COURSE$
-0320 LET ADDRESS$=CVS(CVS(GR08.ADDRESS$,3)+" "+CVS(GR08.CITY$,3)+" "+GR08.STATE$+" "+GR08.ZIP$,3)
-0330 IF LEN(ADDRESS$)
-:       THEN
-:          LET MAP$=ADDRESS$;
-:          CALL "SW002::URL",MAP$;
-:          LET ADDRESS$="<a href='http://maps.google.com?q="+MAP$+"' target='_blank'>"+ADDRESS$+"</a>"
-0340 CALL "CDW000",ROW$,"d",ADDRESS$
-0350 CALL "CDW000",TAB$,"r",ROW$
-0360 LET DATES=DATES+1
-0370 GOTO 0240
-0380 IF DATES=0
-:       THEN
-:          LET MSG$="No Post Season dates scheduled today or later";
-:          RUN "GW011"
-0390 CALL "CDW000",ROW$,"d","Email Message"
-0400 CALL "CDS261",Y$,"XXGR02",WASES.LEAGUE$+"p","",0,"","",0,NOTEPAD$
-0410 CALL "CDW000",ROW$,"ds3","<textarea name='NOTE' cols='80' rows='15'>"+NOTEPAD$+"</textarea>"
-0420 CALL "CDW000",TAB$,"r",ROW$
-0430 CALL "CDW000",ROW$,"dcs4","[CANCEL] <input type='submit' value='Send Emails'>"
-0440 CALL "CDW000",TAB$,"r class='foot'",ROW$
-0450 CALL "CDW000",HTML$,"tc",TAB$
-0460 LET HTML$="<form method='post' action='[DSN]?p=GW072'>"+HTML$+"</form>"
-0470 GOTO EOJ
+0100 rem "GW071 - 09/30/15 Post Season Email Entry
+0110 setesc 8000; seterr 8000
+0120 call "CDS095", gr06, "XXGR06", "YUY", gr06$
+0121 call "CDS095", gr08, "XXGR08", "YUY", gr08$
+0130 call "CDW000", row$, "ds4", wases.leaguename$
+0140 call "CDW000", tab$, "r class='top'", row$
+0150 call "CDW000", row$, "ds4", y5$
+0160 call "CDW000", tab$, "r class='title'", row$
+0170 call "CDW000", row$, "dc", "Date"
+0180 call "CDW000", row$, "dc", "Time"
+0190 call "CDW000", row$, "d", "Course"
+0200 call "CDW000", row$, "d", "Address"
+0210 call "CDW000", tab$, "r class='head'", row$
+0220 dates = 0
+0230 read record(gr06, knum=0, key=wases.league$ + y.jdate$, dom=0240)gr06$;
+:    goto 0253
+0240 read record(gr06, end=0380)gr06$
+0250 if gr06.league$ <> wases.league$ then goto 0380
+0253 dim gr08$:fattr(gr08$)
+0254 gr08.name$ = "*** Course ID " + gr06.id$ + " is not on file ***"
+0255 read record(gr08, knum=0, key=gr06.id$, dom=0256)gr08$
+0260 call "CDW000", row$, "dc", date(gr06.date:"%Ds %Mz/%Dz/%Yz")
+0270 call "CDW000", row$, "dc", gr06.time$
+0280 course$ = cvs(gr08.name$, 3), url$ = cvs(gr08.url$, 3)
+0290 if len(url$) and pos("http://" = cvs(url$, 8)) = 0 then url$ = "http://" + url$
+0300 if len(url$) then
+:      course$ = "<a href='" + url$ + "' target='_blank'>" + course$ + "</a>"
+:    fi
+0310 call "CDW000", row$, "d", course$
+0320 address$ = cvs(cvs(gr08.address$, 3) + " " + cvs(gr08.city$, 3) + " " + gr08.state$ + " " + gr08.zip$, 3)
+0330 if len(address$) then
+:      map$ = address$;
+:      call "SW002::URL", map$;
+:      address$ = "<a href='http://maps.google.com?q=" + map$ + "' target='_blank'>" + address$ + "</a>"
+:    fi
+0340 call "CDW000", row$, "d", address$
+0350 call "CDW000", tab$, "r", row$
+0360 dates = dates + 1
+0370 goto 0240
+0380 if dates = 0 then
+:      msg$ = "No Post Season dates scheduled today or later";
+:      run "GW011"
+:    fi
+0390 call "CDW000", row$, "d", "Email Message"
+0400 call "CDS261", y$, "XXGR02", wases.league$ + "p", "", 0, "", "", 0, notepad$
+0410 call "CDW000", row$, "ds3", "<textarea name='NOTE' cols='80' rows='15'>" + notepad$ + "</textarea>"
+0420 call "CDW000", tab$, "r", row$
+0430 call "CDW000", row$, "dcs4", "[CANCEL] <input type='submit' value='Send Emails'>"
+0440 call "CDW000", tab$, "r class='foot'", row$
+0450 call "CDW000", html$, "tc", tab$
+0460 html$ = "<form method='post' action='[DSN]?p=GW072'>" + html$ + "</form>"
+0470 goto eoj
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDW999"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDW999"

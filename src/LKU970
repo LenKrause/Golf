@@ -1,12 +1,12 @@
-0100 REM "LKU970 - 02/06/06 PRINT WEST TECH LOGO
-0110 DEF FNP$(V0,H0)=$1B$+"*p"+STR(712+FNM(V0))+"y"+STR(2000+FNM(H0))+"X"
-0115 DEF FNR$(W1,H1)=$1B$+"*c"+STR(FNM(W1))+"a"+STR(FNM(H1))+"b"+"2p"+"100G"
-0120 DEF FNM(W0)=300/4*W0
-0130 DATA 0,0,11,1,5,9,1,1,10,0,5,1,1,0,1,9,3,2,1,7,2,4,1,8,1,6,1,10,2,8,1,9,1,10,1,10
-0140 CALL "CDS084",Y$,Y5$,6
-0145 PRINT (6)'BO',$1B$,"&l1O",; REM "LANDSCAPE
-0150 DREAD Y,X,W,H,ERR=0180
-0160 PRINT (6)FNP$(Y,X),FNR$(W,H),
-0170 GOTO 0150
-0180 PRINT (6)'EO','FF',
-0190 RUN "CDS001"
+0100 rem "LKU970 - 02/06/06 PRINT WEST TECH LOGO
+0110 def fnp$(v0, h0) = $1b$ + "*p" + str(712 + fnm(v0)) + "y" + str(2000 + fnm(h0)) + "X"
+0115 def fnr$(w1, h1) = $1b$ + "*c" + str(fnm(w1)) + "a" + str(fnm(h1)) + "b" + "2p" + "100G"
+0120 def fnm(w0) = 300 / 4 * w0
+0130 data 0, 0, 11, 1, 5, 9, 1, 1, 10, 0, 5, 1, 1, 0, 1, 9, 3, 2, 1, 7, 2, 4, 1, 8, 1, 6, 1, 10, 2, 8, 1, 9, 1, 10, 1, 10
+0140 call "CDS084", y$, y5$, 6
+0145 print (6)'bo', $1b$, "&l1O", ; rem "LANDSCAPE
+0150 dread y, x, w, h, err=0180
+0160 print (6)fnp$(y, x), fnr$(w, h), 
+0170 goto 0150
+0180 print (6)'eo', 'ff', 
+0190 run "CDS001"

@@ -1,88 +1,88 @@
-0100 REM "GW043 - 09/06/14 Golf Score Posting
-0110 SETESC DT_ERR; SETERR DT_ERR
-0115 CALL "SW001","XXGR03",0,WASES.LEAGUE$+BIN(NUM(CGI.DATE$),3),GR03$,SW001$
-0120 LET DISP$="FLT|SEQ\\\\c|GW001.NAME|GW046.SCORE|HC\\\\c|GW046.NET\\\\r|GW046.PUTTS"
-0125 IF GR03.HALF THEN LET DISP$=DISP$+"|GW046.POINTS"
-0130 LET Y5$="Golf Score Posting"
-0140 LET WFIL$="GW043"; CALL "CDS095",GW043,WFIL$,"YYYW",GW043$
-0150 LET HEAD$=FNS$("<style>input { text-align: right }</style>")
-0160 LET HEAD$=FNS$("<form name='form1' method='POST' action='[DSN]?p=GW044&date="+CGI.DATE$+"&wfil="+WFIL$+"' onsubmit='return false'>")
-0170 LET HEAD$=FNS$("<script>")
-0180 LET HEAD$=FNS$("function numrange(el,minv,maxv) {")
-0190 LET HEAD$=FNS$("var num = el.value;")
-0200 LET HEAD$=FNS$("if (isNumber(num) && num >= minv && num <= maxv) {return true;} else {alert(""Invalid Entry""); el.focus();}")
-0210 LET HEAD$=FNS$("}")
-0220 LET HEAD$=FNS$("function isNumber(n) {")
-0230 LET HEAD$=FNS$("return !isNaN(parseFloat(n)) && isFinite(n);")
-0240 LET HEAD$=FNS$("}")
-0250 LET HEAD$=FNS$("function adv(el) {")
-0260 LET HEAD$=FNS$("var f=el.form;")
-0270 LET HEAD$=FNS$("var els = f.elements;")
-0280 LET HEAD$=FNS$("var x, nextEl;")
-0290 LET HEAD$=FNS$("for (var i=0, len=els.length; i<len; i++){")
-0300 LET HEAD$=FNS$("x=els[i];")
-0310 LET HEAD$=FNS$("if (el == x && (nextEl = els[i+1])) {")
-0320 LET HEAD$=FNS$("if (nextEl.focus) nextEl.focus();")
-0330 LET HEAD$=FNS$("}}}")
-0340 IF 0 THEN LET HEAD$=FNS$("var kc = -1;")
-0350 IF 0 THEN LET HEAD$=FNS$("document.onkeyup = function keycode(event) {")
-0360 IF 0
-:       THEN
-:          LET HEAD$=FNS$("kc = (event.which) ? event.which : event.keyCode")
-0370 IF 0
-:       THEN
-:          LET HEAD$=FNS$("if (kc == 13) {event.keyCode = 9; return false;}")
-0380 IF 0 THEN LET HEAD$=FNS$("}")
-0390 LET HEAD$=FNS$("</script>")
-0395 CALL "SW001","XXGR01",0,WASES.LEAGUE$,GR01$,SW001$
-0396 LET TMP$=STBL("MAXPTS",STR(9+GR01.MATCHPOINTS))
-0400 LET Y5A$="Play Date "+DATE(NUM(CGI.DATE$):"%Ds %Mz/%Dz/%Yz")
-0410 CALL "CDS095",GR04,"XXGR04","YNY",GR04$
-0420 CALL "CDS095",GR05,"XXGR05","YNY",GR05$,GR05K$
-0430 LET FLTS$=""
-0440 READ (GR04,KNUM=1,KEY=WASES.LEAGUE$+"A",DOM=0450)
-0450 READ RECORD(GR04,END=0680)GR04$
-0460 IF GR04.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0680
-0470 DIM GR05$:FATTR(GR05$)
-0480 LET GR05.LEAGUE$=GR04.LEAGUE$
-0490 LET GR05.ID$=GR04.ID$
-0500 LET GR05.DATE=NUM(CGI.DATE$)
-0510 LET GR05.FLT$=GR04.FLT$
-0520 LET GR05.HC=GR04.HC
-0530 READ RECORD(GR05,KNUM=0,KEY=KGEN(GR05$,GR05K$,0),DOM=0540)GR05$
-0540 DIM GW043$:FATTR(GW043$)
-0550 LET GW043.ID$=GR05.ID$
-0560 LET GW043.FLT$=GR04.FLT$
-0570 LET GW043.SEQ=GR04.SEQ
-0580 LET GW043.FIRSTNAME$=GR04.FIRSTNAME$
-0590 LET GW043.LASTNAME$=GR04.LASTNAME$
-0600 LET GW043.SCORE=GR05.SCORE
-0610 LET GW043.HC=GR05.HC
-0620 LET GW043.NET=GR05.NET
-0630 LET GW043.PUTTS=GR05.PUTTS
-0640 LET GW043.POINTS=GR05.POINTS
-0650 WRITE RECORD(GW043)GW043$
-0660 IF POS(GW043.FLT$=FLTS$)=0 THEN LET FLTS$=FLTS$+GW043.FLT$
-0670 GOTO 0450
-0680 UNLOCK (GW043)
-0690 FOR FLT=1 TO LEN(FLTS$)
-0700    CALL "CDS261",Y$,"XXGR02",WASES.LEAGUE$+FLTS$(FLT,1),"",0,"","",0,NOTEPAD$
-0710    LET FOOT$=FOOT$+"Flight "+FLTS$(FLT,1)+" Notes<br><textarea name='NOTE"+FLTS$(FLT,1)+"' cols=78 rows=10>"+NOTEPAD$+"</textarea><br>"
-0720 NEXT FLT
-0730 LET FOOT$=FOOT$+"[CANCEL] <input type='button' value='Submit' onclick='document.form1.submit()'>"
-0740 CALL "CDW038",Y$,Y5$,Y5A$,HTML$,W038$,WFIL$,0,"",KEYEND$,DISP$,WHERE$,SORTBY$,MODE$,LIMITVAL,SUBHEAD$,FOOT$,ENV$
-0750 LET HTML$=HEAD$+HTML$+"</form>"
-0760 IF 0
-:       THEN
-:          LET HTML$=HTML$+"<script>var inputitems = document.getElementsByTagName(""input""); for (i = 0; i<inputitems.length; i++){inputitems[i].setAttribute(""onkeydown"",function(){if(event.keyCode==13) event.keyCode=9;});}</script>"
-0770 GOTO EOJ
-0780 DEF FNS$(TXT$)=HEAD$+TXT$+$0A$
+0100 rem "GW043 - 09/06/14 Golf Score Posting
+0110 setesc 8000; seterr 8000
+0115 call "SW001", "XXGR03", 0, wases.league$ + bin(num(cgi.date$), 3), gr03$, sw001$
+0120 disp$ = "FLT|SEQ\\\\c|GW001.NAME|GW046.SCORE|HC\\\\c|GW046.NET\\\\r|GW046.PUTTS"
+0125 if gr03.half then disp$ = disp$ + "|GW046.POINTS"
+0130 y5$ = "Golf Score Posting"
+0140 wfil$ = "GW043"; call "CDS095", gw043, wfil$, "YYYW", gw043$
+0150 head$ = fns$("<style>input { text-align: right }</style>")
+0160 head$ = fns$("<form name='form1' method='POST' action='[DSN]?p=GW044&date=" + cgi.date$ + "&wfil=" + wfil$ + "' onsubmit='return false'>")
+0170 head$ = fns$("<script>")
+0180 head$ = fns$("function numrange(el,minv,maxv) {")
+0190 head$ = fns$("var num = el.value;")
+0200 head$ = fns$("if (isNumber(num) && num >= minv && num <= maxv) {return true;} else {alert(""Invalid Entry""); el.focus();}")
+0210 head$ = fns$("}")
+0220 head$ = fns$("function isNumber(n) {")
+0230 head$ = fns$("return !isNaN(parseFloat(n)) && isFinite(n);")
+0240 head$ = fns$("}")
+0250 head$ = fns$("function adv(el) {")
+0260 head$ = fns$("var f=el.form;")
+0270 head$ = fns$("var els = f.elements;")
+0280 head$ = fns$("var x, nextEl;")
+0290 head$ = fns$("for (var i=0, len=els.length; i<len; i++){")
+0300 head$ = fns$("x=els[i];")
+0310 head$ = fns$("if (el == x && (nextEl = els[i+1])) {")
+0320 head$ = fns$("if (nextEl.focus) nextEl.focus();")
+0330 head$ = fns$("}}}")
+0340 if 0 then head$ = fns$("var kc = -1;")
+0350 if 0 then head$ = fns$("document.onkeyup = function keycode(event) {")
+0360 if 0 then
+:      head$ = fns$("kc = (event.which) ? event.which : event.keyCode")
+:    fi
+0370 if 0 then
+:      head$ = fns$("if (kc == 13) {event.keyCode = 9; return false;}")
+:    fi
+0380 if 0 then head$ = fns$("}")
+0390 head$ = fns$("</script>")
+0395 call "SW001", "XXGR01", 0, wases.league$, gr01$, sw001$
+0396 tmp$ = stbl("MAXPTS", str(9 + gr01.matchpoints))
+0400 y5a$ = "Play Date " + date(num(cgi.date$):"%Ds %Mz/%Dz/%Yz")
+0410 call "CDS095", gr04, "XXGR04", "YNY", gr04$
+0420 call "CDS095", gr05, "XXGR05", "YNY", gr05$, gr05k$
+0430 flts$ = ""
+0440 read (gr04, knum=1, key=wases.league$ + "A", dom=0450)
+0450 read record(gr04, end=0680)gr04$
+0460 if gr04.league$ <> wases.league$ then goto 0680
+0470 dim gr05$:fattr(gr05$)
+0480 gr05.league$ = gr04.league$
+0490 gr05.id$ = gr04.id$
+0500 gr05.date = num(cgi.date$)
+0510 gr05.flt$ = gr04.flt$
+0520 gr05.hc = gr04.hc
+0530 read record(gr05, knum=0, key=kgen(gr05$, gr05k$, 0), dom=0540)gr05$
+0540 dim gw043$:fattr(gw043$)
+0550 gw043.id$ = gr05.id$
+0560 gw043.flt$ = gr04.flt$
+0570 gw043.seq = gr04.seq
+0580 gw043.firstname$ = gr04.firstname$
+0590 gw043.lastname$ = gr04.lastname$
+0600 gw043.score = gr05.score
+0610 gw043.hc = gr05.hc
+0620 gw043.net = gr05.net
+0630 gw043.putts = gr05.putts
+0640 gw043.points = gr05.points
+0650 write record(gw043)gw043$
+0660 if pos(gw043.flt$ = flts$) = 0 then flts$ = flts$ + gw043.flt$
+0670 goto 0450
+0680 unlock (gw043)
+0690 for flt = 1 to len(flts$)
+0700   call "CDS261", y$, "XXGR02", wases.league$ + flts$(flt, 1), "", 0, "", "", 0, notepad$
+0710   foot$ = foot$ + "Flight " + flts$(flt, 1) + " Notes<br><textarea name='NOTE" + flts$(flt, 1) + "' cols=78 rows=10>" + notepad$ + "</textarea><br>"
+0720 next flt
+0730 foot$ = foot$ + "[CANCEL] <input type='button' value='Submit' onclick='document.form1.submit()'>"
+0740 call "CDW038", y$, y5$, y5a$, html$, w038$, wfil$, 0, "", keyend$, disp$, where$, sortby$, mode$, limitval, subhead$, foot$, env$
+0750 html$ = head$ + html$ + "</form>"
+0760 if 0 then
+:      html$ = html$ + "<script>var inputitems = document.getElementsByTagName(""input""); for (i = 0; i<inputitems.length; i++){inputitems[i].setAttribute(""onkeydown"",function(){if(event.keyCode==13) event.keyCode=9;});}</script>"
+:    fi
+0770 goto eoj
+0780 def fns$(txt$) = head$ + txt$ + $0a$
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDW999"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDW999"

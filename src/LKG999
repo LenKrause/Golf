@@ -1,22 +1,22 @@
-0100 REM "LKG999 - 05/20/09 Restore score records
-0110 BEGIN
-0120 OPEN (1)"LK/LKGR05"
-0130 CALL "CDS273",Y$,"LK/LKGR05",0,"SAWBUTE",RECS
-0140 PRINT RECS
-0150 OPEN (2)"tmp/LKGR05"
-0160 READ (2,KNUM=0,KEY="SAWBUTE"+$FFFFFF$,DOM=0170)
-0170 LET K$=KEY(2)
-0175 PRINT K$
-0180 IF K$(1,7)<>"SAWBUTE" THEN ESCAPE
-0190 READ RECORD(2)REC$
-0200 WRITE RECORD(1)REC$
-0210 GOTO 0170
+0100 rem "LKG999 - 05/20/09 Restore score records
+0110 begin
+0120 open (1)"LK/LKGR05"
+0130 call "CDS273", y$, "LK/LKGR05", 0, "SAWBUTE", recs
+0140 print recs
+0150 open (2)"tmp/LKGR05"
+0160 read (2, knum=0, key="SAWBUTE" + $ffffff$, dom=0170)
+0170 k$ = key(2)
+0175 print k$
+0180 if k$(1,7) <> "SAWBUTE" then escape
+0190 read record(2)rec$
+0200 write record(1)rec$
+0210 goto 0170
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

@@ -1,101 +1,101 @@
-0100 REM "GW041 - 06/04/12 Golfer Score Maintenance
-0110 SETESC DT_ERR; SETERR DT_ERR
-0115 CALL "CDS041","GW041",GW041$,"YY"
-0120 LET DISP$="DATE\\\\H|SCORE\\\\I|HC\\\\I|NET\\\\|PUTTS\\\\I|POINTS\\\\I"
-0130 CALL "SW001","XXGR04",0,WASES.LEAGUE$+CGI.ID$,GR04$
-0140 LET HEAD$="<style>input{text-align:right}</style><form method='POST' action=[DSN]?p=GW042&id="+CGI.ID$+">"
-0150 LET Y5A$=CVS(GR04.FIRSTNAME$,2)+" "+CVS(GR04.LASTNAME$,2)
-0155 LET TMP$=STBL("$title",Y5A$)
-0160 CALL "CDS095",GR03,"XXGR03","YNY",GR03$
-0170 CALL "CDS095",GR05,"XXGR05","YNY",GR05$,GR05K$
-0180 READ (GR03,KNUM=0,KEY=WASES.LEAGUE$+Y.JDATE$,DOM=0190)
-0190 READ RECORD(GR03,END=0270)GR03$
-0200 IF GR03.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0270
-0210 DIM GR05$:FATTR(GR05$)
-0220 LET GR05.LEAGUE$=GR03.LEAGUE$
-0230 LET GR05.ID$=GR04.ID$
-0240 LET GR05.DATE=GR03.DATE
-0242 READ RECORD(GR05,KNUM=0,KEY=GR05$(1,10),DOM=0243)GR05$; GOTO 0255
-0245 LET GR05.FLT$=GR04.FLT$
-0250 IF 0 THEN WRITE RECORD(GR05,DOM=0251)GR05$
-0255 IF GR05.SCORE THEN GOSUB SCORE
-0260 GOTO 0190
-0270 CALL "CDS041","CDW038",W038$,"YY"
-0271 LET W038.INPUTROW$="Y",W038.ROWSPERPAGE=9999
-0274 CALL "CDW038",Y$,Y5$,Y5A$,HTML$,W038$,"XXGR05",0,WASES.LEAGUE$+GR04.ID$,KEYEND$,DISP$,WHERE$,SORTBY$,MODE$,LIMITVAL,SUBHEAD$,FOOT$,ENV$
-0275 IF LEN(GW041L$) THEN GOSUB SUMMARY
-0280 LET HTML$=SUMHTML$+"<br>"+HEAD$+HTML$+"<center><input type=submit value='Save Changes'> [CLOSE]</center>"
-0290 CALL "utfrmout.wbb",GR04$,HTML$+"",HTML$
-0300 GOTO EOJ
+0100 rem "GW041 - 06/04/12 Golfer Score Maintenance
+0110 setesc 8000; seterr 8000
+0115 call "CDS041", "GW041", gw041$, "YY"
+0120 disp$ = "DATE\\\\H|SCORE\\\\I|HC\\\\I|NET\\\\|PUTTS\\\\I|POINTS\\\\I"
+0130 call "SW001", "XXGR04", 0, wases.league$ + cgi.id$, gr04$
+0140 head$ = "<style>input{text-align:right}</style><form method='POST' action=[DSN]?p=GW042&id=" + cgi.id$ + ">"
+0150 y5a$ = cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2)
+0155 tmp$ = stbl("$title", y5a$)
+0160 call "CDS095", gr03, "XXGR03", "YNY", gr03$
+0170 call "CDS095", gr05, "XXGR05", "YNY", gr05$, gr05k$
+0180 read (gr03, knum=0, key=wases.league$ + y.jdate$, dom=0190)
+0190 read record(gr03, end=0270)gr03$
+0200 if gr03.league$ <> wases.league$ then goto 0270
+0210 dim gr05$:fattr(gr05$)
+0220 gr05.league$ = gr03.league$
+0230 gr05.id$ = gr04.id$
+0240 gr05.date = gr03.date
+0242 read record(gr05, knum=0, key=gr05$(1,10), dom=0243)gr05$; goto 0255
+0245 gr05.flt$ = gr04.flt$
+0250 if 0 then write record(gr05, dom=0251)gr05$
+0255 if gr05.score then gosub score
+0260 goto 0190
+0270 call "CDS041", "CDW038", w038$, "YY"
+0271 w038.inputrow$ = "Y", w038.rowsperpage = 9999
+0274 call "CDW038", y$, y5$, y5a$, html$, w038$, "XXGR05", 0, wases.league$ + gr04.id$, keyend$, disp$, where$, sortby$, mode$, limitval, subhead$, foot$, env$
+0275 if len(gw041l$) then gosub summary
+0280 html$ = sumhtml$ + "<br>" + head$ + html$ + "<center><input type=submit value='Save Changes'> [CLOSE]</center>"
+0290 call "utfrmout.wbb", gr04$, html$ + "", html$
+0300 goto eoj
 
-1000 SCORE:
-1001 LET YR$=DATE(GR05.DATE:"%Yl")
-1002 LET Z=POS(YR$=GW041L$,LEN(GW041$))
-1003 IF Z=0
-:       THEN
-:          LET Z=LEN(GW041L$)+1;
-:          DIM GW041$:FATTR(GW041$);
-:          LET GW041.YEAR$=YR$,GW041L$=GW041L$+GW041$
-1004 LET GW041$=GW041L$(Z,LEN(GW041$))
-1010 LET GW041.TIMES=GW041.TIMES+1
-1020 IF GW041.SLOW=0
-:       THEN
-:          LET GW041.SLOW=GR05.SCORE
-:       ELSE
-:          LET GW041.SLOW=MIN(GW041.SLOW,GR05.SCORE)
-1030 LET GW041.SHI=MAX(GW041.SHI,GR05.SCORE)
-1040 LET GW041.STOT=GW041.STOT+GR05.SCORE
-1050 LET GW041.SAVG=ROUND(GW041.STOT/GW041.TIMES,1)
-1060 IF GR05.PUTTS THEN GOSUB PUTTS
-1065 LET GW041L$(Z,LEN(GW041$))=GW041$
-1070 RETURN
+1000 score:
+1001 yr$ = date(gr05.date:"%Yl")
+1002 z = pos(yr$ = gw041l$, len(gw041$))
+1003 if z = 0 then
+:      z = len(gw041l$) + 1;
+:      dim gw041$:fattr(gw041$);
+:      gw041.year$ = yr$, gw041l$ = gw041l$ + gw041$
+:    fi
+1004 gw041$ = gw041l$(z, len(gw041$))
+1010 gw041.times = gw041.times + 1
+1020 if gw041.slow = 0 then
+:      gw041.slow = gr05.score
+:    else
+:      gw041.slow = min(gw041.slow, gr05.score)
+:    fi
+1030 gw041.shi = max(gw041.shi, gr05.score)
+1040 gw041.stot = gw041.stot + gr05.score
+1050 gw041.savg = round(gw041.stot / gw041.times, 1)
+1060 if gr05.putts then gosub putts
+1065 gw041l$(z, len(gw041$)) = gw041$
+1070 return
 
-1100 PUTTS:
-1110 LET GW041.PTIMES=GW041.PTIMES+1
-1120 IF GW041.PLOW=0
-:       THEN
-:          LET GW041.PLOW=GR05.PUTTS
-:       ELSE
-:          LET GW041.PLOW=MIN(GW041.PLOW,GR05.PUTTS)
-1130 LET GW041.PHI=MAX(GW041.PHI,GR05.PUTTS)
-1140 LET GW041.PTOT=GW041.PTOT+GR05.PUTTS
-1150 LET GW041.PAVG=ROUND(GW041.PTOT/GW041.PTIMES,1)
-1160 RETURN
+1100 putts:
+1110 gw041.ptimes = gw041.ptimes + 1
+1120 if gw041.plow = 0 then
+:      gw041.plow = gr05.putts
+:    else
+:      gw041.plow = min(gw041.plow, gr05.putts)
+:    fi
+1130 gw041.phi = max(gw041.phi, gr05.putts)
+1140 gw041.ptot = gw041.ptot + gr05.putts
+1150 gw041.pavg = round(gw041.ptot / gw041.ptimes, 1)
+1160 return
 
-1200 SUMMARY:
-1210 CALL "CDW000",ROW$,"ds2",CVS(GR04.FIRSTNAME$,2)+" "+GR04.LASTNAME$
-1220 CALL "CDW000",ROW$,"dcs3","Scores"
-1230 CALL "CDW000",ROW$,"dcs3","Putts"
-1240 CALL "CDW000",TAB$,"r class='head'",ROW$
-1250 CALL "CDW000",ROW$,"dc","Year"
-1260 CALL "CDW000",ROW$,"dc","Times"
-1270 CALL "CDW000",ROW$,"dc","Low"
-1275 CALL "CDW000",ROW$,"dc","High"
-1280 CALL "CDW000",ROW$,"dc","Avg"
-1290 CALL "CDW000",ROW$,"dc","Low"
-1300 CALL "CDW000",ROW$,"dc","High"
-1310 CALL "CDW000",ROW$,"dc","Avg"
-1320 CALL "CDW000",TAB$,"r class='head'",ROW$
-1330 FOR I=1 TO LEN(GW041L$) STEP LEN(GW041$)
-1340    LET GW041$=GW041L$(I,LEN(GW041$))
-1350    CALL "CDW000",ROW$,"dc",GW041.YEAR$
-1360    CALL "CDW000",ROW$,"dc",STR(GW041.TIMES)
-1370    CALL "CDW000",ROW$,"dc",STR(GW041.SLOW)
-1380    CALL "CDW000",ROW$,"dc",STR(GW041.SHI)
-1390    CALL "CDW000",ROW$,"dc",STR(GW041.SAVG)
-1400    CALL "CDW000",ROW$,"dc",STR(GW041.PLOW)
-1410    CALL "CDW000",ROW$,"dc",STR(GW041.PHI)
-1420    CALL "CDW000",ROW$,"dc",STR(GW041.PAVG)
-1430    CALL "CDW000",TAB$,"r",ROW$
-1440 NEXT I
-1450 CALL "CDW000",SUMHTML$,"tc",TAB$
-1460 RETURN
+1200 summary:
+1210 call "CDW000", row$, "ds2", cvs(gr04.firstname$, 2) + " " + gr04.lastname$
+1220 call "CDW000", row$, "dcs3", "Scores"
+1230 call "CDW000", row$, "dcs3", "Putts"
+1240 call "CDW000", tab$, "r class='head'", row$
+1250 call "CDW000", row$, "dc", "Year"
+1260 call "CDW000", row$, "dc", "Times"
+1270 call "CDW000", row$, "dc", "Low"
+1275 call "CDW000", row$, "dc", "High"
+1280 call "CDW000", row$, "dc", "Avg"
+1290 call "CDW000", row$, "dc", "Low"
+1300 call "CDW000", row$, "dc", "High"
+1310 call "CDW000", row$, "dc", "Avg"
+1320 call "CDW000", tab$, "r class='head'", row$
+1330 for i = 1 to len(gw041l$) step len(gw041$)
+1340   gw041$ = gw041l$(i, len(gw041$))
+1350   call "CDW000", row$, "dc", gw041.year$
+1360   call "CDW000", row$, "dc", str(gw041.times)
+1370   call "CDW000", row$, "dc", str(gw041.slow)
+1380   call "CDW000", row$, "dc", str(gw041.shi)
+1390   call "CDW000", row$, "dc", str(gw041.savg)
+1400   call "CDW000", row$, "dc", str(gw041.plow)
+1410   call "CDW000", row$, "dc", str(gw041.phi)
+1420   call "CDW000", row$, "dc", str(gw041.pavg)
+1430   call "CDW000", tab$, "r", row$
+1440 next i
+1450 call "CDW000", sumhtml$, "tc", tab$
+1460 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDW999"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDW999"

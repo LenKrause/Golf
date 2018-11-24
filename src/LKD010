@@ -1,69 +1,69 @@
-0100 REM "LKD010 - 11/03/12 Downloader
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 PRINT 'CS',
-0130 DATA "104551100.Z","124551100.Z","jdk-7u4-linux-x64.rpm","BBj1111_11-11-20011_1514.jar","SMS","ZIP","APGL"
-0140 DATA "604551100.Z","624551100.Z","jdk-7u4-linux-x64.rpm","BBj1111_11-11-2011_1514.jar","SMS","ZIP","APGL"
-0150 LET FILES=7
-0160 DIM F32$[1:FILES],F64$[1:FILES]
-0170 DREAD F32$[ALL],F64$[ALL]
-0180 CALL "CDS276","32/64 bit|All/Selected|File",COL
-0190 REPEAT
-0200 CALL "CDS069",1,2,COL,2,"+option+","#{|,2,|,,,Y}132-bit|264-bit",OPT
-0210 IF CTL=4 THEN GOTO EOJ
-0220 CALL "CDS069",1,1,COL,3,"A=All Files, S=Selected","AAS",0,ALL$
-0230 LET Z$="Y"; CALL "CDS069",1,1,0,0,"Are entries correct (Y/N)+","AYN",0,Z$
-0240 IF CTL=4 THEN GOTO EOJ
-0250 UNTIL Z$="Y"
-0260 IF OPT=1 THEN LET FILES$[ALL]=F32$[ALL] ELSE LET FILES$[ALL]=F64$[ALL]
-0270 FOR I=1 TO FILES
-0280    PRINT @(COL,4),FILES$[I],'CE',
-0290    LET CMD$="curl s3.amazonaws.com/excellware-dnl/"+FILES$[I]+" >$SMSDIR/tmp/"+FILES$[I]
-0300    IF ALL$="S"
-:          THEN
-:             CALL "CDS069",1,1,0,0,"Download this file (Y/N)+","AYN",0,Z$;
-:             IF CTL=4
-:                THEN
-:                   GOTO EOJ
-0310    IF ALL$="A" OR Z$="Y" THEN PRINT @(0,6),; LET A=SCALL(CMD$)
-0320 NEXT I
-0330 CALL "CDS069",0,0,0,0,"Job completed-"
-0340 GOTO EOJ
+0100 rem "LKD010 - 11/03/12 Downloader
+0110 setesc 8000; seterr 8000
+0120 print 'cs', 
+0130 data "104551100.Z", "124551100.Z", "jdk-7u4-linux-x64.rpm", "BBj1111_11-11-20011_1514.jar", "SMS", "ZIP", "APGL"
+0140 data "604551100.Z", "624551100.Z", "jdk-7u4-linux-x64.rpm", "BBj1111_11-11-2011_1514.jar", "SMS", "ZIP", "APGL"
+0150 files = 7
+0160 dim f32$[1:files], f64$[1:files]
+0170 dread f32$[all], f64$[all]
+0180 call "CDS276", "32/64 bit|All/Selected|File", col
+0190 repeat
+0200   call "CDS069", 1, 2, col, 2, "+option+", "#{|,2,|,,,Y}132-bit|264-bit", opt
+0210   if ctl = 4 then goto eoj
+0220   call "CDS069", 1, 1, col, 3, "A=All Files, S=Selected", "AAS", 0, all$
+0230   z$ = "Y"; call "CDS069", 1, 1, 0, 0, "Are entries correct (Y/N)+", "AYN", 0, z$
+0240   if ctl = 4 then goto eoj
+0250 until z$ = "Y"
+0260 if opt = 1 then files$[all] = f32$[all] else files$[all] = f64$[all]
+0270 for i = 1 to files
+0280   print @(col, 4), files$[i], 'ce', 
+0290   cmd$ = "curl s3.amazonaws.com/excellware-dnl/" + files$[i] + " >$SMSDIR/tmp/" + files$[i]
+0300   if all$ = "S" then
+:        call "CDS069", 1, 1, 0, 0, "Download this file (Y/N)+", "AYN", 0, z$;
+:        if ctl = 4 then
+:          goto eoj
+:        fi
+:      fi
+0310   if all$ = "A" or z$ = "Y" then print @(0,6), ; a = scall(cmd$)
+0320 next i
+0330 call "CDS069", 0, 0, 0, 0, "Job completed-"
+0340 goto eoj
 
-1000 TEST:
-1010 CALL "CDS041","CDS700",S700$,"YY"
-1020 LET S700.ACTION$="L"
-1030 LET S700.BUCKET$="excellware-dnl"
-1040 CALL "CDS700",Y$,S700$,S236$,XML$
-1210 PRINT @(8,23),"Obtaining directory list...",
-1230 CALL "CDS700",Y$,S700$,S236$,XML$
-1240 PRINT @(8,23),'CL',
-1250 IF S236.REPEAT[7]=0
-:       THEN
-:          CALL "CDS069",0,0,0,0,"No DynaStore files found-";
-:          RETURN
-1260 LET FILS$="",MAXL=0
-1270 FOR I=1 TO S236.REPEAT[7]
-1280    LET FILS$=FILS$+XML.KEY$[I]+"|"
-1290    LET MAXL=MAX(MAXL,LEN(XML.KEY$[I]))
-1300 NEXT I
-1310 LET FIL$="";
-:    CALL "CDS069",1,MAXL,0,0,"+file name to retrieve+","A{|,,,,,Y}"+FILS$,0,FIL$
-1320 IF CTL<>4 THEN GOSUB GETFILE; GOTO 1310
-1330 RETURN
+1000 test:
+1010 call "CDS041", "CDS700", s700$, "YY"
+1020 s700.action$ = "L"
+1030 s700.bucket$ = "excellware-dnl"
+1040 call "CDS700", y$, s700$, s236$, xml$
+1210 print @(8,23), "Obtaining directory list...", 
+1230 call "CDS700", y$, s700$, s236$, xml$
+1240 print @(8,23), 'cl', 
+1250 if s236.repeat[7] = 0 then
+:      call "CDS069", 0, 0, 0, 0, "No DynaStore files found-";
+:      return
+:    fi
+1260 fils$ = "", maxl = 0
+1270 for i = 1 to s236.repeat[7]
+1280   fils$ = fils$ + xml.key$[i] + "|"
+1290   maxl = max(maxl, len(xml.key$[i]))
+1300 next i
+1310 fil$ = "";
+:    call "CDS069", 1, maxl, 0, 0, "+file name to retrieve+", "A{|,,,,,Y}" + fils$, 0, fil$
+1320 if ctl <> 4 then gosub getfile; goto 1310
+1330 return
 
-1400 GETFILE:
-1410 LET S700.ACTION$="G"
-1420 LET S700.STOREDFILE$=FIL$
-1430 LET S700.LOCALFILE$="tmp/"+FIL$
-1440 LET S700.DISP$="P"
-1450 CALL "CDS700",Y$,S700$,S236$,XML$; REM "Download selected file
-1470 RETURN
+1400 getfile:
+1410 s700.action$ = "G"
+1420 s700.storedfile$ = fil$
+1430 s700.localfile$ = "tmp/" + fil$
+1440 s700.disp$ = "P"
+1450 call "CDS700", y$, s700$, s236$, xml$; rem "Download selected file
+1470 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

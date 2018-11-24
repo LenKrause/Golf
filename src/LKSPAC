@@ -1,30 +1,30 @@
-0100 REM "LKSPAC - 02/17/16 Testing program
-0110 BEGIN
-0115 SETERR DT_ERR; SETESC DT_ERR
-0116 LET A=1/0
-0120 CALL "CDS091",Y$
-0130 LET SORTBY$="STR(PM10.OPENEDBY$<>"""+Y.OPERID$+""")+NOT(PM10.OPENEDON$)"
-0140 CALL "CDS037","CDPM10",KNO,KEYPFX$,"OPENEDBY|OPENEDON|JOBNO|TITLE",WINX,WINY,WINROWS,WINCOLS,WINTITLE$,COLORS$,SELRTN$,WHERE$,SORTBY$,S037$,LIMITVAL,PM10$
-0150 GOTO 9996
-1000 BEGIN
-1005 LET TMP$=STBL("!CLEAR","!DSOPEN")
-1010 CALL "CDS037","TI/TIUD40",KNO,KEYPFX$,DISP$,WINX,WINY,WINROWS,WINCOLS,WINTITLE$,COLORS$,SELRTN$,"SONO$>""1""",SORTBY$,S037$,LIMITVAL,SELREC$
-1020 GOTO 9996
-5000 BEGIN
-5010 CALL "CDS091",Y$
-5011 CALL "CDS041","CDS084",S084$,"YY"
-5012 LET S084.NAME$="MAIL",S084.FROMEMAIL$="len""krause@excellware.com"
-5013 LET S084.SUBJECT$="Apostrophe test"
-5014 LET S084.EMAILCC$="len@excellware.com"
-5020 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
-5030 PRINT (Y6.CH)"Email test"
-5040 CALL "CDS094",Y6$,"E"
-5050 GOTO 9995
+0100 rem "LKSPAC - 02/17/16 Testing program
+0110 begin
+0115 seterr dt_err; setesc dt_err
+0116 a = 1 / 0
+0120 call "CDS091", y$
+0130 sortby$ = "STR(PM10.OPENEDBY$<>""" + y.operid$ + """)+NOT(PM10.OPENEDON$)"
+0140 call "CDS037", "CDPM10", kno, keypfx$, "OPENEDBY|OPENEDON|JOBNO|TITLE", winx, winy, winrows, wincols, wintitle$, colors$, selrtn$, where$, sortby$, s037$, limitval, pm10$
+0150 goto 9996
+1000 begin
+1005 tmp$ = stbl("!CLEAR", "!DSOPEN")
+1010 call "CDS037", "TI/TIUD40", kno, keypfx$, disp$, winx, winy, winrows, wincols, wintitle$, colors$, selrtn$, "SONO$>""1""", sortby$, s037$, limitval, selrec$
+1020 goto 9996
+5000 begin
+5010 call "CDS091", y$
+5011 call "CDS041", "CDS084", s084$, "YY"
+5012 s084.name$ = "MAIL", s084.fromemail$ = "len""krause@excellware.com"
+5013 s084.subject$ = "Apostrophe test"
+5014 s084.emailcc$ = "len@excellware.com"
+5020 call "CDS084", y$, y5$, u0, s084$, y6, y6$
+5030 print (y6.ch)"Email test"
+5040 call "CDS094", y6$, "E"
+5050 goto 9995
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

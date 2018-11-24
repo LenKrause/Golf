@@ -1,11 +1,11 @@
-0001 REM "LKSRCV - 01/06/02 Socket server test
-0010 BEGIN
-0020 OPEN (1,MODE="port=12000")"N0"
-0030 READ (1,ERR=0070)X$
-0035 PRINT X$
-0040 LET H$=HTA(X$)
-0050 WRITE (1)H$
-0060 GOTO 0030
-0070 PRINT "Error ",ERR," on read"
-0080 PRINT "Connection closed."
-0090 GOTO 0030
+0001 rem "LKSRCV - 01/06/02 Socket server test
+0010 begin
+0020 open (1, mode = "port=12000")"N0"
+0030 read (1, err=0070)x$
+0035 print x$
+0040 h$ = hta(x$)
+0050 write (1)h$
+0060 goto 0030
+0070 print "Error ", err, " on read"
+0080 print "Connection closed."
+0090 goto 0030

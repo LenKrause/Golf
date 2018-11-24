@@ -1,171 +1,170 @@
-0100 REM "GW020 - 09/23/15 Golfer Maintenance
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS095",GR04,"XXGR04","YNY",GR04$,GR04K$
-0130 CALL "CDS095",GR05,"XXGR05","YNY",GR05$
-0140 LET RECS=NUM(FIELD(CGI$,"RECS",ERR=0150)); GOSUB SAVE
-0150 CALL "CDW000",ROW$,"dcs9",WASES.LEAGUENAME$
-0160 CALL "CDW000",TAB$,"r class='top'",ROW$
-0170 CALL "CDW000",ROW$,"dcs9","Golfer Maintenance"
-0180 CALL "CDW000",TAB$,"r class='title'",ROW$
-0190 CALL "CDW000",ROW$,"d","First Name"
-0200 CALL "CDW000",ROW$,"d","Last Name"
-0210 CALL "CDW000",ROW$,"d","Email"
-0220 CALL "CDW000",ROW$,"d","Phone#"
-0230 CALL "CDW000",ROW$,"dc","Initial<br>Handicap"
-0235 CALL "CDW000",ROW$,"dc","Preferred<br>Flight"
-0240 CALL "CDW000",ROW$,"dc","Play in "+DATE(0:"%Yl")
-0245 IF 0 THEN CALL "CDW000",ROW$,"dc","Preferred<br>Flight"
-0250 CALL "CDW000",ROW$,"dc","Last Round"
-0255 CALL "CDW000",ROW$,"dc","Scores"
-0260 CALL "CDW000",TAB$,"r class='head'",ROW$
-0270 LET IND=0
-0280 READ (GR04,KNUM=3,KEY=WASES.LEAGUE$,DOM=0290)
-0290 READ RECORD(GR04,END=0480)GR04$
-0300 IF GR04.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0480
-0310 LET IND=IND+1,IND$=STR(IND)
-0320 IF LEN(B$)
-:       THEN
-:          LET GR04.ID$=FNF$("ID"),GR04.FIRSTNAME$=FNF$("FIRSTNAME"),GR04.LASTNAME$=FNF$("LASTNAME"),GR04.PHONE$=FNF$("PHONE"),GR04.EMAIL$=FNF$("EMAIL"),GR04.PLAYTHISYEAR$=FNF$("PLAYTHISYEAR")
-0330 CALL "CDW000",ROW$,"d","<input type='hidden' name='ID"+IND$+"' value='"+GR04.ID$+"'>"+FNI$("FIRSTNAME")
-0340 CALL "CDW000",ROW$,"d",FNI$("LASTNAME")
-0350 CALL "CDW000",ROW$,"d",FNI$("EMAIL")
-0360 CALL "CDW000",ROW$,"d",FNI$("PHONE")
-0370 IF POS("HC"+IND$+"|"=B$)
-:       THEN
-:          LET VAL$=FNF$("HC"),OPT$=";background-color:#ffcccc"
-:       ELSE
-:          LET VAL$=STR(GR04.HC),OPT$="";
-:          IF VAL$="0"
-:             THEN
-:                LET VAL$=""
-0380 CALL "CDW000",ROW$,"dc","<input style='text-align:center"+OPT$+"' type='text' name='HC"+IND$+"' value='"+VAL$+"' size=2 maxlength=2>"
-0385 CALL "CDW000",ROW$,"dc","<input style='text-align:center' type='text' name='PREFLT"+IND$+"' value='"+CVS(GR04.PREFLT$,5)+"' size=1 maxlength=1>"
-0390 IF GR04.PLAYTHISYEAR$="Y" OR POS(" "<>GR04.ID$)=0
-:       THEN
-:          LET YSEL$="checked",NSEL$=""
-:       ELSE
-:          LET NSEL$="checked",YSEL$=""
-0400 CALL "CDW000",ROW$,"d","<input type='radio' name='PLAYTHISYEAR"+IND$+"' value='Y' "+YSEL$+">Yes &nbsp;<input type='radio' name='PLAYTHISYEAR"+IND$+"' value='N' "+NSEL$+">No"
-0403 IF 0 THEN LET PREA$="",PREB$="",PREBLK$=""
-0404 IF 0
-:       THEN
-:          IF GR04.PREFLT$="A"
-:             THEN
-:                LET PREA$="checked"
-:             ELSE
-:                IF GR04.PREFLT$="B"
-:                   THEN
-:                      LET PREB$="checked"
-:                   ELSE
-:                      LET PREBLK$="checked"
-0405 IF 0
-:       THEN
-:          CALL "CDW000",ROW$,"d","<input type='radio' name='PREFLT"+IND$+"' value=' ' "+PREBLK$+">None<br><input type='radio' name='PREFLT"+IND$+"' value='A' "+PREA$+">A<br><input type='radio' name='PREFLT"+IND$+"' value='B' "+PREB$+">B"
-0410 READ (GR05,KNUM=0,KEY=GR04.LEAGUE$+GR04.ID$+$FF$,DOM=0420)
-0420 LET LAST$=""
-0430 READ RECORD(GR05,END=0450)GR05$
-0440 IF GR05.LEAGUE$+GR05.ID$=GR04.LEAGUE$+GR04.ID$
-:       THEN
-:          IF GR05.SCORE
-:             THEN
-:                LET LAST$=DATE(GR05.DATE)
-:             ELSE
-:                GOTO 0430
-0450 CALL "CDW000",ROW$,"dc",LAST$
-0455 CALL "CDW000",ROW$,"dc","<input type='button' value='Edit' onclick='window.open(""[DSN]?p=GW041&id="+GR04.ID$+""")'>"
-0460 CALL "CDW000",TAB$,"r",ROW$
-0470 GOTO 0290
-0480 IF NEW<10 THEN LET NEW=NEW+1; DIM GR04$:FATTR(GR04$); GOTO 0310
-0490 CALL "CDW000",ROW$,"dcs9","[CANCEL] <input type='submit' value='Save Changes'>"
-0500 CALL "CDW000",TAB$,"r",ROW$
-0510 CALL "CDW000",HTML$,"tc",TAB$
-0520 LET HTML$=HTML$+"<input type='hidden' name='recs' value="+IND$+">"
-0530 LET HTML$="<form method='post' action='[DSN]?p=GW020'>"+HTML$+"</form>"
-0540 IF LEN(MSG$) THEN LET HTML$="<p class='msg'>"+MSG$+"</p>"+HTML$
-0550 GOTO EOJ
-0560 DEF FNI$(VBL$)
-0570 LET VAL$=FIELD(GR04$,VBL$),LGTH$=STR(LEN(VAL$))
-0580 IF POS(VBL$+IND$+"|"=B$)
-:       THEN
-:          LET OPT$=" style='background-color:#ffcccc' value='"+FNF$(VBL$)+"'"
-:       ELSE
-:          LET OPT$=" value='"+CVS(VAL$,2)+"'"
-0590 RETURN "<input type='text' name='"+VBL$+IND$+"' size="+LGTH$+" maxlength="+LGTH$+OPT$+">"
-0600 FNEND
+0100 rem "GW020 - 09/23/15 Golfer Maintenance
+0110 setesc 8000; seterr 8000
+0120 call "CDS095", gr04, "XXGR04", "YNY", gr04$, gr04k$
+0130 call "CDS095", gr05, "XXGR05", "YNY", gr05$
+0140 recs = num(field(cgi$, "RECS", err=0150)); gosub save
+0150 call "CDW000", row$, "dcs9", wases.leaguename$
+0160 call "CDW000", tab$, "r class='top'", row$
+0170 call "CDW000", row$, "dcs9", "Golfer Maintenance"
+0180 call "CDW000", tab$, "r class='title'", row$
+0190 call "CDW000", row$, "d", "First Name"
+0200 call "CDW000", row$, "d", "Last Name"
+0210 call "CDW000", row$, "d", "Email"
+0220 call "CDW000", row$, "d", "Phone#"
+0230 call "CDW000", row$, "dc", "Initial<br>Handicap"
+0235 call "CDW000", row$, "dc", "Preferred<br>Flight"
+0240 call "CDW000", row$, "dc", "Play in " + date(0:"%Yl")
+0245 if 0 then call "CDW000", row$, "dc", "Preferred<br>Flight"
+0250 call "CDW000", row$, "dc", "Last Round"
+0255 call "CDW000", row$, "dc", "Scores"
+0260 call "CDW000", tab$, "r class='head'", row$
+0270 ind=0
+0280 read (gr04, knum=3, key=wases.league$, dom=0290)
+0290 read record(gr04, end=0480)gr04$
+0300 if gr04.league$ <> wases.league$ then goto 0480
+0310 ind=ind + 1, ind$ = str(ind)
+0320 if len(b$) then
+:      gr04.id$ = fnf$("ID"), gr04.firstname$ = fnf$("FIRSTNAME"), gr04.lastname$ = fnf$("LASTNAME"), gr04.phone$ = fnf$("PHONE"), gr04.email$ = fnf$("EMAIL"), gr04.playthisyear$ = fnf$("PLAYTHISYEAR")
+:    fi
+0330 call "CDW000", row$, "d", "<input type='hidden' name='ID" + ind$ + "' value='" + gr04.id$ + "'>" + fni$("FIRSTNAME")
+0340 call "CDW000", row$, "d", fni$("LASTNAME")
+0350 call "CDW000", row$, "d", fni$("EMAIL")
+0360 call "CDW000", row$, "d", fni$("PHONE")
+0370 if pos("HC" + ind$ + "|" = b$) then
+:      val$ = fnf$("HC"), opt$ = ";background-color:#ffcccc"
+:    else
+:      val$ = str(gr04.hc), opt$ = "";
+:      if val$ = "0" then
+:        val$ = ""
+:      fi
+:    fi
+0380 call "CDW000", row$, "dc", "<input style='text-align:center" + opt$ + "' type='text' name='HC" + ind$ + "' value='" + val$ + "' size=2 maxlength=2>"
+0385 call "CDW000", row$, "dc", "<input style='text-align:center' type='text' name='PREFLT" + ind$ + "' value='" + cvs(gr04.preflt$, 5) + "' size=1 maxlength=1>"
+0390 if gr04.playthisyear$ = "Y" or pos(" " <> gr04.id$) = 0 then
+:      ysel$ = "checked", nsel$ = ""
+:    else
+:      nsel$ = "checked", ysel$ = ""
+:    fi
+0400 call "CDW000", row$, "d", "<input type='radio' name='PLAYTHISYEAR" + ind$ + "' value='Y' " + ysel$ + ">Yes &nbsp;<input type='radio' name='PLAYTHISYEAR" + ind$ + "' value='N' " + nsel$ + ">No"
+0403 if 0 then prea$ = "", preb$ = "", preblk$ = ""
+0404 if 0 then
+:      if gr04.preflt$ = "A" then
+:        prea$ = "checked"
+:      else
+:        if gr04.preflt$ = "B" then
+:          preb$ = "checked"
+:        else
+:          preblk$ = "checked"
+:        fi
+:      fi
+:    fi
+0405 if 0 then
+:      call "CDW000", row$, "d", "<input type='radio' name='PREFLT" + ind$ + "' value=' ' " + preblk$ + ">None<br><input type='radio' name='PREFLT" + ind$ + "' value='A' " + prea$ + ">A<br><input type='radio' name='PREFLT" + ind$ + "' value='B' " + preb$ + ">B"
+:    fi
+0410 read (gr05, knum=0, key=gr04.league$ + gr04.id$ + $ff$, dom=0420)
+0420 last$ = ""
+0430 read record(gr05, end=0450)gr05$
+0440 if gr05.league$ + gr05.id$ = gr04.league$ + gr04.id$ then
+:      if gr05.score then
+:        last$ = date(gr05.date)
+:      else
+:        goto 0430
+:      fi
+:    fi
+0450 call "CDW000", row$, "dc", last$
+0455 call "CDW000", row$, "dc", "<input type='button' value='Edit' onclick='window.open(""[DSN]?p=GW041&id=" + gr04.id$ + """)'>"
+0460 call "CDW000", tab$, "r", row$
+0470 goto 0290
+0480 if new < 10 then new = new + 1; dim gr04$:fattr(gr04$); goto 0310
+0490 call "CDW000", row$, "dcs9", "[CANCEL] <input type='submit' value='Save Changes'>"
+0500 call "CDW000", tab$, "r", row$
+0510 call "CDW000", html$, "tc", tab$
+0520 html$ = html$ + "<input type='hidden' name='recs' value=" + ind$ + ">"
+0530 html$ = "<form method='post' action='[DSN]?p=GW020'>" + html$ + "</form>"
+0540 if len(msg$) then html$ = "<p class='msg'>" + msg$ + "</p>" + html$
+0550 goto eoj
+0560 def fni$(vbl$)
+0570 val$ = field(gr04$, vbl$), lgth$ = str(len(val$))
+0580 if pos(vbl$ + ind$ + "|" = b$) then
+:      opt$ = " style='background-color:#ffcccc' value='" + fnf$(vbl$) + "'"
+:    else
+:      opt$ = " value='" + cvs(val$, 2) + "'"
+:    fi
+0590 return "<input type='text' name='" + vbl$ + ind$ + "' size=" + lgth$ + " maxlength=" + lgth$ + opt$ + ">"
+0600 fnend
 
-1000 SAVE:
-1010 LET B$=""
-1020 FOR IND=1 TO RECS
-1030    LET IND$=STR(IND)
-1040    LET EMAIL$=CVS(FNF$("EMAIL"),8)
-1050    IF POS(" "<>EMAIL$)
-:          THEN
-:             CALL "CDS275::VALIDATE",ERR=1060,EMAIL$,MSG$;
-:             GOTO 1070
-1060    IF POS(" "<>EMAIL$) THEN LET B$=FNB$("EMAIL")
-1070    LET PHONE$=CVS(FNF$("PHONE"),3)
-1080    IF LEN(PHONE$)
-:          THEN
-:             IF LEN(PHONE$)<>12 OR POS(PHONE$(1,1)="23456789")=0 OR POS(PHONE$(4,1)=".-")=0 OR POS(PHONE$(8,1)=".-")=0 OR MASK(PHONE$(2,2)+PHONE$(5,3)+PHONE$(9,4),"^[0123456789]+$")=0
-:                THEN
-:                   LET B$=FNB$("PHONE")
-1090    IF POS(" "<>EMAIL$+PHONE$)
-:          THEN
-:             IF POS(" "<>FNF$("LASTNAME"))=0
-:                THEN
-:                   LET B$=FNB$("LASTNAME")
-:             FI;
-:             IF POS(" "<>FNF$("FIRSTNAME"))=0
-:                THEN
-:                   LET B$=FNB$("FIRSTNAME")
-1100    LET HC=-1,HC=NUM(FNF$("HC"),ERR=1110)
-1110    IF HC<0 OR FPT(HC) THEN LET B$=FNB$("HC")
-1120 NEXT IND
-1130 IF LEN(B$) THEN LET MSG$="Correct problems shown in red!"; RETURN
-1140 FOR IND=1 TO RECS
-1150    LET IND$=STR(IND)
-1160    DIM GR04$:FATTR(GR04$)
-1170    LET GR04.LEAGUE$=WASES.LEAGUE$,ID$=FNF$("ID"),CHG=0
-1180    IF POS(" "<>ID$)
-:          THEN
-:             LET GR04.ID$=ID$;
-:             EXTRACT RECORD(GR04,KNUM=0,KEY=KGEN(GR04$,GR04K$,0))GR04$
-1190    IF POS(" "<>FNF$("FIRSTNAME"))
-:          THEN
-:             LET GR04.FIRSTNAME$=FNF$("FIRSTNAME"),CHG=1
-1200    IF POS(" "<>FNF$("LASTNAME"))
-:          THEN
-:             LET GR04.LASTNAME$=FNF$("LASTNAME"),CHG=1
-1210    LET GR04.EMAIL$=CVS(FNF$("EMAIL"),8)
-1220    LET GR04.PHONE$=CVS(FNF$("PHONE"),8)
-1230    IF NUM(FNF$("HC")) THEN LET GR04.HC=NUM(FNF$("HC"))
-1231    LET PREFLT$=CVS(PAD(FNF$("PREFLT"),1),4)
-1235    IF POS(PREFLT$=" ABCD") THEN LET GR04.PREFLT$=PREFLT$
-1240    IF POS(FNF$("PLAYTHISYEAR")="YN")
-:          THEN
-:             LET GR04.PLAYTHISYEAR$=FNF$("PLAYTHISYEAR")
-1250    IF POS(" "<>ID$) THEN WRITE RECORD(GR04)GR04$ ELSE IF CHG THEN GOSUB NEWID
-1260 NEXT IND
-1270 RUN "GW011"
+1000 save:
+1010 b$ = ""
+1020 for ind=1 to recs
+1030   ind$ = str(ind)
+1040   email$ = cvs(fnf$("EMAIL"), 8)
+1050   if pos(" " <> email$) then
+:        call "CDS275::VALIDATE", err=1060, email$, msg$;
+:        goto 1070
+:      fi
+1060   if pos(" " <> email$) then b$ = fnb$("EMAIL")
+1070   phone$ = cvs(fnf$("PHONE"), 3)
+1080   if len(phone$) then
+:        if len(phone$) <> 12 or pos(phone$(1,1) = "23456789") = 0 or pos(phone$(4,1) = ".-") = 0 or pos(phone$(8,1) = ".-") = 0 or mask(phone$(2,2) + phone$(5,3) + phone$(9,4), "^[0123456789]+$") = 0 then
+:          b$ = fnb$("PHONE")
+:        fi
+:      fi
+1090   if pos(" " <> email$ + phone$) then
+:        if pos(" " <> fnf$("LASTNAME")) = 0 then
+:          b$ = fnb$("LASTNAME")
+:        fi;
+:        if pos(" " <> fnf$("FIRSTNAME")) = 0 then
+:          b$ = fnb$("FIRSTNAME")
+:        fi
+:      fi
+1100   hc = -1, hc = num(fnf$("HC"), err=1110)
+1110   if hc < 0 or fpt(hc) then b$ = fnb$("HC")
+1120 next ind
+1130 if len(b$) then msg$ = "Correct problems shown in red!"; return
+1140 for ind=1 to recs
+1150   ind$ = str(ind)
+1160   dim gr04$:fattr(gr04$)
+1170   gr04.league$ = wases.league$, id$ = fnf$("ID"), chg = 0
+1180   if pos(" " <> id$) then
+:        gr04.id$ = id$;
+:        extract record(gr04, knum=0, key=kgen(gr04$, gr04k$, 0))gr04$
+:      fi
+1190   if pos(" " <> fnf$("FIRSTNAME")) then
+:        gr04.firstname$ = fnf$("FIRSTNAME"), chg = 1
+:      fi
+1200   if pos(" " <> fnf$("LASTNAME")) then
+:        gr04.lastname$ = fnf$("LASTNAME"), chg = 1
+:      fi
+1210   gr04.email$ = cvs(fnf$("EMAIL"), 8)
+1220   gr04.phone$ = cvs(fnf$("PHONE"), 8)
+1230   if num(fnf$("HC")) then gr04.hc = num(fnf$("HC"))
+1231   preflt$ = cvs(pad(fnf$("PREFLT"), 1), 4)
+1235   if pos(preflt$ = " ABCD") then gr04.preflt$ = preflt$
+1240   if pos(fnf$("PLAYTHISYEAR") = "YN") then
+:        gr04.playthisyear$ = fnf$("PLAYTHISYEAR")
+:      fi
+1250   if pos(" " <> id$) then write record(gr04)gr04$ else if chg then gosub newid
+1260 next ind
+1270 run "GW011"
 
-1300 NEWID:
-1310 LET GR04.ID$=CVS(GR04.LASTNAME$(1,3)+GR04.FIRSTNAME$(1,1),4)
-1320 LET Z=POS(" "=GR04.ID$); IF Z THEN LET GR04.ID$(Z,1)="_"; GOTO 1320
-1330 WRITE RECORD(GR04,DOM=1340)GR04$; RETURN
-1340 LET GR04.ID$(4,1)=CHR(1+ASC(GR04.ID$(4,1)))
-1350 GOTO 1330
+1300 newid:
+1310 gr04.id$ = cvs(gr04.lastname$(1,3) + gr04.firstname$(1,1), 4)
+1320 z = pos(" " = gr04.id$); if z then gr04.id$(z, 1) = "_"; goto 1320
+1330 write record(gr04, dom=1340)gr04$; return
+1340 gr04.id$(4,1) = chr(1 + asc(gr04.id$(4,1)))
+1350 goto 1330
 
-1400 FUNCTIONS:
-1410 DEF FNB$(FLD$)=B$+FLD$+IND$+"|"
-1420 DEF FNF$(FLD$)
-1430 LET VAL$="",VAL$=FIELD(CGI$,FLD$+IND$,ERR=1440)
-1440 RETURN VAL$
-1450 FNEND
+1400 functions:
+1410 def fnb$(fld$) = b$ + fld$ + ind$ + "|"
+1420 def fnf$(fld$)
+1430 val$ = "", val$ = field(cgi$, fld$ + ind$, err=1440)
+1440 return val$
+1450 fnend
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDW999"
+9000 eoj:
+9010 run "CDW999"

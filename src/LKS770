@@ -1,26 +1,26 @@
-0100 REM "LKS770 - 03/25/00 dbf file read
-0110 BEGIN
-0120 CALL "CDS395",1,"/u/pc/downloads/TechData/NewProducts.dbf","",REC$
-0130 GOSUB SETUP
-0140 READ RECORD(1,SIZ=LEN(REC$))REC$
-0145 IF REC$=$1A$ THEN INPUT "End of File ",*; GOTO EOJ
-0150 FOR I=1 TO FLDS
-0160    PRINT 'SB',PAD(DAT.NAM$[I],12),'SF',FIELD(REC$,DAT.NAM$[I])
-0170 NEXT I
-0180 INPUT *
-0190 GOTO 0140
+0100 rem "LKS770 - 03/25/00 dbf file read
+0110 begin
+0120 call "CDS395", 1, "/u/pc/downloads/TechData/NewProducts.dbf", "", rec$
+0130 gosub setup
+0140 read record(1, siz=len(rec$))rec$
+0145 if rec$ = $1a$ then input "End of File ", *; goto eoj
+0150 for i = 1 to flds
+0160   print 'sb', pad(dat.nam$[i], 12), 'sf', field(rec$, dat.nam$[i])
+0170 next i
+0180 input *
+0190 goto 0140
 
-1000 SETUP:
-1010 LET FLDS$=FATTR(REC$,""),FLDS=POS($0A$=FLDS$,1,0)
-1020 PRINT FATTR(REC$)
-1080 DIM DAT$:"NAM["+STR(FLDS)+"]:C(1*)"; LET DAT$=FATTR(REC$,"")
-1090 RETURN
+1000 setup:
+1010 flds$ = fattr(rec$, ""), flds = pos($0a$ = flds$, 1, 0)
+1020 print fattr(rec$)
+1080 dim dat$:"NAM[" + str(flds) + "]:C(1*)"; dat$ = fattr(rec$, "")
+1090 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

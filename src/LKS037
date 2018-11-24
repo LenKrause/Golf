@@ -1,25 +1,25 @@
-0100 REM "LKS037 - 12/09/09 Test CDS037 SELRTN$
-0105 BEGIN
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 LET FILNAM$="TEST1"; CALL "CDS095",ERR=EOJ,CHAN,FILNAM$,"YNYW",TEST1$,KGEN$
-0125 LET TMP$=STBL("LKS038",FILNAM$)
-0130 FOR SEQ=1 TO 10
-0140    LET TEST1.SEQ=SEQ
-0150    LET TEST1.VALUE$="Value "+STR(SEQ)
-0160    WRITE RECORD(CHAN)TEST1$
-0170 NEXT SEQ
-0175 CLOSE (CHAN)
-0180 CALL "CDS037",FILNAM$,KNO,KEYPFX$,DISP$,WINX,WINY,WINROWS,WINCOLS,WINTITLE$,COLORS$,"LKS038",WHERE$,SORTBY$,MODE$,LIMITVAL,TEST1$
-0190 CALL "CDS069",1,3,0,0,"1=Re-display records, 2=Re-populate file, 3=Exit","0",OPT
-0200 IF OPT=3 THEN RUN "CDS001"
-0210 IF OPT=1 THEN GOTO 0180
-0220 GOTO 0100
+0100 rem "LKS037 - 12/09/09 Test CDS037 SELRTN$
+0105 begin
+0110 setesc 8000; seterr 8000
+0120 filnam$ = "TEST1"; call "CDS095", err=eoj, chan, filnam$, "YNYW", test1$, kgen$
+0125 tmp$ = stbl("LKS038", filnam$)
+0130 for seq = 1 to 10
+0140   test1.seq = seq
+0150   test1.value$ = "Value " + str(seq)
+0160   write record(chan)test1$
+0170 next seq
+0175 close (chan)
+0180 call "CDS037", filnam$, kno, keypfx$, disp$, winx, winy, winrows, wincols, wintitle$, colors$, "LKS038", where$, sortby$, mode$, limitval, test1$
+0190 call "CDS069", 1, 3, 0, 0, "1=Re-display records, 2=Re-populate file, 3=Exit", "0", opt
+0200 if opt = 3 then run "CDS001"
+0210 if opt = 1 then goto 0180
+0220 goto 0100
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

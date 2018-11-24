@@ -1,410 +1,408 @@
-0100 REM "GW045 - 05/30/17 Score Posting Sheets & Handicap Listing
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "SW010","XXGR04",0,"","FLT|SEQ|ID",FSI$,"","","REC.LEAGUE$="""+WASES.LEAGUE$+""" AND REC.FLT$<>"" """
-0125 DIM PTODAY$[1:4]; LET FLTS$=""
-0130 CALL "SW001","XXGR01",0,WASES.LEAGUE$,GR01$
-0131 CALL "SW001","XXGR08",0,GR01.ID$,GR08$,SW001$
-0140 CALL "CDS095",GR03,"XXGR03","YPY",GR03$
-0150 READ RECORD(GR03,KNUM=0,KEY=WASES.LEAGUE$+BIN(NUM(CGI.DATE$),3))GR03$
-0151 CALL "CDS041","GW032",GW032$,"YY"
-0152 CALL "GW032",Y$,GR03$,GW032$
-0153 LET LASTWKOFYR=GW032.LASTWEEK
-0155 LET HALF=GR03.HALF
-0160 IF GR03.NINE$="F"
-:       THEN
-:          LET NINE$="Front Nine",HOLE0=1,PAR=GR08.PARF
-:       ELSE
-:          LET NINE$="Back Nine",HOLE0=10,PAR=GR08.PARB
-0170 CALL "CDS095",GR04,"XXGR04","YPY",GR04$
-0175 CALL "CDS133","XXGR05","","NNYY";
-:    REM "Archive scores file for possible rollback if prior scores are lost
-0180 CALL "CDS095",GR05,"XXGR05","YNY",GR05$,GR05K$
-0182 LET GR05S=UNT
-0183 SELECT (GR05S)GR05$ FROM Y.COMPCODE$+"GR05" WHERE GR05.LEAGUE$=WASES.LEAGUE$ AND GR05.DATE=NUM(CGI.DATE$) AND GR05.SCORE=0
-0184 READ RECORD(GR05S,END=0189)GR05$
-0185 REMOVE (GR05,KEY=KGEN(GR05$,GR05K$,0))
-0186 GOTO 0184
-0189 CLOSE (GR05S)
-0190 CALL "CDS041","CDS084",S084$
-0200 LET S084.MODE$="E",S084.NAME$="APDF",S084.SIZE=2
-0210 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
-0215 LET HCFILE$=Y6.FILEOUT$(POS("/tmp/"=Y6.FILEOUT$))
-0220 GOSUB HCLIST
-0230 CALL "CDS094",Y6$,"E"
-0240 LET S084.MODE$="E",S084.NAME$="APDF",S084.SIZE=2,S084.FILEOUT$=""
-0250 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
-0260 LET FLT$="",SPFILE$=Y6.FILEOUT$(POS("/tmp/"=Y6.FILEOUT$))
-0270 LET DOC$="Score",MAXCOLS=10; GOSUB DODOC
-0280 LET DOC$="Skin",MAXCOLS=12; GOSUB DODOC
-0290 CALL "CDS094",Y6$,"E"
-0300 LET HTML$="<html><head><title>"+CVS(GR01.NAME$,2)+"</title></head><frameset cols='*,*'><frame src='"+HCFILE$+"'><frame src='"+SPFILE$+"'></frameset></html>"
-0310 LET TMP$=STBL("!CLEAR","$title")
-0320 DIM S084$(0)
-0330 LET HTMFIL$=",htm"; CALL "CDS064",Y$,TMP,0,0,0,0,"STR",HTMFIL$
-0340 WRITE (TMP)HTML$
-0350 CLOSE (TMP)
-0355 LET HTMFIL$=HTMFIL$(POS("/tmp/"=HTMFIL$))
-0360 LET HTML$="<script>window.open('"+HTMFIL$+"');</script>"
-0370 RUN "GW011"
+0100 rem "GW045 - 05/30/17 Score Posting Sheets & Handicap Listing
+0110 setesc 8000; seterr 8000
+0120 call "SW010", "XXGR04", 0, "", "FLT|SEQ|ID", fsi$, "", "", "REC.LEAGUE$=""" + wases.league$ + """ AND REC.FLT$<>"" """
+0125 dim ptoday$[1:4]; flts$ = ""
+0130 call "SW001", "XXGR01", 0, wases.league$, gr01$
+0131 call "SW001", "XXGR08", 0, gr01.id$, gr08$, sw001$
+0140 call "CDS095", gr03, "XXGR03", "YPY", gr03$
+0150 read record(gr03, knum=0, key=wases.league$ + bin(num(cgi.date$), 3))gr03$
+0151 call "CDS041", "GW032", gw032$, "YY"
+0152 call "GW032", y$, gr03$, gw032$
+0153 lastwkofyr = gw032.lastweek
+0155 half = gr03.half
+0160 if gr03.nine$ = "F" then
+:      nine$ = "Front Nine", hole0 = 1, par = gr08.parf
+:    else
+:      nine$ = "Back Nine", hole0 = 10, par = gr08.parb
+:    fi
+0170 call "CDS095", gr04, "XXGR04", "YPY", gr04$
+0175 call "CDS133", "XXGR05", "", "NNYY";
+:    rem "Archive scores file for possible rollback if prior scores are lost
+0180 call "CDS095", gr05, "XXGR05", "YNY", gr05$, gr05k$
+0182 gr05s = unt
+0183 select (gr05s)gr05$ from y.compcode$ + "GR05" where gr05.league$ = wases.league$ and gr05.date = num(cgi.date$) and gr05.score = 0
+0184 read record(gr05s, end=0189)gr05$
+0185 remove (gr05, key=kgen(gr05$, gr05k$, 0))
+0186 goto 0184
+0189 close (gr05s)
+0190 call "CDS041", "CDS084", s084$
+0200 s084.mode$ = "E", s084.name$ = "APDF", s084.size = 2
+0210 call "CDS084", y$, y5$, u0, s084$, y6, y6$
+0215 hcfile$ = y6.fileout$(pos("/tmp/" = y6.fileout$))
+0220 gosub hclist
+0230 call "CDS094", y6$, "E"
+0240 s084.mode$ = "E", s084.name$ = "APDF", s084.size = 2, s084.fileout$ = ""
+0250 call "CDS084", y$, y5$, u0, s084$, y6, y6$
+0260 flt$ = "", spfile$ = y6.fileout$(pos("/tmp/" = y6.fileout$))
+0270 doc$ = "Score", maxcols = 10; gosub dodoc
+0280 doc$ = "Skin", maxcols = 12; gosub dodoc
+0290 call "CDS094", y6$, "E"
+0300 html$ = "<html><head><title>" + cvs(gr01.name$, 2) + "</title></head><frameset cols='*,*'><frame src='" + hcfile$ + "'><frame src='" + spfile$ + "'></frameset></html>"
+0310 tmp$ = stbl("!CLEAR", "$title")
+0320 dim s084$(0)
+0330 htmfil$ = ",htm"; call "CDS064", y$, tmp, 0, 0, 0, 0, "STR", htmfil$
+0340 write (tmp)html$
+0350 close (tmp)
+0355 htmfil$ = htmfil$(pos("/tmp/" = htmfil$))
+0360 html$ = "<script>window.open('" + htmfil$ + "');</script>"
+0370 run "GW011"
 
-1000 DODOC:
-1005 LET FLT$=""
-1010 READ (GR04,KNUM=1,KEY=WASES.LEAGUE$,DOM=1020)
-1020 READ RECORD(GR04,END=1170)GR04$
-1025 IF GR04.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 1170
-1030 IF GR04.FLT$=" " THEN GOTO 1020
-1040 LET HC$=""
-1050 IF DOC$="Score"
-:       THEN
-:          READ RECORD(GR05,KNUM=0,KEY=GR04.LEAGUE$+GR04.ID$+BIN(NUM(CGI.DATE$),3))GR05$;
-:          IF GR05.HC
-:             THEN
-:                LET HC$=STR(GR05.HC)
-:             ELSE
-:                LET HC$=""
-1060 IF LEN(FLT$) AND GR04.FLT$<>FLT$ THEN GOSUB FINISHFLT
-1070 IF GR04.FLT$<>FLT$ THEN GOSUB NEWFLT
-1080 LET ROWNO=ROWNO+1
-1085 FOR COLNO=1 TO MAXCOLS
-1090    IF COLNO=1
-:          THEN
-:             CALL "CDS454",Y6$,COLNO,ROWNO,"C",STR(GR04.SEQ),0,0,0,14,70;
-:             CONTINUE
-1100    IF COLNO=2
-:          THEN
-:             CALL "CDS454",Y6$,COLNO,ROWNO,"L",CVS(CVS(GR04.FIRSTNAME$,2)+" "+CVS(GR04.LASTNAME$,2),1),0,0,0,14,70;
-:             CONTINUE
-1110    IF COLNO=3 AND DOC$="Score"
-:          THEN
-:             CALL "CDS454",Y6$,COLNO,ROWNO,"L",GR04.PHONE$,0,0,0,14,70;
-:             CONTINUE
-1112    IF COLNO=4 AND DOC$="Score"
-:          THEN
-:             CALL "CDS454",Y6$,COLNO,ROWNO,"L",CVS(GR04.EMAIL$,2),0,0,0,14,70;
-:             CONTINUE
-1114    IF COLNO=5 AND DOC$="Score"
-:          THEN
-:             IF HALF
-:                THEN
-:                   CALL "CDS454",Y6$,COLNO,ROWNO,"C",STR(ASC(PLAYTODAY$(GR04.SEQ))),0,0,0,14,70
-:             FI;
-:             CONTINUE
-1120    IF COLNO=7 AND DOC$="Score"
-:          THEN
-:             CALL "CDS454",Y6$,COLNO,ROWNO,"C",HC$,0,0,0,14,70;
-:             CONTINUE
-1140    IF DOC$<>"Score" OR COLNO<>10 OR HALF THEN CALL "CDS454",Y6$,COLNO,ROWNO
-1150 NEXT COLNO
-1160 GOTO 1020
-1170 GOSUB FINISHFLT
-1180 RETURN
+1000 dodoc:
+1005 flt$ = ""
+1010 read (gr04, knum=1, key=wases.league$, dom=1020)
+1020 read record(gr04, end=1170)gr04$
+1025 if gr04.league$ <> wases.league$ then goto 1170
+1030 if gr04.flt$ = " " then goto 1020
+1040 hc$ = ""
+1050 if doc$ = "Score" then
+:      read record(gr05, knum=0, key=gr04.league$ + gr04.id$ + bin(num(cgi.date$), 3))gr05$;
+:      if gr05.hc then
+:        hc$ = str(gr05.hc)
+:      else
+:        hc$ = ""
+:      fi
+:    fi
+1060 if len(flt$) and gr04.flt$ <> flt$ then gosub finishflt
+1070 if gr04.flt$ <> flt$ then gosub newflt
+1080 rowno = rowno + 1
+1085 for colno = 1 to maxcols
+1090   if colno = 1 then
+:        call "CDS454", y6$, colno, rowno, "C", str(gr04.seq), 0, 0, 0, 14, 70;
+:        continue
+:      fi
+1100   if colno = 2 then
+:        call "CDS454", y6$, colno, rowno, "L", cvs(cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2), 1), 0, 0, 0, 14, 70;
+:        continue
+:      fi
+1110   if colno = 3 and doc$ = "Score" then
+:        call "CDS454", y6$, colno, rowno, "L", gr04.phone$, 0, 0, 0, 14, 70;
+:        continue
+:      fi
+1112   if colno = 4 and doc$ = "Score" then
+:        call "CDS454", y6$, colno, rowno, "L", cvs(gr04.email$, 2), 0, 0, 0, 14, 70;
+:        continue
+:      fi
+1114   if colno = 5 and doc$ = "Score" then
+:        if half then
+:          call "CDS454", y6$, colno, rowno, "C", str(asc(playtoday$(gr04.seq))), 0, 0, 0, 14, 70
+:        fi;
+:        continue
+:      fi
+1120   if colno = 7 and doc$ = "Score" then
+:        call "CDS454", y6$, colno, rowno, "C", hc$, 0, 0, 0, 14, 70;
+:        continue
+:      fi
+1140   if doc$ <> "Score" or colno <> 10 or half then call "CDS454", y6$, colno, rowno
+1150 next colno
+1160 goto 1020
+1170 gosub finishflt
+1180 return
 
-1200 FINISHFLT:
-1210 IF DOC$="Skin" THEN RETURN
-1220 IF 0 THEN CALL "CDS254",Y6$,"T1,,,,12,,4148"," "+$0D0A0D0A$
-1221 IF 1 THEN CALL "CDS254",Y6$,"T1,+75,,,12,,4148"
-1230 CALL "CDS257",Y$,GR01.LEAGUE$+FLT$,"","XXGR02","PN",8,0,0,0,Y6$
-1240 RETURN
+1200 finishflt:
+1210 if doc$ = "Skin" then return
+1220 if 0 then call "CDS254", y6$, "T1,,,,12,,4148", " " + $0d0a0d0a$
+1221 if 1 then call "CDS254", y6$, "T1,+75,,,12,,4148"
+1230 call "CDS257", y$, gr01.league$ + flt$, "", "XXGR02", "PN", 8, 0, 0, 0, y6$
+1240 return
 
-1300 NEWFLT:
-1310 CALL "CDS094",Y6$
-1315 IF DOC$="Skin"
-:       THEN
-:          PRINT (Y6.CH)'BO',Y6.DEPTH11$,'EO',;
-:          LET ACROSS=8.5,ROW=150,SKIP=120
-:       ELSE
-:          LET ACROSS=11,ROW=50,SKIP=50
-1320 LET FLT$=GR04.FLT$,CENTER$="T"+STR((ACROSS-.5)*300/2)+"C,"
-1321 LET RIGHT$="T"+STR((ACROSS-.5)*300)+"R,"
-1330 CALL "CDS254",Y6$,CENTER$+STR(ROW)+",3,1,14,,4148",GR01.NAME$
-1340 IF 0 THEN LET ROW=ROW+75
-1350 CALL "CDS254",Y6$,"T0,"+STR(ROW)+",3,1,14,,4148",DOC$+" Posting Sheet"
-1360 IF 0 THEN LET ROW=ROW+75
-1370 CALL "CDS254",Y6$,RIGHT$+STR(ROW)+",3,1,14,,4148",FLT$+" Flight - "+DATE(NUM(CGI.DATE$))
-1380 LET ROW=ROW+SKIP
-1390 CALL "SW004","XXGR04",1,WASES.LEAGUE$+FLT$,RECS,0,"","NP"
-1400 LET ROWNO=1
-1410 ON DOC$="Score" GOSUB NSKIN,NSCORE
-1420 RETURN
+1300 newflt:
+1310 call "CDS094", y6$
+1315 if doc$ = "Skin" then
+:      print (y6.ch)'bo', y6.depth11$, 'eo', ;
+:      across = 8.5, row = 150, skip = 120
+:    else
+:      across = 11, row = 50, skip = 50
+:    fi
+1320 flt$ = gr04.flt$, center$ = "T" + str((across - .5) * 300 / 2) + "C,"
+1321 right$ = "T" + str((across - .5) * 300) + "R,"
+1330 call "CDS254", y6$, center$ + str(row) + ",3,1,14,,4148", gr01.name$
+1340 if 0 then row = row + 75
+1350 call "CDS254", y6$, "T0," + str(row) + ",3,1,14,,4148", doc$ + " Posting Sheet"
+1360 if 0 then row = row + 75
+1370 call "CDS254", y6$, right$ + str(row) + ",3,1,14,,4148", flt$ + " Flight - " + date(num(cgi.date$))
+1380 row = row + skip
+1390 call "SW004", "XXGR04", 1, wases.league$ + flt$, recs, 0, "", "NP"
+1400 rowno = 1
+1410 on doc$ = "Score" gosub nskin, nscore
+1420 return
 
-1500 NSCORE:
-1510 CALL "CDS454::SETUP",0,ROW,"74,560,408,872,"+STR(111*SGN(HALF))+",165,165,165,165,165","84,"+FILL(RECS*3,"84,"),1
-1520 CALL "CDS454",Y6$,1,1,"C","ID",1,1,1,14,70
-1530 CALL "CDS454",Y6$,2,1,"L","Name",1,1,1,14,70
-1532 CALL "CDS454",Y6$,3,1,"L","Phone",1,1,1,14,70
-1534 CALL "CDS454",Y6$,4,1,"L","Email",1,1,1,14,70
-1535 IF HALF THEN CALL "CDS454",Y6$,5,1,"L","Play",1,1,1,14,70
-1540 CALL "CDS454",Y6$,6,1,"C","Gross",1,1,1,14,70
-1550 CALL "CDS454",Y6$,7,1,"C","HC",1,1,1,14,70
-1560 CALL "CDS454",Y6$,8,1,"C","Net",1,1,1,14,70
-1570 CALL "CDS454",Y6$,9,1,"C","Putts",1,1,1,14,70
-1580 IF HALF THEN CALL "CDS454",Y6$,10,1,"C","Points",1,1,1,14,70
-1585 LET PLAYTODAY$=PTODAY$[POS(FLT$=FLTS$)]
-1590 RETURN
+1500 nscore:
+1510 call "CDS454::SETUP", 0, row, "74,560,408,872," + str(111 * sgn(half)) + ",165,165,165,165,165", "84," + fill(recs * 3, "84,"), 1
+1520 call "CDS454", y6$, 1, 1, "C", "ID", 1, 1, 1, 14, 70
+1530 call "CDS454", y6$, 2, 1, "L", "Name", 1, 1, 1, 14, 70
+1532 call "CDS454", y6$, 3, 1, "L", "Phone", 1, 1, 1, 14, 70
+1534 call "CDS454", y6$, 4, 1, "L", "Email", 1, 1, 1, 14, 70
+1535 if half then call "CDS454", y6$, 5, 1, "L", "Play", 1, 1, 1, 14, 70
+1540 call "CDS454", y6$, 6, 1, "C", "Gross", 1, 1, 1, 14, 70
+1550 call "CDS454", y6$, 7, 1, "C", "HC", 1, 1, 1, 14, 70
+1560 call "CDS454", y6$, 8, 1, "C", "Net", 1, 1, 1, 14, 70
+1570 call "CDS454", y6$, 9, 1, "C", "Putts", 1, 1, 1, 14, 70
+1580 if half then call "CDS454", y6$, 10, 1, "C", "Points", 1, 1, 1, 14, 70
+1585 playtoday$ = ptoday$[pos(flt$ = flts$)]
+1590 return
 
-1600 NSKIN:
-1610 CALL "CDS454::SETUP",150,ROW,"74,560"+FILL(10*4,",112"),"100"+FILL(RECS*4,",100"),1
-1620 CALL "CDS454",Y6$,1,1,"C","ID",1,1,1,14,70
-1630 CALL "CDS454",Y6$,2,1,"L","Name",1,1,1,14,70
-1640 CALL "CDS454",Y6$,3,1,"C","Paid",1,1,1,14,70
-1650 LET HOLE=HOLE0
-1660 FOR COLNO=4 TO MAXCOLS
-1670    CALL "CDS454",Y6$,COLNO,1,"C",STR(HOLE),1,1,1,14,70
-1680    LET HOLE=HOLE+1
-1690 NEXT COLNO
-1700 RETURN
+1600 nskin:
+1610 call "CDS454::SETUP", 150, row, "74,560" + fill(10 * 4,",112"), "100" + fill(recs * 4, ",100"), 1
+1620 call "CDS454", y6$, 1, 1, "C", "ID", 1, 1, 1, 14, 70
+1630 call "CDS454", y6$, 2, 1, "L", "Name", 1, 1, 1, 14, 70
+1640 call "CDS454", y6$, 3, 1, "C", "Paid", 1, 1, 1, 14, 70
+1650 hole = hole0
+1660 for colno = 4 to maxcols
+1670   call "CDS454", y6$, colno, 1, "C", str(hole), 1, 1, 1, 14, 70
+1680   hole = hole + 1
+1690 next colno
+1700 return
 
-1800 HCLIST:
-1810 GOSUB WKNO
-1811 IF HALF=1 OR NUM(CGI.DATE$)=FIRST2HALFDATE
-:       THEN
-:          LET SHOWHALF=1
-:       ELSE
-:          LET SHOWHALF=2
-1815 FOR PASS=1 TO 2
-1819    LET FLT$=""
-1820    READ (GR04,KNUM=1,KEY=WASES.LEAGUE$+"A",DOM=1830)
-1830    READ RECORD(GR04,END=2150)GR04$
-1840    IF GR04.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 2150
-1850    LET HC$=""
-1860    DIM RND$[1:9]
-1870    IF LEN(FLT$) AND GR04.FLT$<>FLT$ AND PASS=2
-:          THEN
-:             LET FLT$="#",DOC$="";
-:             GOSUB FINISHFLT
-1880    IF GR04.FLT$<>FLT$ THEN LET FLT$=GR04.FLT$; IF PASS=2 THEN GOSUB NEWHCFLT
-1885    GOSUB CALCS
-1886    IF PASS=1 THEN GOTO 1830
-1890    LET ROWNO=ROWNO+1
-1900    CALL "CDS454",Y6$,1,ROWNO,"C",STR(GR04.SEQ)
-1910    CALL "CDS454",Y6$,2,ROWNO,"L",CVS(CVS(GR04.FIRSTNAME$,2)+" "+CVS(GR04.LASTNAME$,2),1)
-1920    CALL "CDS454",Y6$,3,ROWNO,"C",GR04.PHONE$
-1930    IF HALF THEN CALL "CDS454",Y6$,4,ROWNO,"C",STR(ASC(PLAYTODAY$(GR04.SEQ)))
-1932    LET Z=POS(GR04.FLT$+PLAYTODAY$(GR04.SEQ,1)=FSI$,6),PTID$=FSI$(Z+2,4)
-1940    IF !(LASTWKOFYR) AND HALF
-:          THEN
-:             CALL "CDS454",Y6$,5,ROWNO,"C",STR(ASC(PLAYNEXT$(GR04.SEQ)))
-1960    CALL "CDS454",Y6$,6,ROWNO,"C",HC$+""
-1965    LET Z=POS(FLT$=BEST$,9)
-1966    IF Z AND POINTS[SHOWHALF] AND POINTS[SHOWHALF]=NUM(BEST$(Z+1,4))
-:          THEN
-:             LET RED$="red"
-:          ELSE
-:             LET RED$=""
-1970    IF HALF
-:          THEN
-:             CALL "CDS454",Y6$,7,ROWNO,"R",STR(POINTS[SHOWHALF]),0,0,0,0,0,0,RED$
-1980    CALL "CDS454",Y6$,8,ROWNO,"R",AVGSCORE$
-1985    IF Z AND AVGPUTTS$=BEST$(Z+5,4) THEN LET RED$="red" ELSE LET RED$=""
-1990    CALL "CDS454",Y6$,9,ROWNO,"R",AVGPUTTS$,0,0,0,0,0,0,RED$
-1995    IF BESTSCORE=LASTSCORE THEN LET RED$="red",BESTRNDNO=0 ELSE LET RED$=""
-2000    CALL "CDS454",Y6$,10,ROWNO,"L",LASTROUND$,0,0,0,0,0,0,RED$
-2010    LET COLNO=11
-2020    FOR RND=1 TO 9
-2025       IF RND=BESTRNDNO THEN LET RED$="red" ELSE LET RED$=""
-2030       CALL "CDS454",Y6$,COLNO,ROWNO,"L",RND$[RND],0,0,0,8,33,0,RED$
-2040       LET COLNO=COLNO+1
-2050    NEXT RND
-2060    DIM GR05$:FATTR(GR05$)
-2070    LET GR05.LEAGUE$=GR01.LEAGUE$
-2080    LET GR05.ID$=GR04.ID$
-2090    LET GR05.DATE=NUM(CGI.DATE$)
-2100    EXTRACT RECORD(GR05,KNUM=0,KEY=KGEN(GR05$,GR05K$,0),DOM=2110)GR05$;
-:       IF GR05.SCORE
-:          THEN
-:             GOTO 2120
-2110    LET GR05.HC=NUM(HC$)
-2120    IF GR05.SCORE AND GR05.HC THEN LET GR05.NET=GR05.SCORE-GR05.HC
-2125    LET GR05.FLT$=GR04.FLT$
-2127    IF GR05.SCORE=0 THEN LET GR05.OPP$=PTID$,GR05.PAR=PAR
-2130    WRITE RECORD(GR05)GR05$
-2140    GOTO 1830
-2150    IF PASS=2 THEN LET FLT$="#",DOC$=""; GOSUB FINISHFLT
-2155 NEXT PASS
-2160 RETURN
+1800 hclist:
+1810 gosub wkno
+1811 if half = 1 or num(cgi.date$) = first2halfdate then
+:      showhalf = 1
+:    else
+:      showhalf = 2
+:    fi
+1815 for pass = 1 to 2
+1819   flt$ = ""
+1820   read (gr04, knum=1, key=wases.league$ + "A", dom=1830)
+1830   read record(gr04, end=2150)gr04$
+1840   if gr04.league$ <> wases.league$ then goto 2150
+1850   hc$ = ""
+1860   dim rnd$[1:9]
+1870   if len(flt$) and gr04.flt$ <> flt$ and pass = 2 then
+:        flt$ = "#", doc$ = "";
+:        gosub finishflt
+:      fi
+1880   if gr04.flt$ <> flt$ then flt$ = gr04.flt$; if pass = 2 then gosub newhcflt
+1885   gosub calcs
+1886   if pass = 1 then goto 1830
+1890   rowno = rowno + 1
+1900   call "CDS454", y6$, 1, rowno, "C", str(gr04.seq)
+1910   call "CDS454", y6$, 2, rowno, "L", cvs(cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2), 1)
+1920   call "CDS454", y6$, 3, rowno, "C", gr04.phone$
+1930   if half then call "CDS454", y6$, 4, rowno, "C", str(asc(playtoday$(gr04.seq)))
+1932   z = pos(gr04.flt$ + playtoday$(gr04.seq, 1) = fsi$, 6), ptid$ = fsi$(z + 2, 4)
+1940   if !(lastwkofyr) and half then
+:        call "CDS454", y6$, 5, rowno, "C", str(asc(playnext$(gr04.seq)))
+:      fi
+1960   call "CDS454", y6$, 6, rowno, "C", hc$ + ""
+1965   z = pos(flt$ = best$, 9)
+1966   if z and points[showhalf] and points[showhalf] = num(best$(z + 1, 4)) then
+:        red$ = "red"
+:      else
+:        red$ = ""
+:      fi
+1970   if half then
+:        call "CDS454", y6$, 7, rowno, "R", str(points[showhalf]), 0, 0, 0, 0, 0, 0, red$
+:      fi
+1980   call "CDS454", y6$, 8, rowno, "R", avgscore$
+1985   if z and avgputts$ = best$(z + 5, 4) then red$ = "red" else red$ = ""
+1990   call "CDS454", y6$, 9, rowno, "R", avgputts$, 0, 0, 0, 0, 0, 0, red$
+1995   if bestscore = lastscore then red$ = "red", bestrndno = 0 else red$ = ""
+2000   call "CDS454", y6$, 10, rowno, "L", lastround$, 0, 0, 0, 0, 0, 0, red$
+2010   colno = 11
+2020   for rnd = 1 to 9
+2025     if rnd = bestrndno then red$ = "red" else red$ = ""
+2030     call "CDS454", y6$, colno, rowno, "L", rnd$[rnd], 0, 0, 0, 8, 33, 0, red$
+2040     colno = colno + 1
+2050   next rnd
+2060   dim gr05$:fattr(gr05$)
+2070   gr05.league$ = gr01.league$
+2080   gr05.id$ = gr04.id$
+2090   gr05.date = num(cgi.date$)
+2100   extract record(gr05, knum=0, key=kgen(gr05$, gr05k$, 0), dom=2110)gr05$;
+:      if gr05.score then
+:        goto 2120
+:      fi
+2110   gr05.hc = num(hc$)
+2120   if gr05.score and gr05.hc then gr05.net = gr05.score - gr05.hc
+2125   gr05.flt$ = gr04.flt$
+2127   if gr05.score = 0 then gr05.opp$ = ptid$, gr05.par = par
+2130   write record(gr05)gr05$
+2140   goto 1830
+2150   if pass = 2 then flt$ = "#", doc$ = ""; gosub finishflt
+2155 next pass
+2160 return
 
-2200 NEWHCFLT:
-2210 CALL "CDS094",Y6$
-2220 LET ROW=25
-2230 CALL "CDS254",Y6$,"T1575C,"+STR(ROW)+",3,1,14,,4148",GR01.NAME$
-2240 LET ROW=ROW+65
-2250 CALL "CDS254",Y6$,"T1575C,"+STR(ROW)+",3,1,14,,4148","Handicap Listing"
-2260 LET ROW=ROW+65
-2270 CALL "CDS254",Y6$,"T1575C,"+STR(ROW)+",3,1,14,,4148",FLT$+" Flight - "+DATE(NUM(CGI.DATE$))+" - "+NINE$
-2280 LET ROW=ROW+40
-2290 CALL "SW004","XXGR04",1,WASES.LEAGUE$+FLT$,RECS,0,"","NP"
-2300 LET ROWNO=1
-2310 CALL "CDS454::SETUP",0,ROW,"52,384,288,"+STR(107*SGN(HALF))+","+STR(107*!(LASTWKOFYR)*SGN(HALF))+",107,"+STR(107*SGN(HALF))+",107,107,310"+FILL(9*4,",100"),"120,"+FILL(RECS*4,"060,"),1
-2320 CALL "CDS454",Y6$,1,1,"C","ID",1
-2330 CALL "CDS454",Y6$,2,1,"L","Name",1
-2340 CALL "CDS454",Y6$,3,1,"C","Phone",1
-2350 IF HALF THEN CALL "CDS454",Y6$,4,1,"C","Play"+$0A$+"Today",1
-2360 IF !(LASTWKOFYR) AND HALF
-:       THEN
-:          CALL "CDS454",Y6$,5,1,"C","Play"+$0A$+"Next",1
-2370 CALL "CDS454",Y6$,6,1,"C","HC",1
-2380 IF HALF THEN CALL "CDS454",Y6$,7,1,"C","Points",1
-2390 CALL "CDS454",Y6$,8,1,"C","Avg"+$0A$+"Score",1
-2400 CALL "CDS454",Y6$,9,1,"C","Avg"+$0A$+"Putts",1
-2410 CALL "CDS454",Y6$,10,1,"C","Last Round",1
-2420 CALL "CDS454",Y6$,11,1,"C","Prior Rounds (Gross & Points)",1,9
-2430 GOSUB PLAYWHO
-2440 RETURN
+2200 newhcflt:
+2210 call "CDS094", y6$
+2220 row = 25
+2230 call "CDS254", y6$, "T1575C," + str(row) + ",3,1,14,,4148", gr01.name$
+2240 row = row + 65
+2250 call "CDS254", y6$, "T1575C," + str(row) + ",3,1,14,,4148", "Handicap Listing"
+2260 row = row + 65
+2270 call "CDS254", y6$, "T1575C," + str(row) + ",3,1,14,,4148", flt$ + " Flight - " + date(num(cgi.date$)) + " - " + nine$
+2280 row = row + 40
+2290 call "SW004", "XXGR04", 1, wases.league$ + flt$, recs, 0, "", "NP"
+2300 rowno = 1
+2310 call "CDS454::SETUP", 0, row, "52,384,288," + str(107 * sgn(half)) + "," + str(107 * !(lastwkofyr) * sgn(half)) + ",107," + str(107 * sgn(half)) + ",107,107,310" + fill(9 * 4,",100"), "120," + fill(recs * 4, "060,"), 1
+2320 call "CDS454", y6$, 1, 1, "C", "ID", 1
+2330 call "CDS454", y6$, 2, 1, "L", "Name", 1
+2340 call "CDS454", y6$, 3, 1, "C", "Phone", 1
+2350 if half then call "CDS454", y6$, 4, 1, "C", "Play" + $0a$ + "Today", 1
+2360 if !(lastwkofyr) and half then
+:      call "CDS454", y6$, 5, 1, "C", "Play" + $0a$ + "Next", 1
+:    fi
+2370 call "CDS454", y6$, 6, 1, "C", "HC", 1
+2380 if half then call "CDS454", y6$, 7, 1, "C", "Points", 1
+2390 call "CDS454", y6$, 8, 1, "C", "Avg" + $0a$ + "Score", 1
+2400 call "CDS454", y6$, 9, 1, "C", "Avg" + $0a$ + "Putts", 1
+2410 call "CDS454", y6$, 10, 1, "C", "Last Round", 1
+2420 call "CDS454", y6$, 11, 1, "C", "Prior Rounds (Gross & Points)", 1, 9
+2430 gosub playwho
+2440 return
 
-2500 PLAYWHO:
-2510 LET PLAYTODAY$="",PLAYNEXT$=""
-2520 LET STRT=WKNO-10*NUM(DATE(0:"%Yz"))
-2525 WHILE STRT<1; LET STRT=STRT+RECS-1; WEND
-2526 LET STRT0=STRT
-2530 FOR SEQ=1 TO RECS-1
-2540    IF STRT<>LEN(PLAYTODAY$)+1
-:          THEN
-:             LET PLAY=STRT
-:          ELSE
-:             LET PLAY=RECS,LAST=LEN(PLAYTODAY$)+1
-2550    LET PLAYTODAY$=PLAYTODAY$+CHR(PLAY),STRT=STRT-1
-2560    IF STRT=0 THEN LET STRT=RECS-1
-2570 NEXT SEQ
-2580 LET PLAYTODAY$=PLAYTODAY$+CHR(LAST),LAST=0
-2590 LET STRT=STRT0+1
-2595 WHILE STRT<1; LET STRT=STRT+RECS-1; WEND
-2600 FOR SEQ=1 TO RECS-1
-2610    IF STRT<>LEN(PLAYNEXT$)+1
-:          THEN
-:             LET PLAY=STRT
-:          ELSE
-:             LET PLAY=RECS,LAST=LEN(PLAYNEXT$)+1
-2620    LET PLAYNEXT$=PLAYNEXT$+CHR(PLAY),STRT=STRT-1
-2630    IF STRT=0 THEN LET STRT=RECS-1
-2640 NEXT SEQ
-2650 LET PLAYNEXT$=PLAYNEXT$+CHR(MAX(LAST,1))
-2655 LET FLTS$=FLTS$+FLT$,PTODAY$[LEN(FLTS$)]=PLAYTODAY$
-2656 IF 0
-:       THEN
-:          CALL "CDS094",Y6$,"e";
-:          CALL "CDS173";
-:          LET HTML$="<p>See Dump</p>";
-:          RUN "CDW999"
-2660 RETURN
+2500 playwho:
+2510 playtoday$ = "", playnext$ = ""
+2520 strt = wkno - 10 * num(date(0:"%Yz"))
+2525 while strt < 1; strt = strt + recs - 1; wend
+2526 strt0 = strt
+2530 for seq = 1 to recs - 1
+2540   if strt <> len(playtoday$) + 1 then
+:        play = strt
+:      else
+:        play = recs, last = len(playtoday$) + 1
+:      fi
+2550   playtoday$ = playtoday$ + chr(play), strt = strt - 1
+2560   if strt = 0 then strt = recs - 1
+2570 next seq
+2580 playtoday$ = playtoday$ + chr(last), last = 0
+2590 strt = strt0 + 1
+2595 while strt < 1; strt = strt + recs - 1; wend
+2600 for seq = 1 to recs - 1
+2610   if strt <> len(playnext$) + 1 then
+:        play = strt
+:      else
+:        play = recs, last = len(playnext$) + 1
+:      fi
+2620   playnext$ = playnext$ + chr(play), strt = strt - 1
+2630   if strt = 0 then strt = recs - 1
+2640 next seq
+2650 playnext$ = playnext$ + chr(max(last, 1))
+2655 flts$ = flts$ + flt$, ptoday$[len(flts$)] = playtoday$
+2656 if 0 then
+:      call "CDS094", y6$, "e";
+:      call "CDS173";
+:      html$ = "<p>See Dump</p>";
+:      run "CDW999"
+:    fi
+2660 return
 
-2700 WKNO:
-2710 LET WKNO=0,FIRST2HALFDATE=0
-2715 DIM DATES$[3]
-2720 READ (GR03,KNUM=0,KEY=WASES.LEAGUE$+$FFFFFF$,DOM=2730)
-2730 READ RECORD(GR03,END=2770)GR03$
-2740 IF GR03.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 2770
-2750 IF GR03.DATE>NUM(CGI.DATE$) THEN GOTO 2730
-2755 IF GR03.HALF=2 THEN LET FIRST2HALFDATE=GR03.DATE
-2760 IF DATE(GR03.DATE:"%Y")=DATE(NUM(CGI.DATE$):"%Y")
-:       THEN
-:          LET DATES$[GR03.HALF]=DATES$[GR03.HALF]+GR03.DATE$;
-:          IF GR03.HALF=1 OR GR03.HALF=2
-:             THEN
-:                LET WKNO=WKNO+1
-:          FI;
-:          GOTO 2730
-2770 RETURN
+2700 wkno:
+2710 wkno = 0, first2halfdate = 0
+2715 dim dates$[3]
+2720 read (gr03, knum=0, key=wases.league$ + $ffffff$, dom=2730)
+2730 read record(gr03, end=2770)gr03$
+2740 if gr03.league$ <> wases.league$ then goto 2770
+2750 if gr03.date > num(cgi.date$) then goto 2730
+2755 if gr03.half = 2 then first2halfdate = gr03.date
+2760 if date(gr03.date:"%Y") = date(num(cgi.date$):"%Y") then
+:      dates$[gr03.half] = dates$[gr03.half] + gr03.date$;
+:      if gr03.half = 1 or gr03.half = 2 then
+:        wkno = wkno + 1
+:      fi;
+:      goto 2730
+:    fi
+2770 return
 
-2800 CALCS:
-2810 DIM RND$[1:9],POINTS[2]
-2820 LET SCORES=0,TOTSCORE=0,TOTPUTTS=0,LASTROUND$="",SCLIST$="",RND=0,PUTTSC=0,LASTSCORE=0,BESTSCORE=100,BESTRNDNO=0,TOTPAR=0
-2830 READ (GR05,KNUM=0,KEY=GR04.LEAGUE$+GR04.ID$+BIN(NUM(CGI.DATE$),3),DOM=2840)
-2840 READ RECORD(GR05,END=2910)GR05$
-2850 IF GR05.SCORE=0 THEN GOTO 2840
-2855 IF GR05.PAR=0 THEN LET GR05.PAR=36
-2860 IF GR05.LEAGUE$<>GR04.LEAGUE$ OR GR05.ID$<>GR04.ID$ THEN GOTO 2910
-2870 IF LEN(LASTROUND$)=0
-:       THEN
-:          LET LASTSCORE=GR05.SCORE,LASTROUND$=DATE(GR05.DATE:"%M/%Dz")+STR(GR05.SCORE:"##0")+STR(GR05.PUTTS:"###B")+FNH$(GR05.POINTS)
-:       ELSE
-:          LET RND=RND+1,RND$[RND]=STR(GR05.SCORE)+" "+FNH$(GR05.POINTS)
-2875 IF GR05.SCORE<BESTSCORE THEN LET BESTSCORE=GR05.SCORE,BESTRNDNO=RND
-2880 IF POS(GR05.DATE$=DATES$[1],3)
-:       THEN
-:          LET DH=1
-:       ELSE
-:          IF POS(GR05.DATE$=DATES$[2],3)
-:             THEN
-:                LET DH=2
-:             ELSE
-:                LET DH=0
-2881 IF DH THEN LET POINTS[DH]=POINTS[DH]+GR05.POINTS
-2890 LET SCORES=SCORES+1,SCLIST$=SCLIST$+STR(GR05.SCORE:"00")+STR(GR05.PUTTS:"00")+STR(GR05.PAR:"00")
-2900 IF SCORES<10 THEN GOTO 2840
-2910 IF SCORES
-:       THEN
-:          GOSUB AVG
-:       ELSE
-:          LET AVGSCORE$="",AVGPUTTS$="";
-:          IF GR04.HC
-:             THEN
-:                LET HC$=STR(GR04.HC)
-:             ELSE
-:                IF GR04.FLT$="A"
-:                   THEN
-:                      LET HC$="8"
-:                   ELSE
-:                      LET HC$="14"
-2920 RETURN
+2800 calcs:
+2810 dim rnd$[1:9], points[2]
+2820 scores = 0, totscore = 0, totputts = 0, lastround$ = "", sclist$ = "", rnd = 0, puttsc = 0, lastscore = 0, bestscore = 100, bestrndno = 0, totpar = 0
+2830 read (gr05, knum=0, key=gr04.league$ + gr04.id$ + bin(num(cgi.date$), 3), dom=2840)
+2840 read record(gr05, end=2910)gr05$
+2850 if gr05.score = 0 then goto 2840
+2855 if gr05.par = 0 then gr05.par = 36
+2860 if gr05.league$ <> gr04.league$ or gr05.id$ <> gr04.id$ then goto 2910
+2870 if len(lastround$) = 0 then
+:      lastscore = gr05.score, lastround$ = date(gr05.date:"%M/%Dz") + str(gr05.score:"##0") + str(gr05.putts:"###B") + fnh$(gr05.points)
+:    else
+:      rnd = rnd + 1, rnd$[rnd] = str(gr05.score) + " " + fnh$(gr05.points)
+:    fi
+2875 if gr05.score < bestscore then bestscore = gr05.score, bestrndno = rnd
+2880 if pos(gr05.date$ = dates$[1], 3) then
+:      dh = 1
+:    else
+:      if pos(gr05.date$ = dates$[2], 3) then
+:        dh = 2
+:      else
+:        dh = 0
+:      fi
+:    fi
+2881 if dh then points[dh] = points[dh] + gr05.points
+2890 scores = scores + 1, sclist$ = sclist$ + str(gr05.score:"00") + str(gr05.putts:"00") + str(gr05.par:"00")
+2900 if scores < 10 then goto 2840
+2910 if scores then
+:      gosub avg
+:    else
+:      avgscore$ = "", avgputts$ = "";
+:      if gr04.hc then
+:        hc$ = str(gr04.hc)
+:      else
+:        if gr04.flt$ = "A" then
+:          hc$ = "8"
+:        else
+:          hc$ = "14"
+:        fi
+:      fi
+:    fi
+2920 return
 
-3000 AVG:
-3010 LET SCLIST$=SSORT(SCLIST$,6)
-3020 LET H=1,SCORES=MIN(8,SCORES)
-3030 FOR SCORE=1 TO SCORES
-3040    LET TOTSCORE=TOTSCORE+NUM(SCLIST$(H,2))
-3050    IF NUM(SCLIST$(H+2,2))
-:          THEN
-:             LET TOTPUTTS=TOTPUTTS+NUM(SCLIST$(H+2,2)),PUTTSC=PUTTSC+1
-3055    LET TOTPAR=TOTPAR+NUM(SCLIST$(H+4,2))
-3060    LET H=H+6
-3070 NEXT SCORE
-3080 LET AVGSCORE$=STR(TOTSCORE/SCORES:"##.0")
-3090 IF PUTTSC
-:       THEN
-:          LET AVGPUTTS$=STR(TOTPUTTS/PUTTSC:"##.0")
-:       ELSE
-:          LET AVGPUTTS$=""
-3100 LET HC=(TOTSCORE-TOTPAR)/SCORES
-3105 IF GR01.HCMULT AND GR01.HCMULT<100 THEN LET HC=HC*GR01.HCMULT/100
-3110 IF SCORES<8 THEN LET HC=HC*.75
-3120 IF FPT(HC) THEN LET HC=INT(HC)+1
-3130 LET HC$=STR(MIN(MAX(HC,0),GR01.MAXHC))
-3135 IF PASS=1 THEN GOSUB BEST
-3140 RETURN
+3000 avg:
+3010 sclist$ = ssort(sclist$, 6)
+3020 h = 1, scores = min(8, scores)
+3030 for score = 1 to scores
+3040   totscore = totscore + num(sclist$(h, 2))
+3050   if num(sclist$(h + 2, 2)) then
+:        totputts = totputts + num(sclist$(h + 2, 2)), puttsc = puttsc + 1
+:      fi
+3055   totpar = totpar + num(sclist$(h + 4, 2))
+3060   h = h + 6
+3070 next score
+3080 avgscore$ = str(totscore / scores:"##.0")
+3090 if puttsc then
+:      avgputts$ = str(totputts / puttsc:"##.0")
+:    else
+:      avgputts$ = ""
+:    fi
+3100 hc = (totscore - totpar) / scores
+3105 if gr01.hcmult and gr01.hcmult < 100 then hc = hc * gr01.hcmult / 100
+3110 if scores < 8 then hc = hc * .75
+3120 if fpt(hc) then hc = int(hc) + 1
+3130 hc$ = str(min(max(hc, 0), gr01.maxhc))
+3135 if pass = 1 then gosub best
+3140 return
 
-3150 BEST:
-3160 LET Z=POS(FLT$=BEST$,9)
-3165 IF Z=0 THEN LET Z=LEN(BEST$)+1,BEST$=BEST$+FLT$+"00.099.9"
-3170 IF POINTS[SHOWHALF]>NUM(BEST$(Z+1,4))
-:       THEN
-:          LET BEST$(Z+1,4)=STR(POINTS[SHOWHALF]:"##.0")
-3175 IF LEN(AVGPUTTS$) AND AVGPUTTS$<BEST$(Z+5,4)
-:       THEN
-:          LET BEST$(Z+5,4)=AVGPUTTS$
-3190 RETURN
+3150 best:
+3160 z = pos(flt$ = best$, 9)
+3165 if z = 0 then z = len(best$) + 1, best$ = best$ + flt$ + "00.099.9"
+3170 if points[showhalf] > num(best$(z + 1, 4)) then
+:      best$(z + 1, 4) = str(points[showhalf]:"##.0")
+:    fi
+3175 if len(avgputts$) and avgputts$ < best$(z + 5, 4) then
+:      best$(z + 5, 4) = avgputts$
+:    fi
+3190 return
 
-3200 FUNCTIONS:
-3210 DEF FNH$(PTS)
-3220 LET OUT$=STR(INT(PTS))
-3230 IF FPT(PTS) THEN LET OUT$=OUT$+".5"
-3240 RETURN OUT$
-3250 FNEND
+3200 functions:
+3210 def fnh$(pts)
+3220 out$ = str(int(pts))
+3230 if fpt(pts) then out$ = out$ + ".5"
+3240 return out$
+3250 fnend
 
-7000 TEST:
-7010 BEGIN
-7020 CALL "CDS091",Y$
-7030 CALL "CDS041","WASES",WASES$,"YY"
-7040 LET WASES.LEAGUE$="WAL"
-7050 LET WASES.LEAGUENAME$="Test League Name"
-7060 DIM CGI$:"DATE:N(7)"
-7070 LET CGI.DATE=JUL(2012,5,9)
-7080 GOTO 0120
+7000 test:
+7010 begin
+7020 call "CDS091", y$
+7030 call "CDS041", "WASES", wases$, "YY"
+7040 wases.league$ = "WAL"
+7050 wases.leaguename$ = "Test League Name"
+7060 dim cgi$:"DATE:N(7)"
+7070 cgi.date = jul(2012,5,9)
+7080 goto 0120
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "WA010"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "WA010"

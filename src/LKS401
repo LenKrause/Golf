@@ -1,22 +1,22 @@
-0100 REM "LKS401 - 12/21/02 Email test
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS041","CDS084",S084$
-0130 LET S084.NAME$="MAIL"
-0140 LET S084.TOEMAIL$="len.krause@excellware.com"
-0150 LET S084.EMAILTYPE$="H"
-0160 LET S084.SUBJECT$="Merry Christmas!"
-0170 LET S084.MODE$="E"
-0180 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
-0190 CALL "CDS095",TXT,"/u/web/shared/xmascard02/xmascard02.htm"
-0200 READ RECORD(TXT,SIZ=10000)TXT$
-0210 PRINT (Y6.CH)TXT$
-0220 GOTO EOJ
+0100 rem "LKS401 - 12/21/02 Email test
+0110 setesc 8000; seterr 8000
+0120 call "CDS041", "CDS084", s084$
+0130 s084.name$ = "MAIL"
+0140 s084.toemail$ = "len.krause@excellware.com"
+0150 s084.emailtype$ = "H"
+0160 s084.subject$ = "Merry Christmas!"
+0170 s084.mode$ = "E"
+0180 call "CDS084", y$, y5$, u0, s084$, y6, y6$
+0190 call "CDS095", txt, "/u/web/shared/xmascard02/xmascard02.htm"
+0200 read record(txt, siz=10000)txt$
+0210 print (y6.ch)txt$
+0220 goto eoj
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

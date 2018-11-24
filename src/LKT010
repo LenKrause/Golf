@@ -1,43 +1,43 @@
-0100 REM "LKT010 - 12/12/11 Select problem
-0110 BEGIN
-0120 LET FILNAM$="tmp/LKT010"
-0130 ERASE FILNAM$,ERR=0140
-0140 MKEYED FILNAM$,3,0,4
-0145 OPEN (1)FILNAM$
-0150 FOR I=1 TO 3
-0160    FOR J=ASC("A") TO ASC("Z")
-0170       DIM REC$:"RECNO:N(3),LETTER:C(1)"
-0180       LET REC=REC+1,REC.RECNO$=STR(REC:"000"),REC.LETTER$=CHR(J)
-0190       WRITE RECORD(1,KEY=REC.RECNO$)REC$
-0200    NEXT J
-0210 NEXT I
-0220 CLOSE (1)
-0225 LET WHERE$="REC.LETTER$=""C"""
-0230 CALL "LKT011",REC$,FILNAM$,WHERE$;
-:    REM SELECT (1)REC$ FROM FILNAM$ WHERE CPL(WHERE$)
-0240 READ RECORD(1,END=0270)REC$
-0250 PRINT REC$
-0260 GOTO 0240
-0270 ESCAPE
+0100 rem "LKT010 - 12/12/11 Select problem
+0110 begin
+0120 filnam$ = "tmp/LKT010"
+0130 erase filnam$, err=0140
+0140 mkeyed filnam$, 3, 0, 4
+0145 open (1)filnam$
+0150 for i = 1 to 3
+0160   for j = asc("A") to asc("Z")
+0170     dim rec$:"RECNO:N(3),LETTER:C(1)"
+0180     rec = rec + 1, rec.recno$ = str(rec:"000"), rec.letter$ = chr(j)
+0190     write record(1, key=rec.recno$)rec$
+0200   next j
+0210 next i
+0220 close (1)
+0225 where$ = "REC.LETTER$=""C"""
+0230 call "LKT011", rec$, filnam$, where$;
+:    rem select (1)rec$ from filnam$ where cpl(where$)
+0240 read record(1, end=0270)rec$
+0250 print rec$
+0260 goto 0240
+0270 escape
 
-1100 REM "Called program
-1110 BEGIN
-1120 PRINT 'CS',"Called Program Timing Test"
-1130 CALL "CDS091",Y$
-1140 CALL "CDS069",1,60,0,1,"+path & program+","A",0,FIL$
-1150 IF CTL=4 THEN GOTO EOJ
-1160 CALL "CDS095",ERR=1140,CHAN,FIL$,"YNX"
-1170 CALL "CDS187",CHAN,S187$
-1180 PRINT @(0,1),S187.FULLNAME$,
-1190 PRECISION 10
-1200 LET STIME=TIM,RECS=1000000
-1205 FOR I=1 TO RECS
-1210    CALL FIL$
-1215 NEXT I
-1220 CLOSE (CHAN)
-1230 LET SECS=3600*(TIM-STIME)
-1240 CALL "CDS078",HMS$,HMA$,TIM-STIME
-1250 PRINT @(0,3),"Elapsed Time: ",HMS$,SECS," seconds ",ROUND(RECS/SECS,0),"calls/sec"
-1260 CALL "CDS069"
-1270 PRINT 'CF',
-1280 GOTO 1140
+1100 rem "Called program
+1110 begin
+1120 print 'cs', "Called Program Timing Test"
+1130 call "CDS091", y$
+1140 call "CDS069", 1, 60, 0, 1, "+path & program+", "A", 0, fil$
+1150 if ctl = 4 then goto eoj
+1160 call "CDS095", err=1140, chan, fil$, "YNX"
+1170 call "CDS187", chan, s187$
+1180 print @(0,1), s187.fullname$, 
+1190 precision 10
+1200 stime = tim, recs = 1000000
+1205 for i = 1 to recs
+1210   call fil$
+1215 next i
+1220 close (chan)
+1230 secs = 3600 * (tim - stime)
+1240 call "CDS078", hms$, hma$, tim - stime
+1250 print @(0,3), "Elapsed Time: ", hms$, secs, " seconds ", round(recs / secs, 0), "calls/sec"
+1260 call "CDS069"
+1270 print 'cf', 
+1280 goto 1140

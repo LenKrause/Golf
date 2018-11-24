@@ -1,156 +1,154 @@
-0100 REM "GW015 - 05/01/17 Golf Assign Flight & Sequence
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 IF 0
-:       THEN
-:          OPEN (1234,MODE="O_CREATE,O_TRUNC")"tmp/gw015.txt";
-:          SETTRACE (1234)
-0130 LET PLAYERS=NUM(FIELD(CGI$,"PLAYERS",ERR=0180))
-0140 LET FLTS=NUM(FIELD(CGI$,"FLTS",ERR=0180))
-0150 GOSUB PROCESS
-0160 LET MSG$="Flights & Sequence Numbers have been assigned"
-0170 RUN "GW011"
-0180 CALL "CDW000",ROW$,"dcs2",WASES.LEAGUENAME$
-0190 CALL "CDW000",TAB$,"r class='top'",ROW$
-0200 CALL "CDW000",ROW$,"dcs2",Y5$
-0210 CALL "CDW000",TAB$,"r class='title'",ROW$
-0220 CALL "CDW000",ROW$,"d","Golfers playing this year"
-0230 CALL "SW404",Y$,"XXGR04",GR04$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" AND GR04.PLAYTHISYEAR$=""Y"" AND gr04.ID$<>""open""",RECS
-0240 IF RECS=0
-:       THEN
-:          LET MSG$="Use Golfer Maintenance to indicate those playing this year.";
-:          RUN "GW011"
-0250 CALL "CDW000",ROW$,"d",STR(RECS)+"<input type='hidden' name='PLAYERS' value='"+STR(RECS)+"'>"
-0260 CALL "CDW000",TAB$,"r",ROW$
-0270 LET MAXFLTS=RECS/12,DEFAULT=RECS/24
-0280 IF FPT(MAXFLTS) THEN LET MAXFLTS=INT(MAXFLTS)+1
-0290 IF FPT(DEFAULT) THEN LET DEFAULT=INT(DEFAULT)+1
-0300 LET TXT$="<select name='FLTS'>"
-0310 FOR I=1 TO MAXFLTS
-0320    IF I=DEFAULT THEN LET SEL$=" selected" ELSE LET SEL$=""
-0330    LET TXT$=TXT$+"<option value='"+STR(I)+"'"+SEL$+">"+STR(I)+"</option>"
-0340 NEXT I
-0350 CALL "CDW000",ROW$,"d","Number of Flights"
-0360 CALL "CDW000",ROW$,"d",TXT$
-0370 CALL "CDW000",TAB$,"r",ROW$
-0380 CALL "CDW000",ROW$,"d","Assign Sequence based on"
-0390 CALL "CDW000",ROW$,"d","<input type='radio' name='SEQ' value='L' checked>Last Name<br><input type='radio' name='SEQ' value='F'>First Name"
-0400 CALL "CDW000",TAB$,"r",ROW$
-0410 CALL "CDW000",ROW$,"dcs2","[CANCEL] <input type='submit' value='Submit'>"
-0420 CALL "CDW000",TAB$,"r class='foot'",ROW$
-0430 CALL "CDW000",HTML$,"tc",TAB$
-0440 LET HTML$="<form method='post' action='[DSN]?p=GW015'>"+HTML$+"</form>"
-0450 RUN "CDW999"
+0100 rem "GW015 - 05/01/17 Golf Assign Flight & Sequence
+0110 setesc 8000; seterr 8000
+0120 if 0 then
+:      open (1234, mode = "O_CREATE,O_TRUNC")"tmp/gw015.txt";
+:      settrace (1234)
+:    fi
+0130 players = num(field(cgi$, "PLAYERS", err=0180))
+0140 flts = num(field(cgi$, "FLTS", err=0180))
+0150 gosub process
+0160 msg$ = "Flights & Sequence Numbers have been assigned"
+0170 run "GW011"
+0180 call "CDW000", row$, "dcs2", wases.leaguename$
+0190 call "CDW000", tab$, "r class='top'", row$
+0200 call "CDW000", row$, "dcs2", y5$
+0210 call "CDW000", tab$, "r class='title'", row$
+0220 call "CDW000", row$, "d", "Golfers playing this year"
+0230 call "SW404", y$, "XXGR04", gr04$, "GR04.LEAGUE$=""" + wases.league$ + """ AND GR04.PLAYTHISYEAR$=""Y"" AND gr04.ID$<>""open""", recs
+0240 if recs = 0 then
+:      msg$ = "Use Golfer Maintenance to indicate those playing this year.";
+:      run "GW011"
+:    fi
+0250 call "CDW000", row$, "d", str(recs) + "<input type='hidden' name='PLAYERS' value='" + str(recs) + "'>"
+0260 call "CDW000", tab$, "r", row$
+0270 maxflts = recs / 12, default = recs / 24
+0280 if fpt(maxflts) then maxflts = int(maxflts) + 1
+0290 if fpt(default) then default = int(default) + 1
+0300 txt$ = "<select name='FLTS'>"
+0310 for i = 1 to maxflts
+0320   if i = default then sel$ = " selected" else sel$ = ""
+0330   txt$ = txt$ + "<option value='" + str(i) + "'" + sel$ + ">" + str(i) + "</option>"
+0340 next i
+0350 call "CDW000", row$, "d", "Number of Flights"
+0360 call "CDW000", row$, "d", txt$
+0370 call "CDW000", tab$, "r", row$
+0380 call "CDW000", row$, "d", "Assign Sequence based on"
+0390 call "CDW000", row$, "d", "<input type='radio' name='SEQ' value='L' checked>Last Name<br><input type='radio' name='SEQ' value='F'>First Name"
+0400 call "CDW000", tab$, "r", row$
+0410 call "CDW000", row$, "dcs2", "[CANCEL] <input type='submit' value='Submit'>"
+0420 call "CDW000", tab$, "r class='foot'", row$
+0430 call "CDW000", html$, "tc", tab$
+0440 html$ = "<form method='post' action='[DSN]?p=GW015'>" + html$ + "</form>"
+0450 run "CDW999"
 
-1000 PROCESS:
-1010 CALL "CDS041","GW009",GW009$,"YY"
-1020 LET HI$="",FLTS$=""
-1030 FOR I=1 TO FLTS; LET FLTS$=FLTS$+CHR(ASC("A")-1+I); NEXT I
-1040 DIM CNT[1:FLTS]
-1050 CALL "CDS095",GR04,"XXGR04","YUY",GR04$,GR04K$
-1060 IF MOD(PLAYERS,2)
-:       THEN
-:          GOSUB EXTRA
-:       ELSE
-:          REMOVE (GR04,KEY=WASES.LEAGUE$+"open",DOM=1070)
-1070 READ (GR04,KNUM=0,KEY=WASES.LEAGUE$,DOM=1080)
-1080 READ RECORD(GR04,END=1120)GR04$
-1090 IF GR04.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 1120
-1100 IF GR04.PLAYTHISYEAR$="Y"
-:       THEN
-:          GOSUB GETHC
-:       ELSE
-:          LET GR04.FLT$="",GR04.SEQ=0;
-:          WRITE RECORD(GR04)GR04$
-1110 GOTO 1080
-1120 IF LEN(HI$) THEN GOSUB ASSIGNFLT
-1130 GOSUB ASSIGNSEQ
-1140 GOSUB SHOWRESULTS
-1150 RETURN
+1000 process:
+1010 call "CDS041", "GW009", gw009$, "YY"
+1020 hi$ = "", flts$ = ""
+1030 for i = 1 to flts; flts$ = flts$ + chr(asc("A") - 1 + i); next i
+1040 dim cnt[1:flts]
+1050 call "CDS095", gr04, "XXGR04", "YUY", gr04$, gr04k$
+1060 if mod(players, 2) then
+:      gosub extra
+:    else
+:      remove (gr04, key=wases.league$ + "open", dom=1070)
+1070 read (gr04, knum=0, key=wases.league$, dom=1080)
+1080 read record(gr04, end=1120)gr04$
+1090 if gr04.league$ <> wases.league$ then goto 1120
+1100 if gr04.playthisyear$ = "Y" then
+:      gosub gethc
+:    else
+:      gr04.flt$ = "", gr04.seq = 0;
+:      write record(gr04)gr04$
+:    fi
+1110 goto 1080
+1120 if len(hi$) then gosub assignflt
+1130 gosub assignseq
+1140 gosub showresults
+1150 return
 
-1200 ASSIGNFLT:
-1210 LET HI$=SSORT(HI$,8)
-1220 LET FLT=0,PLAYERS1=PLAYERS,FLTS1=FLTS,PTF=0
-1230 FOR I=1 TO LEN(HI$) STEP 8
-1240    IF PTF=0 THEN GOSUB NEWFLT
-1250    EXTRACT RECORD(GR04,KNUM=0,KEY=WASES.LEAGUE$+HI$(I+4,4))GR04$
-1260    LET GR04.FLT$=FLT$
-1270    WRITE RECORD(GR04)GR04$
-1280    LET PTF=PTF-1
-1290 NEXT I
-1300 RETURN
+1200 assignflt:
+1210 hi$ = ssort(hi$, 8)
+1220 flt = 0, players1 = players, flts1 = flts, ptf = 0
+1230 for i = 1 to len(hi$) step 8
+1240   if ptf = 0 then gosub newflt
+1250   extract record(gr04, knum=0, key=wases.league$ + hi$(i + 4, 4))gr04$
+1260   gr04.flt$ = flt$
+1270   write record(gr04)gr04$
+1280   ptf = ptf - 1
+1290 next i
+1300 return
 
-1400 ASSIGNSEQ:
-1410 LET FLT$=""
-1420 LET GR04S=UNT
-1430 SWITCH POS(CGI.SEQ$="LF")
-1440 CASE 1; LET SORTBY$="GR04.LASTNAME$+GR04.FIRSTNAME$"; BREAK
-1450 CASE 2; LET SORTBY$="GR04.FIRSTNAME$+GR04.LASTNAME$"; BREAK
-1460 SWEND
-1470 LET SORTBY$="GR04.FLT$+"+SORTBY$
-1480 SELECT (GR04S)GR04$ FROM Y.COMPCODE$+"GR04" WHERE GR04.LEAGUE$=WASES.LEAGUE$ AND GR04.PLAYTHISYEAR$="Y" SORTBY CPL(SORTBY$)
-1490 READ RECORD(GR04S,END=1540)GR04$
-1500 IF GR04.FLT$<>FLT$ THEN LET FLT$=GR04.FLT$,SEQ=0
-1510 LET SEQ=SEQ+1,GR04.SEQ=SEQ
-1520 WRITE RECORD(GR04)GR04$
-1530 GOTO 1490
-1540 CLOSE (GR04S)
-1550 RETURN
+1400 assignseq:
+1410 flt$ = ""
+1420 gr04s = unt
+1430 switch pos(cgi.seq$ = "LF")
+1440   case 1; sortby$ = "GR04.LASTNAME$+GR04.FIRSTNAME$"; break
+1450   case 2; sortby$ = "GR04.FIRSTNAME$+GR04.LASTNAME$"; break
+1460 swend
+1470 sortby$ = "GR04.FLT$+" + sortby$
+1480 select (gr04s)gr04$ from y.compcode$ + "GR04" where gr04.league$ = wases.league$ and gr04.playthisyear$ = "Y" sortby cpl(sortby$)
+1490 read record(gr04s, end=1540)gr04$
+1500 if gr04.flt$ <> flt$ then flt$ = gr04.flt$, seq = 0
+1510 seq = seq + 1, gr04.seq = seq
+1520 write record(gr04)gr04$
+1530 goto 1490
+1540 close (gr04s)
+1550 return
 
-1600 EXTRA:
-1610 DIM GR04$:FATTR(GR04$)
-1620 LET GR04.LEAGUE$=WASES.LEAGUE$
-1630 LET GR04.ID$="open"
-1640 LET GR04.LASTNAME$="Available"
-1650 EXTRACT RECORD(GR04,KEY=KGEN(GR04$,GR04K$,0),DOM=1660)GR04$
-1660 LET GR04.PREFLT$=FLTS$(FLTS),GR04.HC=0,GR04.PLAYTHISYEAR$="Y"
-1665 IF 0
-:       THEN
-:          LET GR04.PREFLT$="A";
-:          REM "Need to update this logic so that each flight can get an 'extra' person if there is an odd number of players in the flight
-1670 WRITE RECORD(GR04)GR04$
-1680 LET PLAYERS=PLAYERS+1
-1690 RETURN
+1600 extra:
+1610 dim gr04$:fattr(gr04$)
+1620 gr04.league$ = wases.league$
+1630 gr04.id$ = "open"
+1640 gr04.lastname$ = "Available"
+1650 extract record(gr04, key=kgen(gr04$, gr04k$, 0), dom=1660)gr04$
+1660 gr04.preflt$ = flts$(flts), gr04.hc = 0, gr04.playthisyear$ = "Y"
+1665 if 0 then
+:      gr04.preflt$ = "A";
+:      rem "Need to update this logic so that each flight can get an 'extra' person if there is an odd number of players in the flight
+1670 write record(gr04)gr04$
+1680 players = players + 1
+1690 return
 
-1700 GETHC:
-1710 DIM GW009$:FATTR(GW009$)
-1720 CALL "GW009",Y$,GR04$,GW009$
-1730 LET Z=POS(GR04.PREFLT$=FLTS$)
-1740 IF Z
-:       THEN
-:          LET CNT[Z]=CNT[Z]+1;
-:          LET GR04.FLT$=GR04.PREFLT$;
-:          WRITE RECORD(GR04)GR04$
-:       ELSE
-:          LET HI$=HI$+STR(GW009.HC:"00.0")+GR04.ID$
-1750 RETURN
+1700 gethc:
+1710 dim gw009$:fattr(gw009$)
+1720 call "GW009", y$, gr04$, gw009$
+1730 z = pos(gr04.preflt$ = flts$)
+1740 if z then
+:      cnt[z] = cnt[z] + 1;
+:      gr04.flt$ = gr04.preflt$;
+:      write record(gr04)gr04$
+:    else
+:      hi$ = hi$ + str(gw009.hc:"00.0") + gr04.id$
+:    fi
+1750 return
 
-1800 NEWFLT:
-1810 LET FLT=FLT+1,FLT$=CHR(ASC("A")-1+FLT)
-1820 LET PTF=PLAYERS1/FLTS1,FLTS1=FLTS1-1
-1830 IF CNT[FLT]>PTF THEN LET PTF=CNT[FLT]
-1840 IF MOD(PTF,2) THEN LET PTF=PTF+1
-1850 LET PLAYERS1=PLAYERS1-PTF
-1860 LET PTF=PTF-CNT[FLT]
-1870 IF PTF<=0 THEN GOTO NEWFLT
-1880 RETURN
+1800 newflt:
+1810 flt = flt + 1, flt$ = chr(asc("A") - 1 + flt)
+1820 ptf = players1 / flts1, flts1 = flts1 - 1
+1830 if cnt[flt] > ptf then ptf = cnt[flt]
+1840 if mod(ptf, 2) then ptf = ptf + 1
+1850 players1 = players1 - ptf
+1860 ptf = ptf - cnt[flt]
+1870 if ptf <= 0 then goto newflt
+1880 return
 
-1900 SHOWRESULTS:
-1910 LET Y5$="Player List"
-1920 LET DISP$="FLT|SEQ|FIRSTNAME|LASTNAME|GW009.HC|PHONE|EMAIL"
-1930 CALL "CDW038",Y$,Y5$,Y5A$,HTML$,W038$,"XXGR04",1,WASES.LEAGUE$+"A",WASES.LEAGUE$+"Z",DISP$
-1940 LET Y5$="Non-Players"
-1950 LET DISP$="GW008.DATE\Last Played|FIRSTNAME|LASTNAME|PHONE|EMAIL"
-1960 LET WHERE$="GR04.LEAGUE$="""+WASES.LEAGUE$+""" and GR04.FLT$="" """
-1970 LET SORTBY$="NOT(GW008.DATE$)+LASTNAME$"
-1980 CALL "CDW038",Y$,Y5$,Y5A$,HTML2$,W038$,"XXGR04",1,WASES.LEAGUE$+" ","",DISP$,WHERE$,SORTBY$,MODE$,LIMITVAL,SUBHEAD$,FOOT$,ENV$
-1990 LET HTML$=HTML$+"<br>"+HTML2$+"<br>"
-2000 RETURN
+1900 showresults:
+1910 y5$ = "Player List"
+1920 disp$ = "FLT|SEQ|FIRSTNAME|LASTNAME|GW009.HC|PHONE|EMAIL"
+1930 call "CDW038", y$, y5$, y5a$, html$, w038$, "XXGR04", 1, wases.league$ + "A", wases.league$ + "Z", disp$
+1940 y5$ = "Non-Players"
+1950 disp$ = "GW008.DATE\Last Played|FIRSTNAME|LASTNAME|PHONE|EMAIL"
+1960 where$ = "GR04.LEAGUE$=""" + wases.league$ + """ and GR04.FLT$="" """
+1970 sortby$ = "NOT(GW008.DATE$)+LASTNAME$"
+1980 call "CDW038", y$, y5$, y5a$, html2$, w038$, "XXGR04", 1, wases.league$ + " ", "", disp$, where$, sortby$, mode$, limitval, subhead$, foot$, env$
+1990 html$ = html$ + "<br>" + html2$ + "<br>"
+2000 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

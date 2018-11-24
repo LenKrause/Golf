@@ -1,41 +1,41 @@
-0100 REM "GW100 - 03/28/15 Broadcast Email Entry
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDW000",ROW$,"ds2",WASES.LEAGUENAME$
-0130 CALL "CDW000",TAB$,"r class='top'",ROW$
-0140 CALL "CDW000",ROW$,"ds2",Y5$
-0150 CALL "CDW000",TAB$,"r class='title'",ROW$
-0160 CALL "SW404",Y$,"XXGR04",RREC$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" and pos("" ""<>gr04.EMAIL$)",ALLG
-0170 CALL "SW404",Y$,"XXGR04",RREC$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" and pos("" ""<>gr04.EMAIL$) and GR04.SEQ",RECENT
-0180 CALL "SW404",Y$,"XXGR04",RREC$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" and pos("" ""<>gr04.EMAIL$) and GR04.PLAYTHISYEAR$=""Y""",YES
-0190 CALL "SW404",Y$,"XXGR04",RREC$,"GR04.LEAGUE$="""+WASES.LEAGUE$+""" and pos("" ""<>gr04.EMAIL$) and GR04.PLAYTHISYEAR$=""N""",NO
-0200 CALL "CDW000",ROW$,"d","Send to"
-0210 LET D$="<input type='radio' name='SENDTO' value='A'>All ("+STR(ALLG)+")"
-0220 LET D$=D$+"<br><input type='radio' name='SENDTO' value='R' checked>Recently played ("+STR(RECENT)+")"
-0230 LET D$=D$+"<br><input type='radio' name='SENDTO' value='Y'>Playing=Yes ("+STR(YES)+")"
-0240 LET D$=D$+"<br><input type='radio' name='SENDTO' value='N'>Playing=No ("+STR(NO)+")"
-0250 CALL "CDW000",ROW$,"d",D$
-0260 CALL "CDW000",TAB$,"r",ROW$
-0270 CALL "SW010","XXGR04",0,"","FIRSTNAME|LASTNAME|PHONE",NOEMA$," ","<br>","REC.LEAGUE$="""+WASES.LEAGUE$+""" and REC.ID$<>""open"" and POS("" ""<>REC.EMAIL$)=0"
-0280 IF LEN(NOEMA$)
-:       THEN
-:          CALL "CDW000",ROW$,"d","No email address";
-:          CALL "CDW000",ROW$,"d",NOEMA$;
-:          CALL "CDW000",TAB$,"r",ROW$
-0290 CALL "CDW000",ROW$,"d","Email Message"
-0300 CALL "CDS261",Y$,"XXGR02",WASES.LEAGUE$+"b","",0,"","",0,NOTEPAD$
-0310 CALL "CDW000",ROW$,"ds2","<textarea name='NOTE' cols='80' rows='15'>"+NOTEPAD$+"</textarea>"
-0320 CALL "CDW000",TAB$,"r",ROW$
-0330 CALL "CDW000",ROW$,"dcs2","[CANCEL] <input type='submit' value='Send Emails'>"
-0340 CALL "CDW000",TAB$,"r class='foot'",ROW$
-0350 CALL "CDW000",HTML$,"tc",TAB$
-0360 LET HTML$="<form method='post' action='[DSN]?p=GW101'>"+HTML$+"</form>"
-0370 GOTO EOJ
+0100 rem "GW100 - 03/28/15 Broadcast Email Entry
+0110 setesc 8000; seterr 8000
+0120 call "CDW000", row$, "ds2", wases.leaguename$
+0130 call "CDW000", tab$, "r class='top'", row$
+0140 call "CDW000", row$, "ds2", y5$
+0150 call "CDW000", tab$, "r class='title'", row$
+0160 call "SW404", y$, "XXGR04", rrec$, "GR04.LEAGUE$=""" + wases.league$ + """ and pos("" ""<>gr04.EMAIL$)", allg
+0170 call "SW404", y$, "XXGR04", rrec$, "GR04.LEAGUE$=""" + wases.league$ + """ and pos("" ""<>gr04.EMAIL$) and GR04.SEQ", recent
+0180 call "SW404", y$, "XXGR04", rrec$, "GR04.LEAGUE$=""" + wases.league$ + """ and pos("" ""<>gr04.EMAIL$) and GR04.PLAYTHISYEAR$=""Y""", yes
+0190 call "SW404", y$, "XXGR04", rrec$, "GR04.LEAGUE$=""" + wases.league$ + """ and pos("" ""<>gr04.EMAIL$) and GR04.PLAYTHISYEAR$=""N""", no
+0200 call "CDW000", row$, "d", "Send to"
+0210 d$ = "<input type='radio' name='SENDTO' value='A'>All (" + str(allg) + ")"
+0220 d$ = d$ + "<br><input type='radio' name='SENDTO' value='R' checked>Recently played (" + str(recent) + ")"
+0230 d$ = d$ + "<br><input type='radio' name='SENDTO' value='Y'>Playing=Yes (" + str(yes) + ")"
+0240 d$ = d$ + "<br><input type='radio' name='SENDTO' value='N'>Playing=No (" + str(no) + ")"
+0250 call "CDW000", row$, "d", d$
+0260 call "CDW000", tab$, "r", row$
+0270 call "SW010", "XXGR04", 0, "", "FIRSTNAME|LASTNAME|PHONE", noema$, " ", "<br>", "REC.LEAGUE$=""" + wases.league$ + """ and REC.ID$<>""open"" and POS("" ""<>REC.EMAIL$)=0"
+0280 if len(noema$) then
+:      call "CDW000", row$, "d", "No email address";
+:      call "CDW000", row$, "d", noema$;
+:      call "CDW000", tab$, "r", row$
+:    fi
+0290 call "CDW000", row$, "d", "Email Message"
+0300 call "CDS261", y$, "XXGR02", wases.league$ + "b", "", 0, "", "", 0, notepad$
+0310 call "CDW000", row$, "ds2", "<textarea name='NOTE' cols='80' rows='15'>" + notepad$ + "</textarea>"
+0320 call "CDW000", tab$, "r", row$
+0330 call "CDW000", row$, "dcs2", "[CANCEL] <input type='submit' value='Send Emails'>"
+0340 call "CDW000", tab$, "r class='foot'", row$
+0350 call "CDW000", html$, "tc", tab$
+0360 html$ = "<form method='post' action='[DSN]?p=GW101'>" + html$ + "</form>"
+0370 goto eoj
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDW999"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDW999"

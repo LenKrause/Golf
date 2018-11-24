@@ -1,10 +1,10 @@
-0100 REM "LKS350 - 11/30/98 Who belongs to this phone#
-0110 CALL "CDS268",Z1,Z2,COL,ROW,"+telephone#+",Z7,PN$,Y,Z8$,FMT$[ALL]
-0120 IF CTL=4 THEN GOTO EOJ
-0125 LET WHERE$="REC.PHONE$="""+PN$+""" OR REC.ALTPHONE$(1,12)="""+PN$+""""
-0130 CALL "CDS037","XXCM01",KNUM,KEYPFX$,DISP$,WINX,WINY,WINROWS,WINCOLS,WINTITLE$,COLORS$,SELRTN$,WHERE$,SORTBY$,MODE$,LIMIT,SELREC$
-0135 LET WHERE$="REC.PHONE$(1,12)="""+PN$+""""
-0140 CALL "CDS037","OSCM02",KNUM,KEYPFX$,DISP$,WINX,WINY,WINROWS,WINCOLS,WINTITLE$,COLORS$,SELRTN$,WHERE$,SORTBY$,MODE$,LIMIT,SELREC$
+0100 rem "LKS350 - 11/30/98 Who belongs to this phone#
+0110 call "CDS268", z1, z2, col, row, "+telephone#+", z7, pn$, y, z8$, fmt$[all]
+0120 if ctl = 4 then goto eoj
+0125 where$ = "REC.PHONE$=""" + pn$ + """ OR REC.ALTPHONE$(1,12)=""" + pn$ + """"
+0130 call "CDS037", "XXCM01", knum, keypfx$, disp$, winx, winy, winrows, wincols, wintitle$, colors$, selrtn$, where$, sortby$, mode$, limit, selrec$
+0135 where$ = "REC.PHONE$(1,12)=""" + pn$ + """"
+0140 call "CDS037", "OSCM02", knum, keypfx$, disp$, winx, winy, winrows, wincols, wintitle$, colors$, selrtn$, where$, sortby$, mode$, limit, selrec$
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

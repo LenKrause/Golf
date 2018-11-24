@@ -1,23 +1,23 @@
-0100 REM "TIME1 - 05/04/10 Time to read DYSW01
-0110 BEGIN
-0120 LET TFILE$="tmp/TIME1.txt"
-0130 ERASE TFILE$,ERR=0140
-0140 STRING TFILE$
-0150 OPEN (1)TFILE$
-0160 OPEN (2)"DYSW01"
-0170 PRECISION 8
-0180 LET TIM0=TIM
-0190 SETTRACE (1)
-0200 READ RECORD(2,END=0210)REC$; GOTO 0200
-0210 ENDTRACE
-0220 PRINT 3600*(TIM-TIM0)
-0230 GOTO 9996
+0100 rem "TIME1 - 05/04/10 Time to read DYSW01
+0110 begin
+0120 tfile$ = "tmp/TIME1.txt"
+0130 erase tfile$, err=0140
+0140 string tfile$
+0150 open (1)tfile$
+0160 open (2)"DYSW01"
+0170 precision 8
+0180 tim0 = tim
+0190 settrace (1)
+0200 read record(2, end=0210)rec$; goto 0200
+0210 endtrace
+0220 print 3600 * (tim - tim0)
+0230 goto 9996
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

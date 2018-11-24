@@ -1,23 +1,23 @@
-0100 REM "LKC102 - 05/08/99 Device Listing
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 ENTER HEAD$,INFO$,FLDS,TTYF$,TTYFLDS,TTY[ALL],REC$
-0130 LET REC$=""
-0140 FOR FLD=1 TO TTYFLDS
-0150    FOR I=1 TO FLDS
-0160       IF HEAD.NO$[I]=TTYF.NO$[FLD] THEN GOSUB MATCH; EXITTO 0180
-0170    NEXT I
-0180 NEXT FLD
-0190 EXIT
+0100 rem "LKC102 - 05/08/99 Device Listing
+0110 setesc 8000; seterr 8000
+0120 enter head$, info$, flds, ttyf$, ttyflds, tty[all], rec$
+0130 rec$ = ""
+0140 for fld = 1 to ttyflds
+0150   for i = 1 to flds
+0160     if head.no$[i] = ttyf.no$[fld] then gosub match; exitto 0180
+0170   next i
+0180 next fld
+0190 exit
 
-1000 MATCH:
-1010 LET TTY[FLD]=MAX(TTY[FLD],LEN(INFO.NO$[I]))
-1020 LET REC$=REC$+INFO.NO$[I]+":"
-1030 RETURN
+1000 match:
+1010 tty[fld] = max(tty[fld], len(info.no$[i]))
+1020 rec$ = rec$ + info.no$[i] + ":"
+1030 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 EXIT
+9000 eoj:
+9010 exit

@@ -1,31 +1,30 @@
-0100 REM "LKS202 - 03/08/01 Internal Font Test
-0110 SETERR DT_ERR; SETESC DT_ERR
-0120 DATA "Courier",4099,"CG Times",4101,"CG Omega",4113,"Coronet",4116,"CG Century School",4119,"Clarendon",4140,"Univers",4148,"Antique Olive",4168,"Garamond Antiqua",4197,"Marigold",4297,"Albertus",4362,"Letter Gothic",4102,"Prestige Elite",4104,"Times New",16901,"Arial",16602,"Line Printer",0
-0130 CALL "CDS084",ERR=EOJ,Y$,Y5$,0,S084$,0,Y6$
-0140 IF Y6.PCL=0
-:       THEN
-:          CALL "CDS069",0,0,0,0,"This option requires a PCL compatible printer such as laser or inkjet-";
-:          GOTO 0130
-0150 DIM FONT$[100],FONT[100]
-0160 LET IND=0
-0170 DREAD FONT$[IND],ERR=0175
-0171 DREAD FONT[IND]
-0172 LET IND=IND+1
-0173 GOTO 0170
-0200 IF 0
-:       THEN
-:          PRINT (Y6.CH)'BO',$1B$,"&l4H",Y6.DEPTH85$,$1B$,"&l81a10C",'EO',;
-:          REM "Force feed from aux paper source - pull down tray - automatic, not manual, to eliminate need to touch printer button; then landscape, then COM10 envelope; 10/48" line spacing
-0205 FOR I=0 TO IND-1
-0210    CALL "CDS254",Y6$,"T ,,0,0,14,,"+STR(FONT[I]),FONT$[I]+"   ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"+$0D0A0A$
-0215 NEXT I
-0270 CALL "CDS094",Y6$,"E"
-0280 GOTO EOJ
+0100 rem "LKS202 - 03/08/01 Internal Font Test
+0110 seterr 8000; setesc 8000
+0120 data "Courier", 4099, "CG Times", 4101, "CG Omega", 4113, "Coronet", 4116, "CG Century School", 4119, "Clarendon", 4140, "Univers", 4148, "Antique Olive", 4168, "Garamond Antiqua", 4197, "Marigold", 4297, "Albertus", 4362, "Letter Gothic", 4102, "Prestige Elite", 4104, "Times New", 16901, "Arial", 16602, "Line Printer", 0
+0130 call "CDS084", err=eoj, y$, y5$, 0, s084$, 0, y6$
+0140 if y6.pcl = 0 then
+:      call "CDS069", 0, 0, 0, 0, "This option requires a PCL compatible printer such as laser or inkjet-";
+:      goto 0130
+:    fi
+0150 dim font$[100], font[100]
+0160 ind=0
+0170 dread font$[ind], err=0175
+0171 dread font[ind]
+0172 ind=ind + 1
+0173 goto 0170
+0200 if 0 then
+:      print (y6.ch)'bo', $1b$, "&l4H", y6.depth85$, $1b$, "&l81a10C", 'eo', ;
+:      rem "Force feed from aux paper source - pull down tray - automatic, not manual, to eliminate need to touch printer button; then landscape, then COM10 envelope; 10/48" line spacing
+0205 for i = 0 to ind - 1
+0210   call "CDS254", y6$, "T ,,0,0,14,," + str(font[i]), font$[i] + "   ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" + $0d0a0a$
+0215 next i
+0270 call "CDS094", y6$, "E"
+0280 goto eoj
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

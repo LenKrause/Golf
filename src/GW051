@@ -1,129 +1,127 @@
-0100 REM "GW051 - 07/13/14 Golf Point Ranking - PDF
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 IF CGI.FORMAT$="E" THEN RUN "GW053"; REM "Email format
-0170 CALL "CDS095",GR03,"XXGR03","YNY",GR03$
-0180 CALL "CDS095",GR04,"XXGR04","YNY",GR04$
-0190 LET HALF=NUM(CGI.PERIOD$); REM "1/2/3=entire year
-0200 LET GR03S=UNT
-0210 SELECT (GR03S)GR03$ FROM Y.COMPCODE$+"GR03" WHERE GR03.LEAGUE$=WASES.LEAGUE$ AND DATE(GR03.DATE:"%Yl")=CGI.YEAR$
-0220 READ RECORD(GR03S,END=0250)GR03$
-0230 IF HALF=3 OR GR03.HALF=HALF THEN LET DATES$=DATES$+GR03.DATE$
-0240 GOTO 0220
-0250 CLOSE (GR03S)
-0255 LET DATES=LEN(DATES$)/3
-0256 IF DATES=0 THEN LET MSG$="No Rounds played"; RUN "GW011"
-0260 LET DATES$=SSORT(DATES$,3)
-0270 DIM DATES$[1:DATES]
-0280 CALL "CDS095",GR05,"XXGR05","YNY",GR05$
-0290 DIM GS$[1:100]
-0300 LET GR05S=UNT
-0310 SELECT (GR05S)GR05$ FROM Y.COMPCODE$+"GR05" WHERE GR05.LEAGUE$=WASES.LEAGUE$ AND POS(GR05.DATE$=DATES$,3) SORTBY GR05.ID$+GR05.DATE$
-0320 READ RECORD(GR05S,END=0380)GR05$
-0330 IF LEN(CG$) AND CG$(1,4)<>GR05.ID$
-:       THEN
-:          IF LEN(CG$)
-:             THEN
-:                LET IDS=IDS+1,GS$[IDS]=LASTFLT$+STR(LASTHC:"##")+CG$
-:          FI;
-:          LET CG$="",LASTHC=0
-0334 LET LASTFLT$=GR05.FLT$,LASTHC=GR05.HC
-0335 IF GR05.SCORE=0
-:       THEN
-:          GOTO 0320;
-:          REM "Need lasthc from last week in year even if golfer did not play
-0340 IF LEN(CG$)=0 THEN LET CG$=GR05.ID$
-0350 LET Z=POS(STR(GR05.DATE)=DATL$,7);
-:    IF Z=0
-:       THEN
-:          LET DATL$=DATL$+STR(GR05.DATE)
-0360 LET CG$=CG$+STR(GR05.DATE)+STR(GR05.POINTS:"##.0")
-0370 GOTO 0320
-0380 CLOSE (GR05S)
-0390 IF LEN(CG$) THEN LET IDS=IDS+1,GS$[IDS]=LASTFLT$+STR(LASTHC:"##")+CG$
-0392 IF IDS=0 THEN LET MSG$="No Rounds Played"; RUN "GW011"
-0393 CALL "CDS041","CDS084",S084$,"YY"
-0394 LET S084.MODE$="E",S084.NAME$="APDF"
-0395 CALL "CDS084",ERR=EOJ,Y$,Y5$,U0,S084$,Y6,Y6$
-0399 LET CG$=""
-0400 LET DATL$=SSORT(DATL$,7)
-0410 LET WKS=LEN(DATL$)/7
-0420 DIM PTS[1:IDS,1:WKS+5];
-:    REM "+1 weeks, +2 total pts, +3 min pts, +4 min wk#, +5 HC
-0430 FOR ID=1 TO IDS
-0440    LET CG$=GS$[ID],TIMES=0,TOT=0,MINPTS=99
-0450    LET PTS[ID,WKS+5]=NUM(CG$(2,2))
-0460    FOR J=8 TO LEN(CG$) STEP 11
-0470       LET WK=(POS(CG$(J,7)=DATL$,7)-1)/7+1
-0480       LET PTS[ID,WK]=NUM(CG$(J+7,4)),TIMES=TIMES+1,TOT=TOT+PTS[ID,WK]
-0490       IF PTS[ID,WK]<MINPTS THEN LET MINPTS=PTS[ID,WK],MINWKNO=WK
-0500    NEXT J
-0510    LET PTS[ID,WKS+1]=TIMES
-0520    LET PTS[ID,WKS+2]=TOT
-0530    IF TIMES=WKS AND CGI.DROP$="Y"
-:          THEN
-:             LET PTS[ID,WKS+3]=MINPTS,PTS[ID,WKS+4]=MINWKNO
-0540    LET SEQ$=SEQ$+CG$(1,1)+STR(200-(PTS[ID,WKS+2]-PTS[ID,WKS+3]):"###.0")+STR(ID:"##0")
-0550 NEXT ID
-0560 LET SEQ$=SSORT(SEQ$,9)
-0570 LET ROW=150
-0580 CALL "CDS254",Y6$,"T1200C,"+STR(ROW)+",3,1,14,,4148",WASES.LEAGUENAME$
-0590 LET ROW=ROW+60;
-:    CALL "CDS254",Y6$,"T1200C,"+STR(ROW)+",3,1,14,,4148","Point Ranking - "+FNH$(HALF)
-0600 CALL "CDS454::SETUP",150,300,"450,59,"+FILL((WKS+2)*4,"102,"),FILL(3*(4+LEN(SEQ$)/9),"50,")
-0610 FOR SEQP=1 TO LEN(SEQ$) STEP 9
-0620    IF SEQP=1 OR SEQ$(SEQP,1)<>FLT$ THEN GOSUB NEWFLT
-0630    LET ID=NUM(SEQ$(SEQP+6,3))
-0640    READ RECORD(GR04,KNUM=0,KEY=WASES.LEAGUE$+GS$[ID](4,4))GR04$
-0650    LET COLNO=1
-0660    LET ROWNO=ROWNO+1;
-:       CALL "CDS454",Y6$,COLNO,ROWNO,"L",CVS(GR04.FIRSTNAME$,2)+" "+CVS(GR04.LASTNAME$,2)
-0670    LET COLNO=COLNO+1; CALL "CDS454",Y6$,COLNO,ROWNO,"C",STR(PTS[ID,WKS+5])
-0680    FOR WK=1 TO WKS
-0685       IF WK=PTS[ID,WKS+4]
-:             THEN
-:                LET SHADE=1,COLOR$="red"
-:             ELSE
-:                LET SHADE=0,COLOR$=""
-0690       LET COLNO=COLNO+1;
-:          CALL "CDS454",Y6$,COLNO,ROWNO,"R",STR(PTS[ID,WK]:"###.0"),SHADE,0,0,0,0,0,COLOR$
-0700    NEXT WK
-0710    LET COLNO=COLNO+1; CALL "CDS454",Y6$,COLNO,ROWNO,"C",STR(PTS[ID,WKS+1])
-0720    LET COLNO=COLNO+1;
-:       CALL "CDS454",Y6$,COLNO,ROWNO,"R",STR(PTS[ID,WKS+2]-PTS[ID,WKS+3]:"###.0")
-0730 NEXT SEQP
-0740 CALL "CDS094",Y6$,"E"
-0745 WAIT 2
-0750 LET HTML$="<script>window.open('"+S084.FILEOUT$(POS("/tmp/"=S084.FILEOUT$))+"');</script>"
-0760 RUN "GW011"
+0100 rem "GW051 - 07/13/14 Golf Point Ranking - PDF
+0110 setesc 8000; seterr 8000
+0120 if cgi.format$ = "E" then run "GW053"; rem "Email format
+0170 call "CDS095", gr03, "XXGR03", "YNY", gr03$
+0180 call "CDS095", gr04, "XXGR04", "YNY", gr04$
+0190 half = num(cgi.period$); rem "1/2/3=entire year
+0200 gr03s = unt
+0210 select (gr03s)gr03$ from y.compcode$ + "GR03" where gr03.league$ = wases.league$ and date(gr03.date:"%Yl") = cgi.year$
+0220 read record(gr03s, end=0250)gr03$
+0230 if half = 3 or gr03.half = half then dates$ = dates$ + gr03.date$
+0240 goto 0220
+0250 close (gr03s)
+0255 dates = len(dates$) / 3
+0256 if dates = 0 then msg$ = "No Rounds played"; run "GW011"
+0260 dates$ = ssort(dates$, 3)
+0270 dim dates$[1:dates]
+0280 call "CDS095", gr05, "XXGR05", "YNY", gr05$
+0290 dim gs$[1:100]
+0300 gr05s = unt
+0310 select (gr05s)gr05$ from y.compcode$ + "GR05" where gr05.league$ = wases.league$ and pos(gr05.date$ = dates$, 3) sortby gr05.id$ + gr05.date$
+0320 read record(gr05s, end=0380)gr05$
+0330 if len(cg$) and cg$(1,4) <> gr05.id$ then
+:      if len(cg$) then
+:        ids = ids + 1, gs$[ids] = lastflt$ + str(lasthc:"##") + cg$
+:      fi;
+:      cg$ = "", lasthc = 0
+:    fi
+0334 lastflt$ = gr05.flt$, lasthc = gr05.hc
+0335 if gr05.score = 0 then
+:      goto 0320;
+:      rem "Need lasthc from last week in year even if golfer did not play
+0340 if len(cg$) = 0 then cg$ = gr05.id$
+0350 z = pos(str(gr05.date) = datl$, 7);
+:    if z = 0 then
+:      datl$ = datl$ + str(gr05.date)
+:    fi
+0360 cg$ = cg$ + str(gr05.date) + str(gr05.points:"##.0")
+0370 goto 0320
+0380 close (gr05s)
+0390 if len(cg$) then ids = ids + 1, gs$[ids] = lastflt$ + str(lasthc:"##") + cg$
+0392 if ids = 0 then msg$ = "No Rounds Played"; run "GW011"
+0393 call "CDS041", "CDS084", s084$, "YY"
+0394 s084.mode$ = "E", s084.name$ = "APDF"
+0395 call "CDS084", err=eoj, y$, y5$, u0, s084$, y6, y6$
+0399 cg$ = ""
+0400 datl$ = ssort(datl$, 7)
+0410 wks = len(datl$) / 7
+0420 dim pts[1:ids, 1:wks + 5];
+:    rem "+1 weeks, +2 total pts, +3 min pts, +4 min wk#, +5 HC
+0430 for id = 1 to ids
+0440   cg$ = gs$[id], times = 0, tot = 0, minpts = 99
+0450   pts[id, wks + 5] = num(cg$(2,2))
+0460   for j = 8 to len(cg$) step 11
+0470     wk = (pos(cg$(j, 7) = datl$, 7) - 1) / 7 + 1
+0480     pts[id, wk] = num(cg$(j + 7, 4)), times = times + 1, tot = tot + pts[id, wk]
+0490     if pts[id, wk] < minpts then minpts = pts[id, wk], minwkno = wk
+0500   next j
+0510   pts[id, wks + 1] = times
+0520   pts[id, wks + 2] = tot
+0530   if times = wks and cgi.drop$ = "Y" then
+:        pts[id, wks + 3] = minpts, pts[id, wks + 4] = minwkno
+:      fi
+0540   seq$ = seq$ + cg$(1,1) + str(200 - (pts[id, wks + 2] - pts[id, wks + 3]):"###.0") + str(id:"##0")
+0550 next id
+0560 seq$ = ssort(seq$, 9)
+0570 row = 150
+0580 call "CDS254", y6$, "T1200C," + str(row) + ",3,1,14,,4148", wases.leaguename$
+0590 row = row + 60;
+:    call "CDS254", y6$, "T1200C," + str(row) + ",3,1,14,,4148", "Point Ranking - " + fnh$(half)
+0600 call "CDS454::SETUP", 150, 300, "450,59," + fill((wks + 2) * 4,"102,"), fill(3 * (4 + len(seq$) / 9), "50,")
+0610 for seqp = 1 to len(seq$) step 9
+0620   if seqp = 1 or seq$(seqp, 1) <> flt$ then gosub newflt
+0630   id = num(seq$(seqp + 6, 3))
+0640   read record(gr04, knum=0, key=wases.league$ + gs$[id](4,4))gr04$
+0650   colno = 1
+0660   rowno = rowno + 1;
+:      call "CDS454", y6$, colno, rowno, "L", cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2)
+0670   colno = colno + 1; call "CDS454", y6$, colno, rowno, "C", str(pts[id, wks + 5])
+0680   for wk = 1 to wks
+0685     if wk = pts[id, wks + 4] then
+:          shade = 1, color$ = "red"
+:        else
+:          shade = 0, color$ = ""
+:        fi
+0690     colno = colno + 1;
+:        call "CDS454", y6$, colno, rowno, "R", str(pts[id, wk]:"###.0"), shade, 0, 0, 0, 0, 0, color$
+0700   next wk
+0710   colno = colno + 1; call "CDS454", y6$, colno, rowno, "C", str(pts[id, wks + 1])
+0720   colno = colno + 1;
+:      call "CDS454", y6$, colno, rowno, "R", str(pts[id, wks + 2] - pts[id, wks + 3]:"###.0")
+0730 next seqp
+0740 call "CDS094", y6$, "E"
+0745 wait 2
+0750 html$ = "<script>window.open('" + s084.fileout$(pos("/tmp/" = s084.fileout$)) + "');</script>"
+0760 run "GW011"
 
-1000 NEWFLT:
-1010 LET ROWNO=ROWNO+1
-1020 LET FLT$=SEQ$(SEQP,1)
-1030 LET TXT$=FLT$+" Flight"
-1040 CALL "CDS454",Y6$,1,ROWNO,"C",TXT$,1,2+WKS+2,1
-1050 LET ROWNO=ROWNO+1,COLNO=0
-1060 LET COLNO=COLNO+1; CALL "CDS454",Y6$,COLNO,ROWNO,"L","Name",1
-1070 LET COLNO=COLNO+1; CALL "CDS454",Y6$,COLNO,ROWNO,"C","HC",1
-1080 FOR DATP=1 TO LEN(DATL$) STEP 7
-1090    LET TXT$=DATE(NUM(DATL$(DATP,7)):" %M/%Dz")
-1100    LET COLNO=COLNO+1; CALL "CDS454",Y6$,COLNO,ROWNO,"R",TXT$,1
-1110 NEXT DATP
-1120 LET COLNO=COLNO+1; CALL "CDS454",Y6$,COLNO,ROWNO,"C","Wks",1
-1130 LET COLNO=COLNO+1; CALL "CDS454",Y6$,COLNO,ROWNO,"R","Pts",1
-1140 RETURN
-7010 DEF FNH$(HALF)
-7020 SWITCH HALF
-7030 CASE 1; LET OUT$="1st half "; BREAK
-7040 CASE 2; LET OUT$="2nd half "; BREAK
-7045 CASE 3; LET OUT$=""; BREAK
-7050 SWEND
-7060 RETURN OUT$+CGI.YEAR$
-7070 FNEND
+1000 newflt:
+1010 rowno = rowno + 1
+1020 flt$ = seq$(seqp, 1)
+1030 txt$ = flt$ + " Flight"
+1040 call "CDS454", y6$, 1, rowno, "C", txt$, 1, 2 + wks + 2, 1
+1050 rowno = rowno + 1, colno = 0
+1060 colno = colno + 1; call "CDS454", y6$, colno, rowno, "L", "Name", 1
+1070 colno = colno + 1; call "CDS454", y6$, colno, rowno, "C", "HC", 1
+1080 for datp = 1 to len(datl$) step 7
+1090   txt$ = date(num(datl$(datp, 7)):" %M/%Dz")
+1100   colno = colno + 1; call "CDS454", y6$, colno, rowno, "R", txt$, 1
+1110 next datp
+1120 colno = colno + 1; call "CDS454", y6$, colno, rowno, "C", "Wks", 1
+1130 colno = colno + 1; call "CDS454", y6$, colno, rowno, "R", "Pts", 1
+1140 return
+7010 def fnh$(half)
+7020 switch half
+7030   case 1; out$ = "1st half "; break
+7040   case 2; out$ = "2nd half "; break
+7045   case 3; out$ = ""; break
+7050 swend
+7060 return out$ + cgi.year$
+7070 fnend
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDW999"
+9000 eoj:
+9010 run "CDW999"

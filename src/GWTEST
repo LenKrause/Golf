@@ -1,22 +1,22 @@
-0100 REM "GWTEST - 04/24/12 Test input
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 IF FIELD(CGI$,"go",ERR=0130)>"" THEN CALL "CDW279",CGI$,HTML$; RUN "CDW999"
-0130 FOR ROW=1 TO 10
-0140    CALL "CDW000",ROW$,"d","<input type='text' name='COL1'>"
-0141    CALL "CDW000",ROW$,"d","<input type='text' name='COL2'>"
-0142    CALL "CDW000",ROW$,"d","<input type='radio' name='COL3"+STR(ROW)+"' value='1'>1<input type='radio' name='COL3"+STR(ROW)+"' value='2'>2<input type='hidden' name='COL3"+STR(ROW)+"' value='3'>"
-0150    CALL "CDW000",TAB$,"r",ROW$
-0160 NEXT ROW
-0170 CALL "CDW000",HTML$,"t",TAB$
-0174 LET HTML$=HTML$+"<input type='submit' value='Submit'>"
-0175 LET HTML$="<form method='post' action='[DSN]?p=GWTEST&go=1'>"+HTML$+"</form>"
-0180 RUN "CDW999"
+0100 rem "GWTEST - 04/24/12 Test input
+0110 setesc 8000; seterr 8000
+0120 if field(cgi$, "go", err=0130) > "" then call "CDW279", cgi$, html$; run "CDW999"
+0130 for row = 1 to 10
+0140   call "CDW000", row$, "d", "<input type='text' name='COL1'>"
+0141   call "CDW000", row$, "d", "<input type='text' name='COL2'>"
+0142   call "CDW000", row$, "d", "<input type='radio' name='COL3" + str(row) + "' value='1'>1<input type='radio' name='COL3" + str(row) + "' value='2'>2<input type='hidden' name='COL3" + str(row) + "' value='3'>"
+0150   call "CDW000", tab$, "r", row$
+0160 next row
+0170 call "CDW000", html$, "t", tab$
+0174 html$ = html$ + "<input type='submit' value='Submit'>"
+0175 html$ = "<form method='post' action='[DSN]?p=GWTEST&go=1'>" + html$ + "</form>"
+0180 run "CDW999"
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

@@ -1,22 +1,22 @@
-0100 REM "GW997 - 04/17/16 Send Test Email
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS041","CDS084",S084$,"YY"
-0130 LET S084.MODE$="E"
-0140 LET S084.NAME$="MAIL"
-0150 LET S084.TONAME$="Len Krause"
-0160 LET S084.TOEMAIL$="len@excellware.com"
-0170 LET S084.FROMEMAIL$="webmaster@scoresandcharts.com"
-0180 LET S084.SUBJECT$="Test Email"
-0190 CALL "CDS084",ERR=EOJ,Y$,Y5$,U0,S084$,Y6,Y6$
-0200 PRINT (Y6.CH)"Email Test"
-0210 CALL "CDS094",Y6$,"E"
-0220 GOTO EOJ
+0100 rem "GW997 - 04/17/16 Send Test Email
+0110 setesc dt_err; seterr dt_err
+0120 call "CDS041", "CDS084", s084$, "YY"
+0130 s084.mode$ = "E"
+0140 s084.name$ = "MAIL"
+0150 s084.toname$ = "Len Krause"
+0160 s084.toemail$ = "len@excellware.com"
+0170 s084.fromemail$ = "webmaster@scoresandcharts.com"
+0180 s084.subject$ = "Test Email"
+0190 call "CDS084", err=eoj, y$, y5$, u0, s084$, y6, y6$
+0200 print (y6.ch)"Email Test"
+0210 call "CDS094", y6$, "E"
+0220 goto eoj
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

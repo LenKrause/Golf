@@ -1,17 +1,17 @@
-0100 REM "LKS002 - 03/16/00 test background task
-0110 BEGIN
-0120 LET A=SCALL("mknod tmp/lks002.in p")
-0130 LET A=SCALL("mknod tmp/lks002.out p")
-0140 LET A=SCALL("nohup $BBXDIR/pro5 -c$BBXDIR/config.bbx < tmp/lks002.in > tmp/lks002.out & echo $! > tmp/lks002.pid")
-0150 OPEN (1)"tmp/lks002.in"
-0160 OPEN (2)"tmp/lks002.out"
-0170 OPEN (3)FID(0)
-0175 OPEN (5)"tmp/lks002.pid"
-0176 READ (5)PID$
-0177 CLOSE (5)
-0180 READ RECORD(2,SIZ=1,TIM=0,ERR=0210)A$
-0190 PRINT A$,
-0200 GOTO 0180
-0210 READ RECORD(3,SIZ=1,TIM=0,ERR=0180)B$
-0220 PRINT (1)B$,
-0230 GOTO 0210
+0100 rem "LKS002 - 03/16/00 test background task
+0110 begin
+0120 a = scall("mknod tmp/lks002.in p")
+0130 a = scall("mknod tmp/lks002.out p")
+0140 a = scall("nohup $BBXDIR/pro5 -c$BBXDIR/config.bbx < tmp/lks002.in > tmp/lks002.out & echo $! > tmp/lks002.pid")
+0150 open (1)"tmp/lks002.in"
+0160 open (2)"tmp/lks002.out"
+0170 open (3)fid(0)
+0175 open (5)"tmp/lks002.pid"
+0176 read (5)pid$
+0177 close (5)
+0180 read record(2, siz=1, tim=0, err=0210)a$
+0190 print a$, 
+0200 goto 0180
+0210 read record(3, siz=1, tim=0, err=0180)b$
+0220 print (1)b$, 
+0230 goto 0210

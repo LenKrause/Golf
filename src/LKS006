@@ -1,20 +1,20 @@
-0100 REM "LKS006 - 02/16/99 Replace blanks in G/L Acct# MAS90 GL4 file with 0's
-0110 BEGIN
-0120 CALL "CDS069",3,3,0,0,"+MAS90 COMPANY CODE+","A",0,CC$
-0130 IF CTL=4 THEN GOTO EOJ
-0140 OPEN (1)STBL("SOADIR")+"GL"+CC$+"/GL4"+CC$+".SOA"
-0150 LET K$=KEY(1,END=0300)
-0160 READ RECORD(1)REC$
-0165 IF LEN(K$)=0 THEN GOTO 0150
-0166 LET CHG=0
-0170 LET Z=POS(" "=REC$(13,9))
-0180 IF Z THEN LET REC$(12+Z,1)="0",CHG=CHG+1; GOTO 0170
-0190 IF CHG=0 THEN GOTO 0150
-0200 WRITE RECORD(1,KEY=REC$(1,LEN(K$)))REC$
-0210 REMOVE (1,KEY=K$)
-0215 LET REC=REC+1
-0220 GOTO 0150
-0300 CALL "CDS069",0,0,0,0,STR(REC)+" records revised-"
+0100 rem "LKS006 - 02/16/99 Replace blanks in G/L Acct# MAS90 GL4 file with 0's
+0110 begin
+0120 call "CDS069", 3, 3, 0, 0, "+MAS90 COMPANY CODE+", "A", 0, cc$
+0130 if ctl = 4 then goto eoj
+0140 open (1)stbl("SOADIR") + "GL" + cc$ + "/GL4" + cc$ + ".SOA"
+0150 k$ = key(1, end=0300)
+0160 read record(1)rec$
+0165 if len(k$) = 0 then goto 0150
+0166 chg = 0
+0170 z = pos(" " = rec$(13,9))
+0180 if z then rec$(12 + z, 1) = "0", chg = chg + 1; goto 0170
+0190 if chg = 0 then goto 0150
+0200 write record(1, key=rec$(1, len(k$)))rec$
+0210 remove (1, key=k$)
+0215 rec = rec + 1
+0220 goto 0150
+0300 call "CDS069", 0, 0, 0, 0, str(rec) + " records revised-"
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

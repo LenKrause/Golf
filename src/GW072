@@ -1,82 +1,82 @@
-0100 REM "GW072 - 08/27/14 Send Post Season Email
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS041","CDS084",S084$,"YY"
-0130 LET SENT=0
-0140 LET S084.MODE$="E",S084.NAME$="MAIL",S084.EMAILTYPE$="H"
-0150 LET S084.FROMNAME$="ScoresAndCharts.com",S084.FROMEMAIL$="webmaster@scoresandcharts.com"
-0160 LET TMP$=STBL("WMS_CDW000","D")
-0170 CALL "CDS095",GR04,"XXGR04","YNY",GR04$
-0180 CALL "CDS095",GR06,"XXGR06","YNY",GR06$
-0190 CALL "CDS095",GR08,"XXGR08","YNY",GR08$
-0200 CALL "SW001","XXGR01",0,WASES.LEAGUE$,GR01$,SW001$
-0210 LET S084.SUBJECT$=CVS(GR01.NAME$,3)+" Post Season"
-0220 LET GR04S=UNT,EML$=""
-0230 SELECT (GR04S)GR04$ FROM Y.COMPCODE$+"GR04" WHERE GR04.LEAGUE$=WASES.LEAGUE$ AND POS(" "<>GR04.EMAIL$)
-0240 READ RECORD(GR04S,END=0246)GR04$
-0242 LET EML$=EML$+CVS(GR04.EMAIL$,3)+",",SENT=SENT+1
-0244 GOTO 0240
-0246 IF 1
-:       THEN
-:          LET S084.EMAILBCC$=EML$
-:       ELSE
-:          LET S084.TOEMAIL$="len@excellware.com"
-0247 GOSUB DATES
-0430 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
-0440 LET NOTE$=CGI.NOTE$
-0445 OPEN (99,MODE="O_CREATE,O_TRUNC")"tmp/lknote.htm";
-:    WRITE (99)NOTE$;
-:    CLOSE (99)
-0450 CALL "SW002",NOTE$,$0D0A$,"<br>"
-0455 CALL "SW002",NOTE$,"video link","<a href='https://www.facebook.com/photo.php?v=10151575018971088'>this video</a>"
-0460 PRINT (Y6.CH)NOTE$
-0470 CALL "CDS257",Y$,WASES.LEAGUE$+"p","","XXGR02","W",0,0,0,0,"","","","",CGI.NOTE$
-0580 PRINT (Y6.CH)HTML$
-0590 CALL "CDS094",Y6$,"e"
-0610 GOTO EOJ
+0100 rem "GW072 - 08/27/14 Send Post Season Email
+0110 setesc 8000; seterr 8000
+0120 call "CDS041", "CDS084", s084$, "YY"
+0130 sent = 0
+0140 s084.mode$ = "E", s084.name$ = "MAIL", s084.emailtype$ = "H"
+0150 s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "webmaster@scoresandcharts.com"
+0160 tmp$ = stbl("WMS_CDW000", "D")
+0170 call "CDS095", gr04, "XXGR04", "YNY", gr04$
+0180 call "CDS095", gr06, "XXGR06", "YNY", gr06$
+0190 call "CDS095", gr08, "XXGR08", "YNY", gr08$
+0200 call "SW001", "XXGR01", 0, wases.league$, gr01$, sw001$
+0210 s084.subject$ = cvs(gr01.name$, 3) + " Post Season"
+0220 gr04s = unt, eml$ = ""
+0230 select (gr04s)gr04$ from y.compcode$ + "GR04" where gr04.league$ = wases.league$ and pos(" " <> gr04.email$)
+0240 read record(gr04s, end=0246)gr04$
+0242 eml$ = eml$ + cvs(gr04.email$, 3) + ",", sent = sent + 1
+0244 goto 0240
+0246 if 1 then
+:      s084.emailbcc$ = eml$
+:    else
+:      s084.toemail$ = "len@excellware.com"
+:    fi
+0247 gosub dates
+0430 call "CDS084", y$, y5$, u0, s084$, y6, y6$
+0440 note$ = cgi.note$
+0445 open (99, mode = "O_CREATE,O_TRUNC")"tmp/lknote.htm";
+:    write (99)note$;
+:    close (99)
+0450 call "SW002", note$, $0d0a$, "<br>"
+0455 call "SW002", note$, "video link", "<a href='https://www.facebook.com/photo.php?v=10151575018971088'>this video</a>"
+0460 print (y6.ch)note$
+0470 call "CDS257", y$, wases.league$ + "p", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
+0580 print (y6.ch)html$
+0590 call "CDS094", y6$, "e"
+0610 goto eoj
 
-2000 DATES:
-2010 LET HTML$="<br><br>",TAB$="",ROW$=""
-2030 CALL "CDW000",ROW$,"hcs4b",WASES.LEAGUENAME$
-2040 CALL "CDW000",TAB$,"r",ROW$
-2050 CALL "CDW000",ROW$,"hcs4b","Post Season Schedule"
-2060 CALL "CDW000",TAB$,"r",ROW$
-2070 CALL "CDW000",ROW$,"hc","Date"
-2080 CALL "CDW000",ROW$,"hc","Time"
-2090 CALL "CDW000",ROW$,"h","Course"
-2100 CALL "CDW000",ROW$,"h","Address"
-2110 CALL "CDW000",TAB$,"r",ROW$
-2220 CALL "CDS095",GR06,"XXGR06","YNY",GR06$
-2230 READ RECORD(GR06,KNUM=0,KEY=WASES.LEAGUE$+Y.JDATE$,DOM=2240)GR06$;
-:    GOTO 2260
-2240 READ RECORD(GR06,END=2380)GR06$
-2250 IF GR06.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 2380
-2260 CALL "CDW000",ROW$,"dc",DATE(GR06.DATE:"%Ds %Mz/%Dz/%Yz")
-2270 CALL "CDW000",ROW$,"dc",GR06.TIME$
-2275 DIM GR08$:FATTR(GR08$); LET GR08.NAME$="Course ID="+GR06.ID$
-2276 READ RECORD(GR08,KNUM=0,KEY=GR06.ID$,DOM=2277)GR08$
-2280 LET COURSE$=CVS(GR08.NAME$,3),URL$=CVS(GR08.URL$,3)
-2290 IF LEN(URL$) AND POS("http://"=CVS(URL$,8))=0 THEN LET URL$="http://"+URL$
-2300 IF LEN(URL$) THEN LET COURSE$="<a href='"+URL$+"'>"+COURSE$+"</a>"
-2310 CALL "CDW000",ROW$,"d",COURSE$
-2320 LET ADDRESS$=CVS(CVS(GR08.ADDRESS$,3)+" "+CVS(GR08.CITY$,3)+" "+GR08.STATE$+" "+GR08.ZIP$,3)
-2330 IF LEN(ADDRESS$)
-:       THEN
-:          LET MAP$=ADDRESS$;
-:          CALL "SW002::URL",MAP$;
-:          LET ADDRESS$="<a href='http://maps.google.com?q="+MAP$+"'>"+ADDRESS$+"</a>"
-2340 CALL "CDW000",ROW$,"d",ADDRESS$
-2350 CALL "CDW000",TAB$,"r",ROW$
-2360 GOTO 2240
-2380 CALL "CDW000",HTML$,"t",TAB$
-2390 RETURN
+2000 dates:
+2010 html$ = "<br><br>", tab$ = "", row$ = ""
+2030 call "CDW000", row$, "hcs4b", wases.leaguename$
+2040 call "CDW000", tab$, "r", row$
+2050 call "CDW000", row$, "hcs4b", "Post Season Schedule"
+2060 call "CDW000", tab$, "r", row$
+2070 call "CDW000", row$, "hc", "Date"
+2080 call "CDW000", row$, "hc", "Time"
+2090 call "CDW000", row$, "h", "Course"
+2100 call "CDW000", row$, "h", "Address"
+2110 call "CDW000", tab$, "r", row$
+2220 call "CDS095", gr06, "XXGR06", "YNY", gr06$
+2230 read record(gr06, knum=0, key=wases.league$ + y.jdate$, dom=2240)gr06$;
+:    goto 2260
+2240 read record(gr06, end=2380)gr06$
+2250 if gr06.league$ <> wases.league$ then goto 2380
+2260 call "CDW000", row$, "dc", date(gr06.date:"%Ds %Mz/%Dz/%Yz")
+2270 call "CDW000", row$, "dc", gr06.time$
+2275 dim gr08$:fattr(gr08$); gr08.name$ = "Course ID=" + gr06.id$
+2276 read record(gr08, knum=0, key=gr06.id$, dom=2277)gr08$
+2280 course$ = cvs(gr08.name$, 3), url$ = cvs(gr08.url$, 3)
+2290 if len(url$) and pos("http://" = cvs(url$, 8)) = 0 then url$ = "http://" + url$
+2300 if len(url$) then course$ = "<a href='" + url$ + "'>" + course$ + "</a>"
+2310 call "CDW000", row$, "d", course$
+2320 address$ = cvs(cvs(gr08.address$, 3) + " " + cvs(gr08.city$, 3) + " " + gr08.state$ + " " + gr08.zip$, 3)
+2330 if len(address$) then
+:      map$ = address$;
+:      call "SW002::URL", map$;
+:      address$ = "<a href='http://maps.google.com?q=" + map$ + "'>" + address$ + "</a>"
+:    fi
+2340 call "CDW000", row$, "d", address$
+2350 call "CDW000", tab$, "r", row$
+2360 goto 2240
+2380 call "CDW000", html$, "t", tab$
+2390 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9003 LET TMP$=STBL("!CLEAR","WMS_CDW000")
-9004 LET HTML$=""
-9005 LET MSG$="Job Completed, "+STR(SENT)+" emails sent."
-9010 RUN "GW011"
+9000 eoj:
+9003 tmp$ = stbl("!CLEAR", "WMS_CDW000")
+9004 html$ = ""
+9005 msg$ = "Job Completed, " + str(sent) + " emails sent."
+9010 run "GW011"

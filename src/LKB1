@@ -1,7 +1,7 @@
-0100 REM "LKB1 - test CDS173 with bbj
-0110 BEGIN
-0120 LET A=10
-0130 LET A$="This is a test"
-0140 DIM A$[3:4]
-0150 LET A$[3]="Index=3"
-0160 CALL "LK/LKB2",A,A$,A$[ALL]
+0100 rem "LKB1 - test CDS173 with bbj
+0110 begin
+0120 a = 10
+0130 a$ = "This is a test"
+0140 dim a$[3:4]
+0150 a$[3] = "Index=3"
+0160 call "LK/LKB2", a, a$, a$[all]

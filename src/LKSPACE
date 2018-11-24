@@ -1,16 +1,16 @@
-0100 REM "LKSPACE - 08/05/15 One time use
-0110 BEGIN
-0120 CALL "CDS091",Y$
-0130 SETERR DT_ERR; SETESC DT_ERR
-0134 CALL "CDS095",CM01,"DSCM01","YNY",CM01$
-0135 LET A=1/0
-0140 INPUT "*",A$
-0150 GOTO 9995
+0100 rem "LKSPACE - 08/05/15 One time use
+0110 begin
+0120 call "CDS091", y$
+0130 seterr 8000; setesc 8000
+0134 call "CDS095", cm01, "DSCM01", "YNY", cm01$
+0135 a = 1 / 0
+0140 input "*", a$
+0150 goto 9995
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

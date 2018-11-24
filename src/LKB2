@@ -1,10 +1,10 @@
-0100 REM "LKB2 - 03/15/10 test CDS173 with bbj
-0105 SETERR DT_ERR; SETESC DT_ERR
-0110 ENTER B123456,B123456$,B123456$[ALL],C123456$[ALL],ERR=0120
-0120 LET C=1/0
-0130 ESCAPE
+0100 rem "LKB2 - 03/15/10 test CDS173 with bbj
+0105 seterr 8000; setesc 8000
+0110 enter b123456, b123456$, b123456$[all], c123456$[all], err=0120
+0120 c = 1 / 0
+0130 escape
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry

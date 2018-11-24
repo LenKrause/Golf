@@ -1,22 +1,22 @@
-0100 REM "GW008 - 04/21/13 Return Last Round Played
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 ENTER Y$,GR04$,GR05$
-0130 CALL "CDS095",GR05,"XXGR05","YUY",GR05$
-0140 READ (GR05,KNUM=0,KEY=GR04.LEAGUE$+GR04.ID$+BIN(-1,3),DOM=0150)
-0150 READ RECORD(GR05,END=0170)GR05$
-0160 IF GR05.LEAGUE$<>GR04.LEAGUE$ OR GR05.ID$<>GR04.ID$
-:       THEN
-:          DIM GR05$:FATTR(GR05$)
-:       ELSE
-:          IF GR05.SCORE=0
-:             THEN
-:                GOTO 0150
-0170 EXIT
+0100 rem "GW008 - 04/21/13 Return Last Round Played
+0110 setesc 8000; seterr 8000
+0120 enter y$, gr04$, gr05$
+0130 call "CDS095", gr05, "XXGR05", "YUY", gr05$
+0140 read (gr05, knum=0, key=gr04.league$ + gr04.id$ + bin(-1,3), dom=0150)
+0150 read record(gr05, end=0170)gr05$
+0160 if gr05.league$ <> gr04.league$ or gr05.id$ <> gr04.id$ then
+:      dim gr05$:fattr(gr05$)
+:    else
+:      if gr05.score = 0 then
+:        goto 0150
+:      fi
+:    fi
+0170 exit
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 EXIT
+9000 eoj:
+9010 exit

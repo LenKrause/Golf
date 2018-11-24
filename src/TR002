@@ -1,22 +1,22 @@
-0100 REM "TR002 - 10/16/08 Test CDS037 SELRTN Delete
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 ENTER Y$,TR01$,L
-0130 LET Z$="Y";
-:    IF 0
-:       THEN
-:          CALL "CDS069",1,1,0,0,"Delete record: "+CVS(TR01.NOTE$,2)+" (Y/N)","PAYN",0,Z$
-0140 IF Z$="Y"
-:       THEN
-:          CALL "CDS095",TR01,"LKTR01","YUX","",TR01K$;
-:          REMOVE (TR01,KEY=KGEN(TR01$,TR01K$,0));
-:          DIM TR01$:FATTR(TR01$)
-0150 EXIT
+0100 rem "TR002 - 10/16/08 Test CDS037 SELRTN Delete
+0110 setesc 8000; seterr 8000
+0120 enter y$, tr01$, l
+0130 z$ = "Y";
+:    if 0 then
+:      call "CDS069", 1, 1, 0, 0, "Delete record: " + cvs(tr01.note$, 2) + " (Y/N)", "PAYN", 0, z$
+:    fi
+0140 if z$ = "Y" then
+:      call "CDS095", tr01, "LKTR01", "YUX", "", tr01k$;
+:      remove (tr01, key=kgen(tr01$, tr01k$, 0));
+:      dim tr01$:fattr(tr01$)
+:    fi
+0150 exit
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

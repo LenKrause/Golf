@@ -1,106 +1,105 @@
-0100 REM "LKS310 - 02/16/12 Proportional font analyzer
-0110 PRINT 'CS',
-0120 BEGIN
-0130 CALL "CDS095",ERR=EOJ,SM80,"CDSM80","YPY",SM80$,SM80K$
-0140 CALL "CDS276","Option|Typeface|Point size",COL0
-0150 LET OPT=3,SM80.STYLE=4148,SM80.POINT=10
-0160 REPEAT
-0170 CALL "CDS069",1,4,COL0,2,"+option+","#{|,2,|,R,,Y}1Print font width grid|2Print font verification for selected font|3Print font verification for all fonts|4Maintain font width table",OPT
-0180 IF CTL=4 THEN GOTO EOJ
-0190 LET VER$="<#####"
-0200 IF OPT<>4 THEN LET VER$="F"+VER$+"{CDSM80}"
-0210 IF OPT<>3 THEN CALL "CDS039",1,0,COL0,3,"+typeface",VER$,SM80$,"STYLE"
-0215 IF SM80.STYLE=4116
-:       THEN
-:          LET STYLE$="1"
-:       ELSE
-:          LET STYLE$="0";
-:          REM "Need italic for Coronet
-0220 LET VER$="<###"
-0230 IF OPT<>4 THEN LET VER$="F"+VER$+"{CDSM80,-,,,,,,,,,"+SM80.STYLE$+"}"
-0240 IF OPT<>3 THEN CALL "CDS039",0,0,COL0,4,"+point size",VER$,SM80$,"POINT"
-0250 LET Z$="Y"; CALL "CDS069",1,1,0,0,"Are entries correct (Y/N)+","AYN",0,Z$
-0260 IF CTL=4 THEN GOTO EOJ
-0270 UNTIL Z$="Y"
-0280 IF OPT<>4 THEN CALL "CDS084",ERR=EOJ,"","",0,"N",Y6,Y6$
-0290 IF OPT<>4 THEN PRINT (Y6.CH)'BO',Y6.DEPTH85$,'EO',
-0295 IF OPT=1 OR OPT=2
-:       THEN
-:          FOR I=1 TO 95;
-:             LET SM80.SIZE[I]=0;
-:          NEXT I;
-:          READ RECORD(SM80,KNUM=0,KEY=KGEN(SM80$,SM80K$,0),DOM=0296)SM80$
-0300 ON OPT-1 GOSUB ONE,ONE,ALL,STORE
-0305 CALL "CDS094",Y6$,"E"
-0310 PRINT 'CF',
-0320 GOTO 0160
+0100 rem "LKS310 - 02/16/12 Proportional font analyzer
+0110 print 'cs', 
+0120 begin
+0130 call "CDS095", err=eoj, sm80, "CDSM80", "YPY", sm80$, sm80k$
+0140 call "CDS276", "Option|Typeface|Point size", col0
+0150 opt = 3, sm80.style = 4148, sm80.point = 10
+0160 repeat
+0170   call "CDS069", 1, 4, col0, 2, "+option+", "#{|,2,|,R,,Y}1Print font width grid|2Print font verification for selected font|3Print font verification for all fonts|4Maintain font width table", opt
+0180   if ctl = 4 then goto eoj
+0190   ver$ = "<#####"
+0200   if opt <> 4 then ver$ = "F" + ver$ + "{CDSM80}"
+0210   if opt <> 3 then call "CDS039", 1, 0, col0, 3, "+typeface", ver$, sm80$, "STYLE"
+0215   if sm80.style = 4116 then
+:        style$ = "1"
+:      else
+:        style$ = "0";
+:        rem "Need italic for Coronet
+0220   ver$ = "<###"
+0230   if opt <> 4 then ver$ = "F" + ver$ + "{CDSM80,-,,,,,,,,," + sm80.style$ + "}"
+0240   if opt <> 3 then call "CDS039", 0, 0, col0, 4, "+point size", ver$, sm80$, "POINT"
+0250   z$ = "Y"; call "CDS069", 1, 1, 0, 0, "Are entries correct (Y/N)+", "AYN", 0, z$
+0260   if ctl = 4 then goto eoj
+0270 until z$ = "Y"
+0280 if opt <> 4 then call "CDS084", err=eoj, "", "", 0, "N", y6, y6$
+0290 if opt <> 4 then print (y6.ch)'bo', y6.depth85$, 'eo', 
+0295 if opt = 1 or opt = 2 then
+:      for i = 1 to 95;
+:        sm80.size[i] = 0;
+:      next i;
+:      read record(sm80, knum=0, key=kgen(sm80$, sm80k$, 0), dom=0296)sm80$
+:    fi
+0300 on opt - 1 gosub one, one, all, store
+0305 call "CDS094", y6$, "E"
+0310 print 'cf', 
+0320 goto 0160
 
-0900 ALL:
-0910 READ (SM80,KEY="",DOM=0920)
-0920 READ RECORD(SM80,END=0990)SM80$
-0925 PRINT @(8,23),"Style:",SM80.STYLE," Point:",SM80.POINT,
-0930 GOSUB ONE
-0940 GOTO 0920
-0990 RETURN
+0900 all:
+0910 read (sm80, key="", dom=0920)
+0920 read record(sm80, end=0990)sm80$
+0925 print @(8,23), "Style:", sm80.style, " Point:", sm80.point, 
+0930 gosub one
+0940 goto 0920
+0990 return
 
-1000 ONE:
-1005 IF SM80.POINT<=14 THEN LET MULT=1 ELSE LET MULT=2
-1010 IF OPT=1 THEN LET LR$="L" ELSE LET LR$="R"
-1020 IF LR$="L" THEN LET AT$="0" ELSE LET AT$="3050R"
-1030 FOR CHAR=ASC(" ") TO 126
-1040    IF MOD(CHAR,32)=0 THEN GOSUB NEWPAGE
-1050    LET TXT$=FILL(50/MULT,CHR(CHAR))
-1060    IF TXT$(1,1)=" "
-:          THEN
-:             IF LR$="L"
-:                THEN
-:                   LET TXT$=TXT$+"<"
-:                ELSE
-:                   LET TXT$=">"+TXT$
-1070    CALL "CDS254",Y6$,"T"+AT$+","+STR(ROW)+",,"+STYLE$+","+STR(SM80.POINT)+",,"+STR(SM80.STYLE),TXT$
-1075    IF OPT=1
-:          THEN
-:             CALL "CDS254",Y6$,"T3060,"+STR(ROW)+",,,10,,4148",CHR(CHAR);
-:             CALL "CDS254",Y6$,"T3110,"+STR(ROW)+",,,10,,4148",STR(SM80.SIZE[CHAR-31])
-1080    LET ROW=ROW+50
-1090 NEXT CHAR
-1110 RETURN
+1000 one:
+1005 if sm80.point <= 14 then mult = 1 else mult = 2
+1010 if opt = 1 then lr$ = "L" else lr$ = "R"
+1020 if lr$ = "L" then at$ = "0" else at$ = "3050R"
+1030 for char = asc(" ") to 126
+1040   if mod(char, 32) = 0 then gosub newpage
+1050   txt$ = fill(50 / mult, chr(char))
+1060   if txt$(1,1) = " " then
+:        if lr$ = "L" then
+:          txt$ = txt$ + "<"
+:        else
+:          txt$ = ">" + txt$
+:        fi
+:      fi
+1070   call "CDS254", y6$, "T" + at$ + "," + str(row) + ",," + style$ + "," + str(sm80.point) + ",," + str(sm80.style), txt$
+1075   if opt = 1 then
+:        call "CDS254", y6$, "T3060," + str(row) + ",,,10,,4148", chr(char);
+:        call "CDS254", y6$, "T3110," + str(row) + ",,,10,,4148", str(sm80.size[char - 31])
+:      fi
+1080   row = row + 50
+1090 next char
+1110 return
 
-1200 NEWPAGE:
-1210 CALL "CDS094",Y6$
-1220 CALL "CDS254",Y6$,"T1,20,,,10,,4148","Style "+STR(SM80.STYLE)+", "+STR(SM80.POINT)+" point"
-1230 FOR J=1 TO 61
-1240    LET COL=50*J
-1250    CALL "CDS254",Y6$,"V"+STR(COL)+",90,1720"
-1260    CALL "CDS254",Y6$,"T"+STR(COL)+"C,80,,,6,,4148",STR(J*MULT)
-1265    CALL "CDS254",Y6$,"T"+STR(COL)+"C,1745,,,6,,4148",STR(J*MULT)
-1270 NEXT J
-1280 LET ROW=150
-1290 RETURN
+1200 newpage:
+1210 call "CDS094", y6$
+1220 call "CDS254", y6$, "T1,20,,,10,,4148", "Style " + str(sm80.style) + ", " + str(sm80.point) + " point"
+1230 for j = 1 to 61
+1240   col = 50 * j
+1250   call "CDS254", y6$, "V" + str(col) + ",90,1720"
+1260   call "CDS254", y6$, "T" + str(col) + "C,80,,,6,,4148", str(j * mult)
+1265   call "CDS254", y6$, "T" + str(col) + "C,1745,,,6,,4148", str(j * mult)
+1270 next j
+1280 row = 150
+1290 return
 
-1300 STORE:
-1310 EXTRACT RECORD(SM80,KNUM=0,KEY=KGEN(SM80$,SM80K$,0),DOM=1320)SM80$
-1320 LET ENTRY=0; GOSUB LOOP
-1330 CALL "CDS069",0,0,0,0,"Enter=Edit+"; IF CTL=4 THEN RETURN
-1340 LET ENTRY=1; GOSUB LOOP
-1350 WRITE RECORD(SM80)SM80$
-1355 LET TMP$=STBL("!CLEAR","SMS_CDS254."+STR(SM80.STYLE)+"."+STR(SM80.POINT),ERR=1356)
-1360 CALL "CDS069"
-1370 RETURN
+1300 store:
+1310 extract record(sm80, knum=0, key=kgen(sm80$, sm80k$, 0), dom=1320)sm80$
+1320 entry = 0; gosub loop
+1330 call "CDS069", 0, 0, 0, 0, "Enter=Edit+"; if ctl = 4 then return
+1340 entry = 1; gosub loop
+1350 write record(sm80)sm80$
+1355 tmp$ = stbl("!CLEAR", "SMS_CDS254." + str(sm80.style) + "." + str(sm80.point), err=1356)
+1360 call "CDS069"
+1370 return
 
-1400 LOOP:
-1410 FOR I=32 TO 126
-1420    LET J=I-32,COL=10*(INT(J/16)),ROW=5+MOD(J,16)
-1430    IF !(ENTRY) THEN PRINT @(COL,ROW),CHR(I)," ",SM80.SIZE[I-31]:"###",
-1440    IF ENTRY THEN CALL "CDS039",1,255,COL+2,ROW,"+dots","##0",SM80$,"SIZE",I-31
-1450    IF CTL=3 AND I>32 THEN LET I=I-1; GOTO 1420
-1460 NEXT I
-1470 RETURN
+1400 loop:
+1410 for i = 32 to 126
+1420   j = i - 32, col = 10 * (int(j / 16)), row = 5 + mod(j, 16)
+1430   if !(entry) then print @(col, row), chr(i), " ", sm80.size[i - 31]:"###", 
+1440   if entry then call "CDS039", 1, 255, col + 2, row, "+dots", "##0", sm80$, "SIZE", i - 31
+1450   if ctl = 3 and i > 32 then i = i - 1; goto 1420
+1460 next i
+1470 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

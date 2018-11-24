@@ -1,103 +1,103 @@
-0100 REM "GW070 - 05/04/14 Post Season Setup"
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS095",GR06,"XXGR06","YNY",GR06$,GR06K$
-0130 CALL "CDS095",GR08,"XXGR08","YNY",GR08$,GR08K$
-0140 LET RECS=NUM(FIELD(CGI$,"RECS",ERR=0145)); GOSUB SAVE
-0145 GOSUB DATESCRIPT
-0150 CALL "CDW000",ROW$,"dcs8",WASES.LEAGUENAME$
-0160 CALL "CDW000",TAB$,"r class='top'",ROW$
-0170 CALL "CDW000",ROW$,"dcs8","Post Season Setup"
-0180 CALL "CDW000",TAB$,"r class='title'",ROW$
-0190 CALL "CDW000",ROW$,"dc","Date"
-0200 CALL "CDW000",ROW$,"dc","Time"
-0205 CALL "CDW000",ROW$,"dc","ID"
-0210 CALL "CDW000",ROW$,"d","Course"
-0220 CALL "CDW000",ROW$,"d","Address"
-0230 CALL "CDW000",ROW$,"d","Web Site"
-0260 CALL "CDW000",TAB$,"r class='head'",ROW$
-0270 LET IND=0
-0280 READ (GR06,KNUM=0,KEY=WASES.LEAGUE$,DOM=0290)
-0290 READ RECORD(GR06,END=0480)GR06$
-0300 IF GR06.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0480
-0310 LET IND=IND+1,IND$=STR(IND)
-0320 DIM GR08$:FATTR(GR08$)
-0322 READ RECORD(GR08,KNUM=0,KEY=GR06.ID$,DOM=0323)GR08$
-0326 IF GR06.DATE
-:       THEN
-:          LET DAT$=DATE(GR06.DATE:"%Ds %Mz/%Dz/%Yz")
-:       ELSE
-:          LET DAT$=""
-0330 CALL "CDW000",ROW$,"dc",FND$("DATE"+IND$,"",DAT$)
-0340 CALL "CDW000",ROW$,"dc",FNI$("TIME")
-0345 CALL "CDW000",ROW$,"dc",FNI$("ID")
-0350 CALL "CDW000",ROW$,"d",GR08.NAME$
-0360 CALL "CDW000",ROW$,"d",GR08.ADDRESS$
-0370 CALL "CDW000",ROW$,"d","<a href='http://"+CVS(GR08.URL$,2)+"' target='_blank'>"+CVS(GR08.URL$,2)+"</a>"
-0460 CALL "CDW000",TAB$,"r",ROW$
-0470 GOTO 0290
-0480 IF NEW<5 THEN LET NEW=NEW+1; DIM GR06$:FATTR(GR06$); GOTO 0310
-0490 CALL "CDW000",ROW$,"dcs8","[HOME] <input type='submit' value='Save Changes'>"
-0500 CALL "CDW000",TAB$,"r",ROW$
-0510 CALL "CDW000",HTML$,"tc",TAB$
-0520 LET HTML$=HTML$+"<input type='hidden' name='recs' value="+IND$+">"
-0530 LET HTML$="<form method='post' action='[DSN]?p=GW070'>"+HTML$+"</form>"
-0540 IF LEN(MSG$) THEN LET HTML$="<p class='msg'>"+MSG$+"</p>"+HTML$
-0550 GOTO EOJ
+0100 rem "GW070 - 05/04/14 Post Season Setup"
+0110 setesc 8000; seterr 8000
+0120 call "CDS095", gr06, "XXGR06", "YNY", gr06$, gr06k$
+0130 call "CDS095", gr08, "XXGR08", "YNY", gr08$, gr08k$
+0140 recs = num(field(cgi$, "RECS", err=0145)); gosub save
+0145 gosub datescript
+0150 call "CDW000", row$, "dcs8", wases.leaguename$
+0160 call "CDW000", tab$, "r class='top'", row$
+0170 call "CDW000", row$, "dcs8", "Post Season Setup"
+0180 call "CDW000", tab$, "r class='title'", row$
+0190 call "CDW000", row$, "dc", "Date"
+0200 call "CDW000", row$, "dc", "Time"
+0205 call "CDW000", row$, "dc", "ID"
+0210 call "CDW000", row$, "d", "Course"
+0220 call "CDW000", row$, "d", "Address"
+0230 call "CDW000", row$, "d", "Web Site"
+0260 call "CDW000", tab$, "r class='head'", row$
+0270 ind=0
+0280 read (gr06, knum=0, key=wases.league$, dom=0290)
+0290 read record(gr06, end=0480)gr06$
+0300 if gr06.league$ <> wases.league$ then goto 0480
+0310 ind=ind + 1, ind$ = str(ind)
+0320 dim gr08$:fattr(gr08$)
+0322 read record(gr08, knum=0, key=gr06.id$, dom=0323)gr08$
+0326 if gr06.date then
+:      dat$ = date(gr06.date:"%Ds %Mz/%Dz/%Yz")
+:    else
+:      dat$ = ""
+:    fi
+0330 call "CDW000", row$, "dc", fnd$("DATE" + ind$, "", dat$)
+0340 call "CDW000", row$, "dc", fni$("TIME")
+0345 call "CDW000", row$, "dc", fni$("ID")
+0350 call "CDW000", row$, "d", gr08.name$
+0360 call "CDW000", row$, "d", gr08.address$
+0370 call "CDW000", row$, "d", "<a href='http://" + cvs(gr08.url$, 2) + "' target='_blank'>" + cvs(gr08.url$, 2) + "</a>"
+0460 call "CDW000", tab$, "r", row$
+0470 goto 0290
+0480 if new < 5 then new = new + 1; dim gr06$:fattr(gr06$); goto 0310
+0490 call "CDW000", row$, "dcs8", "[HOME] <input type='submit' value='Save Changes'>"
+0500 call "CDW000", tab$, "r", row$
+0510 call "CDW000", html$, "tc", tab$
+0520 html$ = html$ + "<input type='hidden' name='recs' value=" + ind$ + ">"
+0530 html$ = "<form method='post' action='[DSN]?p=GW070'>" + html$ + "</form>"
+0540 if len(msg$) then html$ = "<p class='msg'>" + msg$ + "</p>" + html$
+0550 goto eoj
 
-1000 SAVE:
-1135 CALL "CDS273",Y$,"XXGR06",0,WASES.LEAGUE$; REM "Delete all
-1140 FOR IND=1 TO RECS
-1150    LET IND$=STR(IND)
-1160    DIM GR06$:FATTR(GR06$)
-1170    LET GR06.LEAGUE$=WASES.LEAGUE$,DAT$=FNF$("DATE")
-1175    IF POS(" "=DAT$)=4 THEN LET DAT$=DAT$(5); REM "Strip off day of week
-1180    IF POS(" "<>DAT$) AND POS(" "<>FNF$("ID"))
-:          THEN
-:             CALL "CDS055",DAT$,DAT$[ALL];
-:             LET GR06.DATE=NUM(DAT$[2]),GR06.TIME$=FNF$("TIME"),GR06.ID$=FNF$("ID");
-:             WRITE RECORD(GR06)GR06$
-1260 NEXT IND
-1270 RETURN
+1000 save:
+1135 call "CDS273", y$, "XXGR06", 0, wases.league$; rem "Delete all
+1140 for ind=1 to recs
+1150   ind$ = str(ind)
+1160   dim gr06$:fattr(gr06$)
+1170   gr06.league$ = wases.league$, dat$ = fnf$("DATE")
+1175   if pos(" " = dat$) = 4 then dat$ = dat$(5); rem "Strip off day of week
+1180   if pos(" " <> dat$) and pos(" " <> fnf$("ID")) then
+:        call "CDS055", dat$, dat$[all];
+:        gr06.date = num(dat$[2]), gr06.time$ = fnf$("TIME"), gr06.id$ = fnf$("ID");
+:        write record(gr06)gr06$
+:      fi
+1260 next ind
+1270 return
 
-1400 FUNCTIONS:
-1410 DEF FNB$(FLD$)=B$+FLD$+IND$+"|"
-1420 DEF FNF$(FLD$)
-1430 LET VAL$="",VAL$=FIELD(CGI$,FLD$+IND$,ERR=1440)
-1440 RETURN VAL$
-1450 FNEND
+1400 functions:
+1410 def fnb$(fld$) = b$ + fld$ + ind$ + "|"
+1420 def fnf$(fld$)
+1430 val$ = "", val$ = field(cgi$, fld$ + ind$, err=1440)
+1440 return val$
+1450 fnend
 
-1460 DEF FNI$(VBL$)
-1470 LET VAL$=FIELD(GR06$,VBL$),LGTH$=STR(LEN(VAL$))
-1480 IF POS(VBL$+IND$+"|"=B$)
-:       THEN
-:          LET OPT$=" style='background-color:#ffcccc' value='"+FNF$(VBL$)+"'"
-:       ELSE
-:          LET OPT$=" value='"+CVS(VAL$,2)+"'"
-1490 RETURN "<input type='text' name='"+VBL$+IND$+"' size="+LGTH$+" maxlength="+LGTH$+OPT$+">"
-1500 FNEND
+1460 def fni$(vbl$)
+1470 val$ = field(gr06$, vbl$), lgth$ = str(len(val$))
+1480 if pos(vbl$ + ind$ + "|" = b$) then
+:      opt$ = " style='background-color:#ffcccc' value='" + fnf$(vbl$) + "'"
+:    else
+:      opt$ = " value='" + cvs(val$, 2) + "'"
+:    fi
+1490 return "<input type='text' name='" + vbl$ + ind$ + "' size=" + lgth$ + " maxlength=" + lgth$ + opt$ + ">"
+1500 fnend
 
-2800 DATESCRIPT:
-2810 LET HEAD$="",HEAD$=STBL("$otherhead",ERR=2820)
-2820 LET HEAD$=FNT$("<script type='text/JavaScript' src='/scripts/datepicker/jquery.js'></script>")
-2830 LET HEAD$=FNT$("<script type='text/JavaScript' src='/scripts/datepicker/zebra_datepicker.js'></script>")
-2840 LET HEAD$=FNT$("<link rel='stylesheet' href='/scripts/datepicker/zebra_datepicker.css' type='text/css'>")
-2850 LET TMP$=STBL("$otherhead",HEAD$)
-2860 RETURN
+2800 datescript:
+2810 head$ = "", head$ = stbl("$otherhead", err=2820)
+2820 head$ = fnt$("<script type='text/JavaScript' src='/scripts/datepicker/jquery.js'></script>")
+2830 head$ = fnt$("<script type='text/JavaScript' src='/scripts/datepicker/zebra_datepicker.js'></script>")
+2840 head$ = fnt$("<link rel='stylesheet' href='/scripts/datepicker/zebra_datepicker.css' type='text/css'>")
+2850 tmp$ = stbl("$otherhead", head$)
+2860 return
 
-2900 FUNCTIONS:
-2910 DEF FNO$(YR)=YEAR$+"<option value='"+STR(YR)+"'>"+STR(YR)+"</option>"+$0A$
-2920 DEF FND$(FLDNAM$,DOPTS$,VAL$)
-2930 LET DATESCRIPT=1
-2940 RETURN "<input class='datepicker' type='text' size='11' id='"+FLDNAM$+"' name='"+FLDNAM$+"', value='"+VAL$+"'><script>$(document).ready(function() {$('#"+FLDNAM$+"').Zebra_DatePicker({"+DOPTS$+"inside:false,format:'m/d/y',first_day_of_week:0});});</script>"
-2950 FNEND
+2900 functions:
+2910 def fno$(yr) = year$ + "<option value='" + str(yr) + "'>" + str(yr) + "</option>" + $0a$
+2920 def fnd$(fldnam$, dopts$, val$)
+2930 datescript = 1
+2940 return "<input class='datepicker' type='text' size='11' id='" + fldnam$ + "' name='" + fldnam$ + "', value='" + val$ + "'><script>$(document).ready(function() {$('#" + fldnam$ + "').Zebra_DatePicker({" + dopts$ + "inside:false,format:'m/d/y',first_day_of_week:0});});</script>"
+2950 fnend
 
-2960 DEF FNT$(TX$)=HEAD$+TX$+$0A$
-2970 RETURN
+2960 def fnt$(tx$) = head$ + tx$ + $0a$
+2970 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDW999"
+9000 eoj:
+9010 run "CDW999"

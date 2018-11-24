@@ -1,46 +1,46 @@
-0100 REM "GW044 - 09/06/14 Weekly Score Posting Update
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS095",GR05,"XXGR05","YNY",GR05$,GR05K$
-0130 LET FLDS$=FATTR(CGI$,""),FLDS=POS($0A$=FLDS$,1,0)
-0140 DIM FLD$:"NAME["+STR(FLDS)+"]:C(1*)"
-0150 LET FLD$=FLDS$
-0160 FOR FLD=1 TO FLDS
-0170    IF POS("SCORE"=FLD.NAME$[FLD])=1 THEN GOSUB SCORE
-0175    IF POS("NOTE"=FLD.NAME$[FLD])=1 THEN GOSUB NOTEPAD
-0180 NEXT FLD
-0190 DIM GR05$:FATTR(GR05$)
-0200 LET HTML$=""
-0210 RUN "GW011"
+0100 rem "GW044 - 09/06/14 Weekly Score Posting Update
+0110 setesc 8000; seterr 8000
+0120 call "CDS095", gr05, "XXGR05", "YNY", gr05$, gr05k$
+0130 flds$ = fattr(cgi$, ""), flds = pos($0a$ = flds$, 1, 0)
+0140 dim fld$:"NAME[" + str(flds) + "]:C(1*)"
+0150 fld$ = flds$
+0160 for fld = 1 to flds
+0170   if pos("SCORE" = fld.name$[fld]) = 1 then gosub score
+0175   if pos("NOTE" = fld.name$[fld]) = 1 then gosub notepad
+0180 next fld
+0190 dim gr05$:fattr(gr05$)
+0200 html$ = ""
+0210 run "GW011"
 
-1000 SCORE:
-1010 DIM GR05$:FATTR(GR05$)
-1020 LET GR05.LEAGUE$=WASES.LEAGUE$
-1030 LET ID$=FLD.NAME$[FLD](6)
-1040 LET GR05.ID$=ID$
-1050 LET GR05.DATE=NUM(CGI.DATE$)
-1060 LET K$=KGEN(GR05$,GR05K$,0)
-1070 EXTRACT RECORD(GR05,KNUM=0,KEY=K$,DOM=1071)GR05$;
-:    REM "DOM= needed when golfer is added after GR05 record with HC was created when sheets were printed.
-1080 LET GR05.SCORE=NUM(FIELD(CGI$,"SCORE"+ID$))
-1100 IF GR05.SCORE
-:       THEN
-:          LET GR05.NET=GR05.SCORE-GR05.HC;
-:          LET GR05.PUTTS=NUM(FIELD(CGI$,"PUTTS"+ID$));
-:          LET GR05.POINTS=NUM(FIELD(CGI$,"POINTS"+ID$,ERR=1130))
-:       ELSE
-:          LET GR05.NET=0,GR05.PUTTS=0,GR05.POINTS=0
-1130 WRITE RECORD(GR05)GR05$
-1140 RETURN
+1000 score:
+1010 dim gr05$:fattr(gr05$)
+1020 gr05.league$ = wases.league$
+1030 id$ = fld.name$[fld](6)
+1040 gr05.id$ = id$
+1050 gr05.date = num(cgi.date$)
+1060 k$ = kgen(gr05$, gr05k$, 0)
+1070 extract record(gr05, knum=0, key=k$, dom=1071)gr05$;
+:    rem "DOM= needed when golfer is added after GR05 record with HC was created when sheets were printed.
+1080 gr05.score = num(field(cgi$, "SCORE" + id$))
+1100 if gr05.score then
+:      gr05.net = gr05.score - gr05.hc;
+:      gr05.putts = num(field(cgi$, "PUTTS" + id$));
+:      gr05.points = num(field(cgi$, "POINTS" + id$, err=1130))
+:    else
+:      gr05.net = 0, gr05.putts = 0, gr05.points = 0
+:    fi
+1130 write record(gr05)gr05$
+1140 return
 
-1200 NOTEPAD:
-1210 CALL "CDS257",Y$,WASES.LEAGUE$+FLD.NAME$[FLD](5),"","XXGR02","W",COLS,ROWS,XPOS,YPOS,ATTRB$,ATTRW$,WT$,WA$,FIELD(CGI$,FLD.NAME$[FLD])
-1220 RETURN
+1200 notepad:
+1210 call "CDS257", y$, wases.league$ + fld.name$[fld](5), "", "XXGR02", "W", cols, rows, xpos, ypos, attrb$, attrw$, wt$, wa$, field(cgi$, fld.name$[fld])
+1220 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDW999"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDW999"

@@ -1,65 +1,65 @@
-0100 REM "LKS235 - 03/30/10 CDS235 test cases
-0110 BEGIN
-0120 DEF FNS$(BASE$,TXT$)=BASE$+STR(LEN(TXT$):"0000")+TXT$
-0130 CALL "CDS041","CDS235",S235$,"YY"
-0140 LET S235.TAGNAME$="U"
-0150 LET S235.ROOTELEMENT$="Order"
-0160 LET S235.SUBELEMENTS$="U"
-0170 LET S235.DECLARATION$="default"
-0180 LET TPL$="ORDNO:C(8):title=Order_Number:"
-0190 LET TPL$=TPL$+",ORDDATE:C(8):title=Order_Date omask=%Mz/%Dz/%Yz:"
-0200 LET TPL$=TPL$+",LINES__LINE:C(1*=1):title=line_item:"
-0210 LET TPL$=TPL$+",TOTAL:N(10*):title=Order_Total:"
-0220 DIM ORDER$:TPL$
-0230 LET TPL$="ITEMNO:C(5):title=Item_Number:"
-0240 LET TPL$=TPL$+",DESC__:C(1*=2):title=Description:"
-0250 LET TPL$=TPL$+",QTY:N(4):title=Quantity:"
-0260 DIM LINE$:TPL$
-0270 LET TMP$=STBL("TPL_LINE",FATTR(LINE$)); REM "Save template in global space
-0280 LET TPL$="COLOR:C(20)"
-0290 LET TPL$=TPL$+",NECK:N(5)"
-0300 LET TPL$=TPL$+",SLEEVE:N(5)"
-0310 DIM DESC$:TPL$
-0320 LET TMP$=STBL("TPL_DESC",FATTR(DESC$)); REM "Save template in global space
-0330 LET ORDER.ORDNO$="12345"
-0340 LET ORDER.ORDDATE$="10/15/02"
-0350 DIM LINE$:FATTR(LINE$)
-0360 LET DESC.COLOR$="Blue",DESC.NECK=16,DESC.SLEEVE=34
-0370 LET LINE.DESC__$=FNS$(LINE.DESC__$,DESC$)
-0380 LET DESC.COLOR$="Blue",DESC.NECK=16.5,DESC.SLEEVE=34
-0390 LET LINE.DESC__$=FNS$(LINE.DESC__$,DESC$)
-0400 LET LINE.ITEMNO$="1111",LINE.QTY=5
-0410 LET ORDER.LINES__LINE$=FNS$(ORDER.LINES__LINE$,LINE$)
-0420 DIM LINE$:FATTR(LINE$)
-0430 LET DESC.COLOR$="Blue",DESC.NECK=17,DESC.SLEEVE=35
-0440 LET LINE.DESC__$=FNS$(LINE.DESC__$,DESC$)
-0450 LET DESC.COLOR$="White",DESC.NECK=14,DESC.SLEEVE=30
-0460 LET LINE.DESC__$=FNS$(LINE.DESC__$,DESC$)
-0470 LET DESC.COLOR$="White",DESC.NECK=14.5,DESC.SLEEVE=32
-0480 LET LINE.DESC__$=FNS$(LINE.DESC__$,DESC$)
-0490 LET DESC.COLOR$="White",DESC.NECK=15,DESC.SLEEVE=32
-0500 LET LINE.DESC__$=FNS$(LINE.DESC__$,DESC$)
-0510 LET LINE.ITEMNO$="2222",LINE.QTY=15
-0520 LET ORDER.LINES__LINE$=FNS$(ORDER.LINES__LINE$,LINE$)
-0530 DIM LINE$:FATTR(LINE$)
-0540 LET DESC.COLOR$="Yellow",DESC.NECK=14,DESC.SLEEVE=30
-0550 LET LINE.DESC__$=FNS$(LINE.DESC__$,DESC$)
-0560 LET LINE.ITEMNO$="3333",LINE.QTY=-12
-0570 LET ORDER.LINES__LINE$=FNS$(ORDER.LINES__LINE$,LINE$)
-0580 LET ORDER.TOTAL=12345.67
-0590 CALL "CDS235",ORDER$,XML$,S235$
-0600 PRINT 'CS',XML$
-0610 PRECISION 8
-0620 LET T=TIM
-0630 FOR I=1 TO 10000; CALL "CDS235",ORDER$,XML$,S235$; NEXT I
-0640 PRINT 3600*(TIM-T)," seconds/10000 calls"
-0650 GOTO 9996
+0100 rem "LKS235 - 03/30/10 CDS235 test cases
+0110 begin
+0120 def fns$(base$, txt$) = base$ + str(len(txt$):"0000") + txt$
+0130 call "CDS041", "CDS235", s235$, "YY"
+0140 s235.tagname$ = "U"
+0150 s235.rootelement$ = "Order"
+0160 s235.subelements$ = "U"
+0170 s235.declaration$ = "default"
+0180 tpl$ = "ORDNO:C(8):title=Order_Number:"
+0190 tpl$ = tpl$ + ",ORDDATE:C(8):title=Order_Date omask=%Mz/%Dz/%Yz:"
+0200 tpl$ = tpl$ + ",LINES__LINE:C(1*=1):title=line_item:"
+0210 tpl$ = tpl$ + ",TOTAL:N(10*):title=Order_Total:"
+0220 dim order$:tpl$
+0230 tpl$ = "ITEMNO:C(5):title=Item_Number:"
+0240 tpl$ = tpl$ + ",DESC__:C(1*=2):title=Description:"
+0250 tpl$ = tpl$ + ",QTY:N(4):title=Quantity:"
+0260 dim line$:tpl$
+0270 tmp$ = stbl("TPL_LINE", fattr(line$)); rem "Save template in global space
+0280 tpl$ = "COLOR:C(20)"
+0290 tpl$ = tpl$ + ",NECK:N(5)"
+0300 tpl$ = tpl$ + ",SLEEVE:N(5)"
+0310 dim desc$:tpl$
+0320 tmp$ = stbl("TPL_DESC", fattr(desc$)); rem "Save template in global space
+0330 order.ordno$ = "12345"
+0340 order.orddate$ = "10/15/02"
+0350 dim line$:fattr(line$)
+0360 desc.color$ = "Blue", desc.neck = 16, desc.sleeve = 34
+0370 line.desc__$ = fns$(line.desc__$, desc$)
+0380 desc.color$ = "Blue", desc.neck = 16.5, desc.sleeve = 34
+0390 line.desc__$ = fns$(line.desc__$, desc$)
+0400 line.itemno$ = "1111", line.qty = 5
+0410 order.lines__line$ = fns$(order.lines__line$, line$)
+0420 dim line$:fattr(line$)
+0430 desc.color$ = "Blue", desc.neck = 17, desc.sleeve = 35
+0440 line.desc__$ = fns$(line.desc__$, desc$)
+0450 desc.color$ = "White", desc.neck = 14, desc.sleeve = 30
+0460 line.desc__$ = fns$(line.desc__$, desc$)
+0470 desc.color$ = "White", desc.neck = 14.5, desc.sleeve = 32
+0480 line.desc__$ = fns$(line.desc__$, desc$)
+0490 desc.color$ = "White", desc.neck = 15, desc.sleeve = 32
+0500 line.desc__$ = fns$(line.desc__$, desc$)
+0510 line.itemno$ = "2222", line.qty = 15
+0520 order.lines__line$ = fns$(order.lines__line$, line$)
+0530 dim line$:fattr(line$)
+0540 desc.color$ = "Yellow", desc.neck = 14, desc.sleeve = 30
+0550 line.desc__$ = fns$(line.desc__$, desc$)
+0560 line.itemno$ = "3333", line.qty = -12
+0570 order.lines__line$ = fns$(order.lines__line$, line$)
+0580 order.total = 12345.67
+0590 call "CDS235", order$, xml$, s235$
+0600 print 'cs', xml$
+0610 precision 8
+0620 t = tim
+0630 for i = 1 to 10000; call "CDS235", order$, xml$, s235$; next i
+0640 print 3600 * (tim - t), " seconds/10000 calls"
+0650 goto 9996
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

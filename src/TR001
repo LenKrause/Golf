@@ -1,27 +1,27 @@
-0100 REM "TR001 - 10/16/08 Tesst CDS037 SELRTN Delete
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS034","LKTR01"
-0130 CALL "CDS095",TR01,"LKTR01","YNY",TR01$
-0140 CALL "CDS002","",TR01
-0150 FOR PFX=1 TO 3
-0160    FOR NUM=1 TO 25
-0170       LET TR01.PFX$=CHR(ASC("A")+PFX-1)
-0180       LET TR01.NUMBER=NUM
-0190       LET TR01.NOTE$=TR01.PFX$+" "+STR(NUM:"000")
-0200       WRITE RECORD(TR01)TR01$
-0210    NEXT NUM
-0220 NEXT PFX
-0230 CALL "CDS069",1,1,0,0,"+key prefix (A/B/C), I=Initialize Data+","A",0,KEYPFX$
-0235 IF CTL=4 THEN GOTO EOJ
-0236 IF KEYPFX$="I" THEN GOTO 0130
-0240 CALL "CDS037","LKTR01",KNO,KEYPFX$,DISP$,WINX,WINY,WINROWS,WINCOLS,WINTITLE$,COLORS$,"TR002",WHERE$,SORTBY$,MODE$,LIMITVAL,SELREC$
-0250 GOTO 0230
+0100 rem "TR001 - 10/16/08 Tesst CDS037 SELRTN Delete
+0110 setesc 8000; seterr 8000
+0120 call "CDS034", "LKTR01"
+0130 call "CDS095", tr01, "LKTR01", "YNY", tr01$
+0140 call "CDS002", "", tr01
+0150 for pfx = 1 to 3
+0160   for num = 1 to 25
+0170     tr01.pfx$ = chr(asc("A") + pfx - 1)
+0180     tr01.number = num
+0190     tr01.note$ = tr01.pfx$ + " " + str(num:"000")
+0200     write record(tr01)tr01$
+0210   next num
+0220 next pfx
+0230 call "CDS069", 1, 1, 0, 0, "+key prefix (A/B/C), I=Initialize Data+", "A", 0, keypfx$
+0235 if ctl = 4 then goto eoj
+0236 if keypfx$ = "I" then goto 0130
+0240 call "CDS037", "LKTR01", kno, keypfx$, disp$, winx, winy, winrows, wincols, wintitle$, colors$, "TR002", where$, sortby$, mode$, limitval, selrec$
+0250 goto 0230
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

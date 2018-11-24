@@ -1,22 +1,22 @@
-0100 REM "LKC103 - 05/08/99 Device Listing
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 ENTER Y$,Y6$,Y5$,FILNAM$,DEVF$,DEVFLDS,DEV[ALL],WHERE$,SORTBY$
-0130 FOR I=1 TO DEVFLDS
-0140    LET TPL$=TPL$+","+DEVF.NO$[I]+":C("+STR(MAX(1,DEV[I]))+"*=58)"
-0150 NEXT I
-0155 IF LEN(WHERE$) THEN LET TPL$=STBL(PGM(-2))+TPL$ ELSE LET TPL$=TPL$(2)
-0160 LET TPL$=STBL("TPL_"+FILNAM$(5),TPL$)
-0165 IF LEN(WHERE$)=0 THEN LET TPL$=STBL(PGM(-2),TPL$)
-0170 CALL "CDS041","CDS038",S038$
-0180 LET S038.KEEPOPEN$="Y"
-0190 LET Y6.P=0,Y6.L=0
-0200 CALL "CDS038",Y$,Y5$,Y5A$,Y6$,Y6.MAXL,L,P,S038$,FILNAM$,KNUM,KEYBEGIN$,KEYEND$,DISP$,WHERE$,SORTBY$,MODE$,LIMIT,SUBHEAD$
-0220 GOTO EOJ
+0100 rem "LKC103 - 05/08/99 Device Listing
+0110 setesc 8000; seterr 8000
+0120 enter y$, y6$, y5$, filnam$, devf$, devflds, dev[all], where$, sortby$
+0130 for i = 1 to devflds
+0140   tpl$ = tpl$ + "," + devf.no$[i] + ":C(" + str(max(1, dev[i])) + "*=58)"
+0150 next i
+0155 if len(where$) then tpl$ = stbl(pgm(-2)) + tpl$ else tpl$ = tpl$(2)
+0160 tpl$ = stbl("TPL_" + filnam$(5), tpl$)
+0165 if len(where$) = 0 then tpl$ = stbl(pgm(-2), tpl$)
+0170 call "CDS041", "CDS038", s038$
+0180 s038.keepopen$ = "Y"
+0190 y6.p = 0, y6.l = 0
+0200 call "CDS038", y$, y5$, y5a$, y6$, y6.maxl, l, p, s038$, filnam$, knum, keybegin$, keyend$, disp$, where$, sortby$, mode$, limit, subhead$
+0220 goto eoj
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 EXIT
+9000 eoj:
+9010 exit

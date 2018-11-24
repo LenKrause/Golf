@@ -1,8 +1,8 @@
-0100 REM "LKTST6 - 11/28/99 Test CPL problem
-0110 ENTER REC$,WHERE$,SORTBY$,LIMITVAL,CTR
-0115 IF CTR=1 THEN CALL "LK/LKTST6",REC$,WHERE$,SORTBY$,LIMITVAL,2
-0120 LET GL32=UNT
-0130 SELECT (GL32)REC$ FROM "DS/DSGL32" WHERE CPL(WHERE$) SORTBY CPL(SORTBY$) LIMIT LIMITVAL
-0140 READ RECORD(GL32)REC$
-0150 PRINT REC.GLACCTNO$," ",DATE(REC.DATE)
-0160 GOTO 0140
+0100 rem "LKTST6 - 11/28/99 Test CPL problem
+0110 enter rec$, where$, sortby$, limitval, ctr
+0115 if ctr = 1 then call "LK/LKTST6", rec$, where$, sortby$, limitval, 2
+0120 gl32 = unt
+0130 select (gl32)rec$ from "DS/DSGL32" where cpl(where$) sortby cpl(sortby$) limit limitval
+0140 read record(gl32)rec$
+0150 print rec.glacctno$, " ", date(rec.date)
+0160 goto 0140

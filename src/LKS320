@@ -1,51 +1,51 @@
-0100 REM "LKS320 - 12/14/02 POP3 mail interface test
-0101 BEGIN
-0104 CALL "CDS069",1,20,0,0,"+mail server name or IP Address+","A",0,SERVER$;
-:    IF CTL=4
-:       THEN
-:          GOTO EOJ
-0105 CALL "CDS069",1,40,0,0,"+user id+","A",0,USER$; IF CTL=4 THEN GOTO 0104
-0106 CALL "CDS069",1,10,0,0,"+password+","A",0,PWD$; IF CTL=4 THEN GOTO 0105
-0110 OPEN (1)"|telnet "+SERVER$+" 110"
-0120 GOSUB GET
-0130 IF STAT<>-1 THEN PRINT "Error ",STAT," ",REC$; ESCAPE
-0140 IF POS("+OK"=REC$)<>1 THEN GOTO 0120
-0150 PRINT (1)"user ",USER$
-0160 GOSUB GETOK
-0170 IF POS("+OK"=REC$)<>1 THEN PRINT REC$; ESCAPE
-0180 PRINT (1)"pass ",PWD$
-0190 GOSUB GETOK
-0200 IF POS("+OK"=REC$)<>1 THEN PRINT REC$; ESCAPE
-0210 PRINT (1)"stat"
-0220 GOSUB GETOK
-0230 IF POS("+OK"=REC$)<>1 THEN PRINT REC$; ESCAPE
-0250 LET COUNT=NUM(REC$(5,POS(" "=REC$(6))))
-0260 IF COUNT=0 THEN CALL "CDS069",0,0,0,0,"No messages-"; CLOSE (1); GOTO 0100
-0265 CALL "CDS069",0,0,0,0,STR(COUNT)+" messages-+"
-0266 IF CTL=4 THEN GOTO 0100
-0270 PRINT (1)"retr 1"
-0280 READ (1)REC$
-0290 PRINT REC$
-0300 IF REC$<>"." THEN GOTO 0280
-0310 LET Z$="";
-:    CALL "CDS069",1,1,0,0,"Delete message from server (Y/N)","AYN",0,Z$
-0320 IF Z$="N" THEN ESCAPE
-0330 PRINT (1)"dele 1"
-0340 GOSUB GETOK
-0350 IF POS("+OK"=REC$)<>1 THEN PRINT REC$; ESCAPE
-0360 GOTO 0210
-0900 ESCAPE
+0100 rem "LKS320 - 12/14/02 POP3 mail interface test
+0101 begin
+0104 call "CDS069", 1, 20, 0, 0, "+mail server name or IP Address+", "A", 0, server$;
+:    if ctl = 4 then
+:      goto eoj
+:    fi
+0105 call "CDS069", 1, 40, 0, 0, "+user id+", "A", 0, user$; if ctl = 4 then goto 0104
+0106 call "CDS069", 1, 10, 0, 0, "+password+", "A", 0, pwd$; if ctl = 4 then goto 0105
+0110 open (1)"|telnet " + server$ + " 110"
+0120 gosub get
+0130 if stat <> -1 then print "Error ", stat, " ", rec$; escape
+0140 if pos("+OK" = rec$) <> 1 then goto 0120
+0150 print (1)"user ", user$
+0160 gosub getok
+0170 if pos("+OK" = rec$) <> 1 then print rec$; escape
+0180 print (1)"pass ", pwd$
+0190 gosub getok
+0200 if pos("+OK" = rec$) <> 1 then print rec$; escape
+0210 print (1)"stat"
+0220 gosub getok
+0230 if pos("+OK" = rec$) <> 1 then print rec$; escape
+0250 count = num(rec$(5, pos(" " = rec$(6))))
+0260 if count = 0 then call "CDS069", 0, 0, 0, 0, "No messages-"; close (1); goto 0100
+0265 call "CDS069", 0, 0, 0, 0, str(count) + " messages-+"
+0266 if ctl = 4 then goto 0100
+0270 print (1)"retr 1"
+0280 read (1)rec$
+0290 print rec$
+0300 if rec$ <> "." then goto 0280
+0310 z$ = "";
+:    call "CDS069", 1, 1, 0, 0, "Delete message from server (Y/N)", "AYN", 0, z$
+0320 if z$ = "N" then escape
+0330 print (1)"dele 1"
+0340 gosub getok
+0350 if pos("+OK" = rec$) <> 1 then print rec$; escape
+0360 goto 0210
+0900 escape
 
-1000 GET:
-1005 LET REC$="",STAT=-1
-1010 READ (1,TIM=10,ERR=1020)REC$
-1015 RETURN
-1020 PRINT "Error ",ERR," reading from POP3"; ESCAPE
+1000 get:
+1005 rec$ = "", stat = -1
+1010 read (1, tim=10, err=1020)rec$
+1015 return
+1020 print "Error ", err, " reading from POP3"; escape
 
-1100 GETOK:
-1110 GOSUB GET
-1120 IF LEN(REC$)=0 THEN GOTO 1110
-1130 RETURN
+1100 getok:
+1110 gosub get
+1120 if len(rec$) = 0 then goto 1110
+1130 return
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

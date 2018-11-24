@@ -1,40 +1,40 @@
-0100 REM "LKH010 - 06/24/04 HTML colors
-0110 BEGIN
-0115 IF TCB(15)<2000 THEN START 2000,"LK/LKH010"
-0120 SETESC DT_ERR; SETERR DT_ERR
-0125 LET CLRVAL$="0123456789ABCDEF",CLRS=LEN(CLRVAL$)
-0126 DIM FONTCOLOR$[1:2]; LET FONTCOLOR$[1]="000000",FONTCOLOR$[2]="ffffff"
-0140 DEF FNV$(CLR)=CLRVAL$(CLR,1)+CLRVAL$(CLR,1)
-0143 FOR FONTCOLOR=1 TO 2
-0144    OPEN (1,MODE="O_create,O_trunc")"/u/web/exw/public/colors"+STR(FONTCOLOR)+".htm"
-0145    WRITE (1)"<html>"
-0146    WRITE (1)"<body><b>"
-0149    WRITE (1)"<font color=""#"+FONTCOLOR$[FONTCOLOR]+""" face=""Courier New"">"
-0150    LET HTML$=""
-0160    FOR RED=1 TO CLRS
-0170       FOR GRN=1 TO CLRS
-0175          LET HTML$=HTML$+"<tr>"
-0180          FOR BLU=1 TO CLRS
-0190             IF COL=1 THEN LET HTML$=HTML$+"<tr>"
-0200             LET CLR$=FNV$(RED)+FNV$(GRN)+FNV$(BLU)
-0210             LET HTML$=HTML$+"<td bgcolor="+CLR$+"><font color="+FONTCOLOR$[FONTCOLOR]+">"+CLR$+"</font></td>"
-0240          NEXT BLU
-0245          LET HTML$=HTML$+"</tr>"+$0A$
-0250       NEXT GRN
-0260    NEXT RED
-0280    LET HTML$="<table border=0 cellpadding=3 cellspacing=0>"+$0A$+HTML$+$0A$+"</table>"
-0284    WRITE (1)HTML$
-0285    WRITE (1)"</font>"
-0287    WRITE (1)"</b></body></html>"
-0288    CLOSE (1)
-0289 NEXT FONTCOLOR
-0340 GOTO 9996
+0100 rem "LKH010 - 06/24/04 HTML colors
+0110 begin
+0115 if tcb(15) < 2000 then start 2000, "LK/LKH010"
+0120 setesc 8000; seterr 8000
+0125 clrval$ = "0123456789ABCDEF", clrs = len(clrval$)
+0126 dim fontcolor$[1:2]; fontcolor$[1] = "000000", fontcolor$[2] = "ffffff"
+0140 def fnv$(clr) = clrval$(clr, 1) + clrval$(clr, 1)
+0143 for fontcolor = 1 to 2
+0144   open (1, mode = "O_create,O_trunc")"/u/web/exw/public/colors" + str(fontcolor) + ".htm"
+0145   write (1)"<html>"
+0146   write (1)"<body><b>"
+0149   write (1)"<font color=""#" + fontcolor$[fontcolor] + """ face=""Courier New"">"
+0150   html$ = ""
+0160   for red = 1 to clrs
+0170     for grn = 1 to clrs
+0175       html$ = html$ + "<tr>"
+0180       for blu = 1 to clrs
+0190         if col = 1 then html$ = html$ + "<tr>"
+0200         clr$ = fnv$(red) + fnv$(grn) + fnv$(blu)
+0210         html$ = html$ + "<td bgcolor=" + clr$ + "><font color=" + fontcolor$[fontcolor] + ">" + clr$ + "</font></td>"
+0240       next blu
+0245       html$ = html$ + "</tr>" + $0a$
+0250     next grn
+0260   next red
+0280   html$ = "<table border=0 cellpadding=3 cellspacing=0>" + $0a$ + html$ + $0a$ + "</table>"
+0284   write (1)html$
+0285   write (1)"</font>"
+0287   write (1)"</b></body></html>"
+0288   close (1)
+0289 next fontcolor
+0340 goto 9996
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

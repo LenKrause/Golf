@@ -1,33 +1,33 @@
-0100 REM "GW012 - 05/05/12 Dynaweb Select League
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 IF POS(" "<>FIELD(CGI$,"LEAGUE",ERR=0130)) THEN GOSUB ASSIGN
-0130 LET FOOT$="[HOME]"
-0140 CALL "CDS041","CDW038",W038$,"YY"
-0150 LET W038.PLINK$="?p=GW012"
-0160 LET Y.COMPNAME$="ScoresAndCharts.com"
-0170 CALL "CDW038",Y$,Y5$,Y5A$,HTML$,W038$,"XXGR01",KNO,KEYBEGIN$,KEYEND$,"LEAGUE\\\\L|NAME",WHERE$,SORTBY$,MODE$,LIMITVAL,SUBHEAD$,FOOT$,ENV$
-0180 GOTO EOJ
+0100 rem "GW012 - 05/05/12 Dynaweb Select League
+0110 setesc 8000; seterr 8000
+0120 if pos(" " <> field(cgi$, "LEAGUE", err=0130)) then gosub assign
+0130 foot$ = "[HOME]"
+0140 call "CDS041", "CDW038", w038$, "YY"
+0150 w038.plink$ = "?p=GW012"
+0160 y.compname$ = "ScoresAndCharts.com"
+0170 call "CDW038", y$, y5$, y5a$, html$, w038$, "XXGR01", kno, keybegin$, keyend$, "LEAGUE\\\\L|NAME", where$, sortby$, mode$, limitval, subhead$, foot$, env$
+0180 goto eoj
 
-1000 ASSIGN:
-1010 CALL "SW001","XXGR01",0,CGI.LEAGUE$,GR01$,SW001$
-1020 IF SW001.ONFILE=0 THEN RETURN
-1030 LET WASES.LEAGUE$=GR01.LEAGUE$
-1040 LET WASES.LEAGUENAME$=GR01.NAME$
-1045 LET WASES.CID$=""
-1050 CALL "utses.wbb",1,WASES$,""
-1060 LET SM08.APPID$=PROG$(MAX(1,LEN(PROG$)-LEN(SM08.APPID$)+1))
-1070 LET SM08.COMPNAME$=WASES.LEAGUENAME$,Y.COMPNAME$=CVS(WASES.LEAGUENAME$,2)
-1080 CALL "CDS095",SM08,"CDSM08","NNX"
-1090 WRITE RECORD(SM08)SM08$
-1100 CLOSE (SM08)
-1110 LET TMP$=STBL("SMS_SM08",SM08$)
-1120 RUN "GW011"
+1000 assign:
+1010 call "SW001", "XXGR01", 0, cgi.league$, gr01$, sw001$
+1020 if sw001.onfile = 0 then return
+1030 wases.league$ = gr01.league$
+1040 wases.leaguename$ = gr01.name$
+1045 wases.cid$ = ""
+1050 call "utses.wbb", 1, wases$, ""
+1060 sm08.appid$ = prog$(max(1, len(prog$) - len(sm08.appid$) + 1))
+1070 sm08.compname$ = wases.leaguename$, y.compname$ = cvs(wases.leaguename$, 2)
+1080 call "CDS095", sm08, "CDSM08", "NNX"
+1090 write record(sm08)sm08$
+1100 close (sm08)
+1110 tmp$ = stbl("SMS_SM08", sm08$)
+1120 run "GW011"
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDW999"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDW999"

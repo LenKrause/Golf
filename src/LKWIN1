@@ -1,19 +1,19 @@
-0100 REM "LKWIN1 - 04/24/04 Determine best window sequence for 'cp'
-0110 PRINT 'CS',
-0120 FOR ROW=0 TO 22
-0130    PRINT FILL(80,STR(ROW:"###0")),
-0140 NEXT ROW
-0150 WAIT 2
-0160 PRINT 'WINDOW'(0,0,132,25),
-0170 WAIT 2
-0180 PRINT 'CS',
-0190 WAIT 2
-0200 PRINT 'CP',
-0210 WAIT 2
-0220 PRINT 'SWAP',
-0230 WAIT 2
-0240 PRINT 'SP',
-0250 WAIT 2
-0260 PRINT 'DROP'(1)
-0270 CALL "CDS069"
-9995 LET O$="",O1$=""
+0100 rem "LKWIN1 - 04/24/04 Determine best window sequence for 'cp'
+0110 print 'cs', 
+0120 for row = 0 to 22
+0130   print fill(80, str(row:"###0")), 
+0140 next row
+0150 wait 2
+0160 print 'window'(0,0,132,25), 
+0170 wait 2
+0180 print 'cs', 
+0190 wait 2
+0200 print 'cp', 
+0210 wait 2
+0220 print 'swap', 
+0230 wait 2
+0240 print 'sp', 
+0250 wait 2
+0260 print 'drop'(1)
+0270 call "CDS069"
+9995 o$ = "", o1$ = ""

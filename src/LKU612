@@ -1,83 +1,83 @@
-0100 REM "EXU612 - 04/03/00 West Tech Label Printing
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 IF Y6.PCL=0
-:       THEN
-:          CALL "CDS069",0,0,0,0,"This program requires a laser or inkjet printer-";
-:          GOTO EOJ
-0125 CALL "CDS069",1,2,0,0,"+option+","0{|,2,|,,,Y}1Print graduates names|2Print Anne Eibens name",OPT
-0126 IF CTL=4 THEN GOTO EOJ
-0127 IF OPT=2
-:       THEN
-:          CALL "CDS069",1,20,0,0,"+number of pages of labels to print+","##",PAGES;
-:          IF CTL=4
-:             THEN
-:                GOTO 0125
-:             ELSE
-:                LET UD15.NAME$="Anne Motul Eiben",UD15.ADDR$="2 Oakshore Drive",UD15.CITYST$="Bratenahl, Ohio  44108",TOPRINT=30*PAGES
-0130 CALL "CDS069",0,0,0,0,"Please insert 8.5 x 11"" sheets with three labels across, and 10 labels down in the printer-+"
-0140 IF CTL=4 THEN GOTO EOJ
-0145 LET PAR$=" N"
-0146 CALL "CDS069",1,1,0,0,"Print addresses using all capital letters (Y/N)","AYN",2,PAR$
-0150 LET COLS=3; DIM COL[1:COLS]; LET COL[1]=0,COL[2]=825,COL[3]=1665
-0160 LET ROWS=10;
-:    DIM ROW[1:ROWS];
-:    FOR I=1 TO ROWS;
-:       LET ROW[I]=125+(I-1)*300;
-:    NEXT I
-0170 PRINT Y6.MSG$,
-0180 PRINT (Y6.CH)'BO',$1B$,"&l0e180Z",'EO',; REM "set top margin to 1/4 inch
-0190 LET ROW=ROWS,COL=COLS
-0210 IF OPT=1 THEN READ RECORD(UD15,END=EOJ)UD15$
-0220 DIM ADR$[4]; LET ADR$[0]=UD15.NAME$,ADR$[1]=UD15.ADDR$,ADR$[2]=UD15.CITYST$
-0230 IF ROW<ROWS
-:       THEN
-:          LET ROW=ROW+1
-:       ELSE
-:          IF COL<COLS
-:             THEN
-:                LET ROW=1,COL=COL+1
-:             ELSE
-:                GOSUB NEWPAGE
-0240 LET LINE=0
-0250 FOR I=0 TO 4
-0260    IF POS(" "<>ADR$[I]) THEN LET LINES=I+1
-0270 NEXT I
-0280 LET DELTA=60-10*(LINES=5)
-0290 LET TOP=MIN((300-(LINES*DELTA))/2,60)
-0300 FOR ADR=1 TO LINES
-0310    LET TXT$=CVS(ADR$[ADR-1],2); GOSUB PRINT
-0320 NEXT ADR
-0325 IF OPT=2 THEN LET TOPRINT=TOPRINT-1; IF TOPRINT=0 THEN GOTO EOJ
-0330 GOTO 0210
+0100 rem "EXU612 - 04/03/00 West Tech Label Printing
+0110 setesc 8000; seterr 8000
+0120 if y6.pcl = 0 then
+:      call "CDS069", 0, 0, 0, 0, "This program requires a laser or inkjet printer-";
+:      goto eoj
+:    fi
+0125 call "CDS069", 1, 2, 0, 0, "+option+", "0{|,2,|,,,Y}1Print graduates names|2Print Anne Eibens name", opt
+0126 if ctl = 4 then goto eoj
+0127 if opt = 2 then
+:      call "CDS069", 1, 20, 0, 0, "+number of pages of labels to print+", "##", pages;
+:      if ctl = 4 then
+:        goto 0125
+:      else
+:        ud15.name$ = "Anne Motul Eiben", ud15.addr$ = "2 Oakshore Drive", ud15.cityst$ = "Bratenahl, Ohio  44108", toprint = 30 * pages
+:      fi
+:    fi
+0130 call "CDS069", 0, 0, 0, 0, "Please insert 8.5 x 11"" sheets with three labels across, and 10 labels down in the printer-+"
+0140 if ctl = 4 then goto eoj
+0145 par$ = " N"
+0146 call "CDS069", 1, 1, 0, 0, "Print addresses using all capital letters (Y/N)", "AYN", 2, par$
+0150 cols = 3; dim col[1:cols]; col[1] = 0, col[2] = 825, col[3] = 1665
+0160 rows = 10;
+:    dim row[1:rows];
+:    for i = 1 to rows;
+:      row[i] = 125 + (i - 1) * 300;
+:    next i
+0170 print y6.msg$, 
+0180 print (y6.ch)'bo', $1b$, "&l0e180Z", 'eo', ; rem "set top margin to 1/4 inch
+0190 row = rows, col = cols
+0210 if opt = 1 then read record(ud15, end=eoj)ud15$
+0220 dim adr$[4]; adr$[0] = ud15.name$, adr$[1] = ud15.addr$, adr$[2] = ud15.cityst$
+0230 if row < rows then
+:      row = row + 1
+:    else
+:      if col < cols then
+:        row = 1, col = col + 1
+:      else
+:        gosub newpage
+:      fi
+:    fi
+0240 line = 0
+0250 for i = 0 to 4
+0260   if pos(" " <> adr$[i]) then lines = i + 1
+0270 next i
+0280 delta = 60 - 10 * (lines = 5)
+0290 top = min((300 - (lines * delta)) / 2,60)
+0300 for adr = 1 to lines
+0310   txt$ = cvs(adr$[adr - 1], 2); gosub print
+0320 next adr
+0325 if opt = 2 then toprint = toprint - 1; if toprint = 0 then goto eoj
+0330 goto 0210
 
-1000 PRINT:
-1010 CALL "CDS254",Y6$,"T"+STR(COL[COL])+"L720,"+STR(ROW[ROW]+TOP+LINE*DELTA)+",,,12",TXT$
-1020 LET LINE=LINE+1
-1030 RETURN
+1000 print:
+1010 call "CDS254", y6$, "T" + str(col[col]) + "L720," + str(row[row] + top + line * delta) + ",,,12", txt$
+1020 line = line + 1
+1030 return
 
-1100 NEWPAGE:
-1110 IF P
-:       THEN
-:          IF CTLVAL<>2
-:             THEN
-:                CALL "CDS069",0,0,0,0,"Page "+STR(P)+" has been sent to the printer, Enter=Print next page, F2=Print remaining pages, F4=Abort";
-:                IF CTL=4
-:                   THEN
-:                      GOTO EOJ
-:                   ELSE
-:                      LET CTLVAL=CTL;
-:                      PRINT Y6.MSG$,
-1120 LET P=P+1,COL=1,ROW=1
-1130 CALL "CDS094",ERR=EOJ,Y6$
-1135 CALL "CDS254",Y6$,"T100,,,,12,,4148","West Tech Labels"
-1140 CALL "CDS254",Y6$,"T1800",DATE(0)
-1150 CALL "CDS254",Y6$,"T2100","Page "+STR(P)
-1160 RETURN
+1100 newpage:
+1110 if p then
+:      if ctlval <> 2 then
+:        call "CDS069", 0, 0, 0, 0, "Page " + str(p) + " has been sent to the printer, Enter=Print next page, F2=Print remaining pages, F4=Abort";
+:        if ctl = 4 then
+:          goto eoj
+:        else
+:          ctlval = ctl;
+:          print y6.msg$, 
+:        fi
+:      fi
+:    fi
+1120 p = p + 1, col = 1, row = 1
+1130 call "CDS094", err=eoj, y6$
+1135 call "CDS254", y6$, "T100,,,,12,,4148", "West Tech Labels"
+1140 call "CDS254", y6$, "T1800", date(0)
+1150 call "CDS254", y6$, "T2100", "Page " + str(p)
+1160 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

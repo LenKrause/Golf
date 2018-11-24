@@ -1,19 +1,19 @@
-0100 REM "LKS064 - 03/26/10 Test CDS064
-0110 SETESC DT_ERR; SETERR DT_ERR
-0111 IF TIM<8.48 THEN WAIT 1; GOTO 0111
-0118 FOR I=1 TO 2000
-0119    LET FILNAM$=""
-0120    CALL "CDS064",Y$,CHAN,DISCNO,KEYSIZE,RECS,BYTES,"STR",FILNAM$,DISPMSG$,AUXFIL$
-0130    PRINT I,FILNAM$
-0140 NEXT I
-0145 CALL "CDS069"
-0150 GOTO EOJ
+0100 rem "LKS064 - 03/26/10 Test CDS064
+0110 setesc 8000; seterr 8000
+0111 if tim < 8.48 then wait 1; goto 0111
+0118 for i = 1 to 2000
+0119   filnam$ = ""
+0120   call "CDS064", y$, chan, discno, keysize, recs, bytes, "STR", filnam$, dispmsg$, auxfil$
+0130   print i, filnam$
+0140 next i
+0145 call "CDS069"
+0150 goto eoj
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

@@ -1,96 +1,96 @@
-0100 REM "GW090 - 05/04/14 Courses
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS095",GR08,"XXGR08","YNY",GR08$,GR08K$
-0140 LET RECS=NUM(FIELD(CGI$,"RECS",ERR=0145)); GOSUB SAVE
-0150 CALL "CDW000",ROW$,"dcs8",WASES.LEAGUENAME$
-0160 CALL "CDW000",TAB$,"r class='top'",ROW$
-0170 CALL "CDW000",ROW$,"dcs8","Courses"
-0180 CALL "CDW000",TAB$,"r class='title'",ROW$
-0190 CALL "CDW000",ROW$,"dc","ID"
-0210 CALL "CDW000",ROW$,"d","Course"
-0220 CALL "CDW000",ROW$,"d","Address"
-0222 CALL "CDW000",ROW$,"d","City"
-0224 CALL "CDW000",ROW$,"d","State"
-0226 CALL "CDW000",ROW$,"d","Zip"
-0228 CALL "CDW000",ROW$,"d","Phone"
-0230 CALL "CDW000",ROW$,"d","Web Site"
-0260 CALL "CDW000",TAB$,"r class='head'",ROW$
-0270 LET IND=0
-0280 READ (GR08,KNUM=0,KEY="",DOM=0290)
-0290 READ RECORD(GR08,END=0480)GR08$
-0310 LET IND=IND+1,IND$=STR(IND)
-0330 CALL "CDW000",ROW$,"dc",FNI$("ID")
-0350 CALL "CDW000",ROW$,"d",FNI$("NAME")
-0360 CALL "CDW000",ROW$,"d",FNI$("ADDRESS")
-0362 CALL "CDW000",ROW$,"d",FNI$("CITY")
-0364 CALL "CDW000",ROW$,"d",FNI$("STATE")
-0366 CALL "CDW000",ROW$,"d",FNI$("ZIP")
-0368 CALL "CDW000",ROW$,"d",FNI$("PHONE")
-0370 CALL "CDW000",ROW$,"d",FNI$("URL")
-0460 CALL "CDW000",TAB$,"r",ROW$
-0470 GOTO 0290
-0480 IF NEW<5 THEN LET NEW=NEW+1; DIM GR08$:FATTR(GR08$); GOTO 0310
-0490 CALL "CDW000",ROW$,"dcs8","[HOME] <input type='submit' value='Save Changes'>"
-0500 CALL "CDW000",TAB$,"r",ROW$
-0510 CALL "CDW000",HTML$,"tc",TAB$
-0520 LET HTML$=HTML$+"<input type='hidden' name='recs' value="+IND$+">"
-0530 LET HTML$="<form method='post' action='[DSN]?p=GW090'>"+HTML$+"</form>"
-0540 IF LEN(MSG$) THEN LET HTML$="<p class='msg'>"+MSG$+"</p>"+HTML$
-0550 GOTO EOJ
+0100 rem "GW090 - 05/04/14 Courses
+0110 setesc 8000; seterr 8000
+0120 call "CDS095", gr08, "XXGR08", "YNY", gr08$, gr08k$
+0140 recs = num(field(cgi$, "RECS", err=0145)); gosub save
+0150 call "CDW000", row$, "dcs8", wases.leaguename$
+0160 call "CDW000", tab$, "r class='top'", row$
+0170 call "CDW000", row$, "dcs8", "Courses"
+0180 call "CDW000", tab$, "r class='title'", row$
+0190 call "CDW000", row$, "dc", "ID"
+0210 call "CDW000", row$, "d", "Course"
+0220 call "CDW000", row$, "d", "Address"
+0222 call "CDW000", row$, "d", "City"
+0224 call "CDW000", row$, "d", "State"
+0226 call "CDW000", row$, "d", "Zip"
+0228 call "CDW000", row$, "d", "Phone"
+0230 call "CDW000", row$, "d", "Web Site"
+0260 call "CDW000", tab$, "r class='head'", row$
+0270 ind=0
+0280 read (gr08, knum=0, key="", dom=0290)
+0290 read record(gr08, end=0480)gr08$
+0310 ind=ind + 1, ind$ = str(ind)
+0330 call "CDW000", row$, "dc", fni$("ID")
+0350 call "CDW000", row$, "d", fni$("NAME")
+0360 call "CDW000", row$, "d", fni$("ADDRESS")
+0362 call "CDW000", row$, "d", fni$("CITY")
+0364 call "CDW000", row$, "d", fni$("STATE")
+0366 call "CDW000", row$, "d", fni$("ZIP")
+0368 call "CDW000", row$, "d", fni$("PHONE")
+0370 call "CDW000", row$, "d", fni$("URL")
+0460 call "CDW000", tab$, "r", row$
+0470 goto 0290
+0480 if new < 5 then new = new + 1; dim gr08$:fattr(gr08$); goto 0310
+0490 call "CDW000", row$, "dcs8", "[HOME] <input type='submit' value='Save Changes'>"
+0500 call "CDW000", tab$, "r", row$
+0510 call "CDW000", html$, "tc", tab$
+0520 html$ = html$ + "<input type='hidden' name='recs' value=" + ind$ + ">"
+0530 html$ = "<form method='post' action='[DSN]?p=GW090'>" + html$ + "</form>"
+0540 if len(msg$) then html$ = "<p class='msg'>" + msg$ + "</p>" + html$
+0550 goto eoj
 
-1000 SAVE:
-1010 FOR IND=1 TO RECS
-1015    LET IND$=STR(IND)
-1020    LET ID$=PAD(FNF$("ID"),3)
-1025    LET Z=POS(ID$=IDL$,3)
-1030    IF POS(" "<>ID$) AND Z
-:          THEN
-:             LET HTML$="<script>alert('Duplicate Course ID of "+ID$+"');window.history.back(-1)</script>";
-:             GOTO EOJ
-1032    LET IDL$=IDL$+ID$
-1033 NEXT IND
-1135 CALL "CDS273",Y$,"XXGR08",0,WASES.LEAGUE$; REM "Delete all
-1140 FOR IND=1 TO RECS
-1150    LET IND$=STR(IND)
-1160    DIM GR08$:FATTR(GR08$)
-1180    IF POS(" "<>FNF$("ID")) AND POS(" "<>FNF$("NAME"))
-:          THEN
-:             LET GR08.ID$=FNF$("ID"),GR08.NAME$=FNF$("NAME"),GR08.ADDRESS$=FNF$("ADDRESS"),GR08.CITY$=FNF$("CITY"),GR08.STATE$=FNF$("STATE"),GR08.ZIP$=FNF$("ZIP"),GR08.PHONE$=FNF$("PHONE"),GR08.URL$=FNF$("URL");
-:             WRITE RECORD(GR08)GR08$
-1260 NEXT IND
-1270 RETURN
+1000 save:
+1010 for ind=1 to recs
+1015   ind$ = str(ind)
+1020   id$ = pad(fnf$("ID"), 3)
+1025   z = pos(id$ = idl$, 3)
+1030   if pos(" " <> id$) and z then
+:        html$ = "<script>alert('Duplicate Course ID of " + id$ + "');window.history.back(-1)</script>";
+:        goto eoj
+:      fi
+1032   idl$ = idl$ + id$
+1033 next ind
+1135 call "CDS273", y$, "XXGR08", 0, wases.league$; rem "Delete all
+1140 for ind=1 to recs
+1150   ind$ = str(ind)
+1160   dim gr08$:fattr(gr08$)
+1180   if pos(" " <> fnf$("ID")) and pos(" " <> fnf$("NAME")) then
+:        gr08.id$ = fnf$("ID"), gr08.name$ = fnf$("NAME"), gr08.address$ = fnf$("ADDRESS"), gr08.city$ = fnf$("CITY"), gr08.state$ = fnf$("STATE"), gr08.zip$ = fnf$("ZIP"), gr08.phone$ = fnf$("PHONE"), gr08.url$ = fnf$("URL");
+:        write record(gr08)gr08$
+:      fi
+1260 next ind
+1270 return
 
-1400 FUNCTIONS:
-1410 DEF FNB$(FLD$)=B$+FLD$+IND$+"|"
-1420 DEF FNF$(FLD$)
-1430 LET VAL$="",VAL$=FIELD(CGI$,FLD$+IND$,ERR=1440)
-1440 RETURN VAL$
-1450 FNEND
+1400 functions:
+1410 def fnb$(fld$) = b$ + fld$ + ind$ + "|"
+1420 def fnf$(fld$)
+1430 val$ = "", val$ = field(cgi$, fld$ + ind$, err=1440)
+1440 return val$
+1450 fnend
 
-1460 DEF FNI$(VBL$)
-1470 LET VAL$=FIELD(GR08$,VBL$),LGTH$=STR(LEN(VAL$))
-1480 IF POS(VBL$+IND$+"|"=B$)
-:       THEN
-:          LET OPT$=" style='background-color:#ffcccc' value='"+FNF$(VBL$)+"'"
-:       ELSE
-:          LET OPT$=" value='"+CVS(VAL$,2)+"'"
-1490 RETURN "<input type='text' name='"+VBL$+IND$+"' size="+LGTH$+" maxlength="+LGTH$+OPT$+">"
-1500 FNEND
+1460 def fni$(vbl$)
+1470 val$ = field(gr08$, vbl$), lgth$ = str(len(val$))
+1480 if pos(vbl$ + ind$ + "|" = b$) then
+:      opt$ = " style='background-color:#ffcccc' value='" + fnf$(vbl$) + "'"
+:    else
+:      opt$ = " value='" + cvs(val$, 2) + "'"
+:    fi
+1490 return "<input type='text' name='" + vbl$ + ind$ + "' size=" + lgth$ + " maxlength=" + lgth$ + opt$ + ">"
+1500 fnend
 
-2900 FUNCTIONS:
-2910 DEF FNO$(YR)=YEAR$+"<option value='"+STR(YR)+"'>"+STR(YR)+"</option>"+$0A$
-2920 DEF FND$(FLDNAM$,DOPTS$,VAL$)
-2930 LET DATESCRIPT=1
-2940 RETURN "<input class='datepicker' type='text' size='11' id='"+FLDNAM$+"' name='"+FLDNAM$+"', value='"+VAL$+"'><script>$(document).ready(function() {$('#"+FLDNAM$+"').Zebra_DatePicker({"+DOPTS$+"inside:false,format:'m/d/y',first_day_of_week:0});});</script>"
-2950 FNEND
+2900 functions:
+2910 def fno$(yr) = year$ + "<option value='" + str(yr) + "'>" + str(yr) + "</option>" + $0a$
+2920 def fnd$(fldnam$, dopts$, val$)
+2930 datescript = 1
+2940 return "<input class='datepicker' type='text' size='11' id='" + fldnam$ + "' name='" + fldnam$ + "', value='" + val$ + "'><script>$(document).ready(function() {$('#" + fldnam$ + "').Zebra_DatePicker({" + dopts$ + "inside:false,format:'m/d/y',first_day_of_week:0});});</script>"
+2950 fnend
 
-2960 DEF FNT$(TX$)=HEAD$+TX$+$0A$
-2970 RETURN
+2960 def fnt$(tx$) = head$ + tx$ + $0a$
+2970 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDW999"
+9000 eoj:
+9010 run "CDW999"

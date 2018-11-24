@@ -1,36 +1,36 @@
-0100 REM "LKS360 - 02/22/10 DUMP test
-0110 IF POS("6"=SYS) AND TCB(13)=0
-:       THEN
-:          LET EXEC$="X15! = 1.155; XSTR!=""ABCdef""; Xobj!=BBJAPI(); Z!=new java.util.HashMap()";
-:          EXECUTE EXEC$
-0115 GOSUB TEST
-0116 EXIT
+0100 rem "LKS360 - 02/22/10 DUMP test
+0110 if pos("6" = sys) and tcb(13) = 0 then
+:      exec$ = "X15! = 1.155; XSTR!=""ABCdef""; Xobj!=BBJAPI(); Z!=new java.util.HashMap()";
+:      execute exec$
+:    fi
+0115 gosub test
+0116 exit
 
-0117 TEST:
-0120 LET X%=5
-0130 LET LEV=TCB(13),LEV$=STR(LEV)
-0140 DIM NAR[2:5]; LET NAR[3]=LEV
-0150 DIM NAR$[2:5]; LET NAR$[3]=LEV$
-0160 CALL "CDS091",Y$
-0170 DIM REC[2],REC$[2]
-0180 IF LEV<12 THEN CALL "LKS360"
-0190 IF POS("5"=SYS) THEN LET FIL$="bbx" ELSE LET FIL$="bbj"
-0200 LET FIL$="tmp/lek"+FIL$+".txt"
-0210 ERASE FIL$,ERR=0220
-0220 STRING FIL$
-0230 LET CHAN=UNT
-0240 OPEN (CHAN)FIL$
-0250 DUMP (CHAN)
-0260 CLOSE (CHAN)
-0270 CALL "CDS188",Y$,"",FIL$,"B"
-0280 CALL "CDS173"
-0290 ESCAPE
+0117 test:
+0120 x% = 5
+0130 lev = tcb(13), lev$ = str(lev)
+0140 dim nar[2:5]; nar[3] = lev
+0150 dim nar$[2:5]; nar$[3] = lev$
+0160 call "CDS091", y$
+0170 dim rec[2], rec$[2]
+0180 if lev < 12 then call "LKS360"
+0190 if pos("5" = sys) then fil$ = "bbx" else fil$ = "bbj"
+0200 fil$ = "tmp/lek" + fil$ + ".txt"
+0210 erase fil$, err=0220
+0220 string fil$
+0230 chan = unt
+0240 open (chan)fil$
+0250 dump (chan)
+0260 close (chan)
+0270 call "CDS188", y$, "", fil$, "B"
+0280 call "CDS173"
+0290 escape
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

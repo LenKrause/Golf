@@ -1,54 +1,54 @@
-0100 REM "GW061 - 09/09/15 Golf Select Week for Last Week Results & Play Next
-0110 SETESC DT_ERR; SETERR DT_ERR
-0115 GOTO 0200
-0120 LET DISP$="DATE\This Week\\\L"
-0127 LET Y5$="Weekly Email"
-0130 CALL "CDS041","CDW038",W038$,"YY"
-0140 LET W038.PLINK$="p=GW062"
-0145 LET FOOT$="[HOME]"
-0150 CALL "CDW038",Y$,Y5$,Y5A$,HTML$,W038$,"XXGR03",1,WASES.LEAGUE$+Y.JDATE$,WASES.LEAGUE$+$FF$,DISP$,WHERE$,SORTBY$,MODE$,3,SUBHEAD$,FOOT$,ENV$
-0155 IF LEN(HTML$)=0 THEN LET MSG$="Setup Play Dates"; RUN "GW011"
-0160 GOTO EOJ
-0200 CALL "CDS095",GR03,"XXGR03","YUY",GR03$
-0210 CALL "CDW000",ROW$,"ds2",WASES.LEAGUENAME$
-0220 CALL "CDW000",TAB$,"r class='top'",ROW$
-0230 CALL "CDW000",ROW$,"ds2",Y5$
-0240 CALL "CDW000",TAB$,"r class='title'",ROW$
-0250 CALL "CDW000",ROW$,"d","Play Date"
-0255 LET DATES=0,OPT$=""
-0260 READ RECORD(GR03,KNUM=1,KEY=WASES.LEAGUE$+Y.JDATE$,DOM=0270)GR03$;
-:    GOTO 0290
-0270 READ RECORD(GR03,END=0300)GR03$
-0280 IF GR03.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0300
-0290 LET OPT$=OPT$+"<option value='"+STR(GR03.DATE)+"'>"+DATE(GR03.DATE)+"</option>"
-0291 LET DATES=DATES+1,LASTDATE=GR03.DATE
-0292 IF DATES<3 THEN GOTO 0270
-0300 IF 0
-:       THEN
-:          IF DATES=0
-:             THEN
-:                LET MSG$="No Play dates scheduled today or later";
-:                RUN "GW011"
-0302 IF DATES<=1
-:       THEN
-:          LET OPT$=OPT$+"<option value='"+STR(LASTDATE+7)+"'>Year End</option>"
-0310 CALL "CDW000",ROW$,"d","<select name='DATE'>"+OPT$+"</select>"
-0320 CALL "CDW000",TAB$,"r",ROW$
-0330 CALL "CDW000",ROW$,"d","Email Message"
-0335 CALL "CDS261",Y$,"XXGR02",WASES.LEAGUE$+"e","",0,"","",0,NOTEPAD$
-0340 CALL "CDW000",ROW$,"d","<textarea name='NOTE' cols='80' rows='15'>"+NOTEPAD$+"</textarea>"
-0350 CALL "CDW000",TAB$,"r",ROW$
-0360 CALL "CDW000",ROW$,"dcs2","[CANCEL] <input type='submit' value='Send Emails'>"
-0370 CALL "CDW000",TAB$,"r class='foot'",ROW$
-0380 CALL "CDW000",HTML$,"tc",TAB$
-0390 LET HTML$="<form method='post' action='[DSN]?p=GW062'>"+HTML$+"</form>"
-0400 GOTO EOJ
+0100 rem "GW061 - 09/09/15 Golf Select Week for Last Week Results & Play Next
+0110 setesc 8000; seterr 8000
+0115 goto 0200
+0120 disp$ = "DATE\This Week\\\L"
+0127 y5$ = "Weekly Email"
+0130 call "CDS041", "CDW038", w038$, "YY"
+0140 w038.plink$ = "p=GW062"
+0145 foot$ = "[HOME]"
+0150 call "CDW038", y$, y5$, y5a$, html$, w038$, "XXGR03", 1, wases.league$ + y.jdate$, wases.league$ + $ff$, disp$, where$, sortby$, mode$, 3, subhead$, foot$, env$
+0155 if len(html$) = 0 then msg$ = "Setup Play Dates"; run "GW011"
+0160 goto eoj
+0200 call "CDS095", gr03, "XXGR03", "YUY", gr03$
+0210 call "CDW000", row$, "ds2", wases.leaguename$
+0220 call "CDW000", tab$, "r class='top'", row$
+0230 call "CDW000", row$, "ds2", y5$
+0240 call "CDW000", tab$, "r class='title'", row$
+0250 call "CDW000", row$, "d", "Play Date"
+0255 dates = 0, opt$ = ""
+0260 read record(gr03, knum=1, key=wases.league$ + y.jdate$, dom=0270)gr03$;
+:    goto 0290
+0270 read record(gr03, end=0300)gr03$
+0280 if gr03.league$ <> wases.league$ then goto 0300
+0290 opt$ = opt$ + "<option value='" + str(gr03.date) + "'>" + date(gr03.date) + "</option>"
+0291 dates = dates + 1, lastdate = gr03.date
+0292 if dates < 3 then goto 0270
+0300 if 0 then
+:      if dates = 0 then
+:        msg$ = "No Play dates scheduled today or later";
+:        run "GW011"
+:      fi
+:    fi
+0302 if dates <= 1 then
+:      opt$ = opt$ + "<option value='" + str(lastdate + 7) + "'>Year End</option>"
+:    fi
+0310 call "CDW000", row$, "d", "<select name='DATE'>" + opt$ + "</select>"
+0320 call "CDW000", tab$, "r", row$
+0330 call "CDW000", row$, "d", "Email Message"
+0335 call "CDS261", y$, "XXGR02", wases.league$ + "e", "", 0, "", "", 0, notepad$
+0340 call "CDW000", row$, "d", "<textarea name='NOTE' cols='80' rows='15'>" + notepad$ + "</textarea>"
+0350 call "CDW000", tab$, "r", row$
+0360 call "CDW000", row$, "dcs2", "[CANCEL] <input type='submit' value='Send Emails'>"
+0370 call "CDW000", tab$, "r class='foot'", row$
+0380 call "CDW000", html$, "tc", tab$
+0390 html$ = "<form method='post' action='[DSN]?p=GW062'>" + html$ + "</form>"
+0400 goto eoj
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDW999"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDW999"

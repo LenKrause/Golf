@@ -1,23 +1,23 @@
-0100 REM "LKS038 - 12/09/09 CDS037 SELRTN routine for LKS037
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 ENTER Y$,TEST1$,L
-0130 CALL "CDS069",0,0,0,0,"Touch Enter to remove selected record-+","PA"
-0140 IF CTL<>4 THEN GOSUB DELETE
-0150 EXIT
+0100 rem "LKS038 - 12/09/09 CDS037 SELRTN routine for LKS037
+0110 setesc 8000; seterr 8000
+0120 enter y$, test1$, l
+0130 call "CDS069", 0, 0, 0, 0, "Touch Enter to remove selected record-+", "PA"
+0140 if ctl <> 4 then gosub delete
+0150 exit
 
-1000 DELETE:
-1010 LET CHAN=UNT
-1020 OPEN (CHAN)STBL("LKS038")
-1030 REMOVE (CHAN,KEY=TEST1.SEQ$)
-1040 CLOSE (CHAN)
-1050 DIM TEST1$:FATTR(TEST1$)
-1060 RETURN
+1000 delete:
+1010 chan = unt
+1020 open (chan)stbl("LKS038")
+1030 remove (chan, key=test1.seq$)
+1040 close (chan)
+1050 dim test1$:fattr(test1$)
+1060 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

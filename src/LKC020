@@ -1,39 +1,39 @@
-0100 REM "LKC020 - 06/23/98 Copy SMS & FMS files from Unix to PC
-0110 BEGIN
-0115 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS069",1,1,0,0,"Copy SMS & FMS to PC directory (Y/N)","AYN",0,Z$
-0130 IF Z$="N" THEN GOTO EOJ
-0135 LET BATFIL$="tmp\update.bat"
-0136 OPEN (1,MODE="O_TRUNC,O_CREATE")BATFIL$
-0140 LET FROM$="//cdi/CDI/",TO$="C:\CDI\"
-0150 LET FLIST$="SMS"; GOSUB XFER
-0160 LET FLIST$="FMS"; GOSUB XFER
-0165 LET FLIST$="DOS"; GOSUB XFER
-0166 CLOSE (1)
-0167 LET A=SCALL("COMMAND.COM /C "+BATFIL$)
-0168 ERASE BATFIL$
-0170 CALL "CDS069",0,0,0,0,"Job completed-"
-0180 GOTO EOJ
+0100 rem "LKC020 - 06/23/98 Copy SMS & FMS files from Unix to PC
+0110 begin
+0115 setesc 8000; seterr 8000
+0120 call "CDS069", 1, 1, 0, 0, "Copy SMS & FMS to PC directory (Y/N)", "AYN", 0, z$
+0130 if z$ = "N" then goto eoj
+0135 batfil$ = "tmp\update.bat"
+0136 open (1, mode = "O_TRUNC,O_CREATE")batfil$
+0140 from$ = "//cdi/CDI/", to$ = "C:\CDI\"
+0150 flist$ = "SMS"; gosub xfer
+0160 flist$ = "FMS"; gosub xfer
+0165 flist$ = "DOS"; gosub xfer
+0166 close (1)
+0167 a = scall("COMMAND.COM /C " + batfil$)
+0168 erase batfil$
+0170 call "CDS069", 0, 0, 0, 0, "Job completed-"
+0180 goto eoj
 
-1000 XFER:
-1010 CALL "CDS095",FLIST,FROM$+"FLIST/pkg"+FLIST$,"YNX"
-1020 READ (FLIST,END=1090)FIL$
-1025 PRINT FIL$
-1030 WRITE (1)FNS$("COPY "+FROM$+FIL$+" "+TO$+FIL$+$0D$)
-1040 GOTO 1020
-1090 CLOSE (FLIST)
-1095 RETURN
-7000 DEF FNS$(TXT$)
-7010 LET H=1
-7020 LET Z=POS("/"=TXT$(H))
-7030 IF Z THEN LET H=H+Z,TXT$(H-1,1)="\"; GOTO 7020
-7040 RETURN TXT$
-7050 FNEND
+1000 xfer:
+1010 call "CDS095", flist, from$ + "FLIST/pkg" + flist$, "YNX"
+1020 read (flist, end=1090)fil$
+1025 print fil$
+1030 write (1)fns$("COPY " + from$ + fil$ + " " + to$ + fil$ + $0d$)
+1040 goto 1020
+1090 close (flist)
+1095 return
+7000 def fns$(txt$)
+7010 h = 1
+7020 z = pos("/" = txt$(h))
+7030 if z then h = h + z, txt$(h - 1, 1) = "\"; goto 7020
+7040 return txt$
+7050 fnend
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 RUN "CDS001"
+9000 eoj:
+9010 run "CDS001"

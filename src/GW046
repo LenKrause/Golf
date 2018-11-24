@@ -1,41 +1,41 @@
-0100 REM "GW046 - 05/04/14 HTML for Putts and Points Entry
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 ENTER Y$,GR05$,GW046$
-0130 IF GR05.SCORE THEN LET SCORE$=STR(GR05.SCORE)
-0140 LET GW046.SCORE$="<input type='text' size='2' maxlength='2' value='"+SCORE$+"' "+FNSTYLE$("score","","if (document.form1.score"+GR05.ID$+".value.length == 0) {document.form1.net"+GR05.ID$+".value=""""; document.form1.putts"+GR05.ID$+".value=""""; document.form1.points"+GR05.ID$+".value="""";} else {if (numrange(this,30,79)) {document.form1.net"+GR05.ID$+".value=eval(document.form1.score"+GR05.ID$+".value-"+STR(GR05.HC)+")}}")
-0150 IF GR05.NET THEN LET NET$=STR(GR05.NET)
-0160 LET GW046.NET$="<input type='text' tabindex='-1' name='net"+GR05.ID$+"' size='2' maxlength='2' value='"+NET$+"'>"
-0170 LET OUT$=FNS$("putts")
-0175 LET OUT$=OUT$+"<option></option>"
-0180 FOR PUTTS=9 TO 27
-0185    IF GR05.PUTTS=PUTTS THEN LET SEL$=" selected" ELSE LET SEL$=""
-0190    LET OUT$=OUT$+"<option"+SEL$+">"+STR(PUTTS)+"</option>"
-0200 NEXT PUTTS
-0210 LET OUT$=OUT$+"</select>"
-0220 LET GW046.PUTTS$=OUT$
-0230 LET OUT$=FNS$("points")
-0235 LET OUT$=OUT$+"<option></option>"
-0240 FOR POINTS=0 TO NUM(STBL("MAXPTS")) STEP .5
-0245    IF GR05.POINTS>0 AND GR05.POINTS=POINTS
-:          THEN
-:             LET SEL$=" selected"
-:          ELSE
-:             LET SEL$=""
-0250    LET OUT$=OUT$+"<option"+SEL$+">"+STR(POINTS)+"</option>"
-0260 NEXT POINTS
-0270 LET OUT$=OUT$+"</select>"
-0280 LET GW046.POINTS$=OUT$
-0290 EXIT
+0100 rem "GW046 - 05/04/14 HTML for Putts and Points Entry
+0110 setesc 8000; seterr 8000
+0120 enter y$, gr05$, gw046$
+0130 if gr05.score then score$ = str(gr05.score)
+0140 gw046.score$ = "<input type='text' size='2' maxlength='2' value='" + score$ + "' " + fnstyle$("score", "", "if (document.form1.score" + gr05.id$ + ".value.length == 0) {document.form1.net" + gr05.id$ + ".value=""""; document.form1.putts" + gr05.id$ + ".value=""""; document.form1.points" + gr05.id$ + ".value="""";} else {if (numrange(this,30,79)) {document.form1.net" + gr05.id$ + ".value=eval(document.form1.score" + gr05.id$ + ".value-" + str(gr05.hc) + ")}}")
+0150 if gr05.net then net$ = str(gr05.net)
+0160 gw046.net$ = "<input type='text' tabindex='-1' name='net" + gr05.id$ + "' size='2' maxlength='2' value='" + net$ + "'>"
+0170 out$ = fns$("putts")
+0175 out$ = out$ + "<option></option>"
+0180 for putts = 9 to 27
+0185   if gr05.putts = putts then sel$ = " selected" else sel$ = ""
+0190   out$ = out$ + "<option" + sel$ + ">" + str(putts) + "</option>"
+0200 next putts
+0210 out$ = out$ + "</select>"
+0220 gw046.putts$ = out$
+0230 out$ = fns$("points")
+0235 out$ = out$ + "<option></option>"
+0240 for points = 0 to num(stbl("MAXPTS")) step .5
+0245   if gr05.points > 0 and gr05.points = points then
+:        sel$ = " selected"
+:      else
+:        sel$ = ""
+:      fi
+0250   out$ = out$ + "<option" + sel$ + ">" + str(points) + "</option>"
+0260 next points
+0270 out$ = out$ + "</select>"
+0280 gw046.points$ = out$
+0290 exit
 
-7000 FUNCTIONS:
-7010 DEF FNS$(FLD$)="<select"+FNSTYLE$(FLD$,"if (document.form1.score"+GR05.ID$+".value == """") {adv(this)} else ","")+">"
-7020 DEF FNSTYLE$(FLD$,FOCUS$,BLUR$)=" name='"+FLD$+GR05.ID$+"' onFocus='"+FOCUS$+"{document.form1."+FLD$+GR05.ID$+".style.cssText = ""background-color:#ffff99""}' onBlur='document.form1."+FLD$+GR05.ID$+".style.cssText = ""background-color:#fff"";"+BLUR$+"'"
+7000 functions:
+7010 def fns$(fld$) = "<select" + fnstyle$(fld$, "if (document.form1.score" + gr05.id$ + ".value == """") {adv(this)} else ", "") + ">"
+7020 def fnstyle$(fld$, focus$, blur$) = " name='" + fld$ + gr05.id$ + "' onFocus='" + focus$ + "{document.form1." + fld$ + gr05.id$ + ".style.cssText = ""background-color:#ffff99""}' onBlur='document.form1." + fld$ + gr05.id$ + ".style.cssText = ""background-color:#fff"";" + blur$ + "'"
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

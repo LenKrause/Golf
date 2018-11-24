@@ -1,16 +1,16 @@
-0100 REM "LKT2 - 05/14/12 SELECT test - BEGIN not closing SELECT chan
-0110 PRINT "Inside called routine, before BEGIN"
-0120 CALL "CDS250"
-0130 BEGIN
-0140 PRINT "After BEGIN"
-0150 CALL "CDS250"
-0160 EXIT
+0100 rem "LKT2 - 05/14/12 SELECT test - BEGIN not closing SELECT chan
+0110 print "Inside called routine, before BEGIN"
+0120 call "CDS250"
+0130 begin
+0140 print "After BEGIN"
+0150 call "CDS250"
+0160 exit
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

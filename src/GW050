@@ -1,58 +1,58 @@
-0100 REM "GW050 - 07/13/14 Golf Select Year and Half for Point Ranking
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 CALL "CDS095",GR03,"XXGR03","YNY",GR03$
-0130 CALL "CDW000",ROW$,"ds3",WASES.LEAGUENAME$
-0140 CALL "CDW000",TAB$,"r class='top'",ROW$
-0150 CALL "CDW000",ROW$,"dcs3","Point Ranking"
-0160 CALL "CDW000",TAB$,"r class='title'",ROW$
-0170 READ (GR03,KNUM=0,KEY=WASES.LEAGUE$+$FF$,DOM=0180)
-0180 READ RECORD(GR03,END=0230)GR03$
-0190 IF GR03.LEAGUE$<>WASES.LEAGUE$ THEN GOTO 0230
-0200 LET YR$=DATE(GR03.DATE:"%Yl")
-0210 IF POS(YR$=YRS$,4)=0
-:       THEN
-:          CALL "SW404",Y$,"XXGR05",GR05$,"GR05.LEAGUE$="""+WASES.LEAGUE$+""" AND GR05.DATE="+STR(GR03.DATE)+" AND GR05.SCORE",RECS,1;
-:          IF RECS
-:             THEN
-:                LET YRS$=YRS$+YR$
-0220 GOTO 0180
-0230 IF LEN(YRS$)
-:       THEN
-:          GOSUB PROCESS
-:       ELSE
-:          LET MSG$="No Data Available";
-:          RUN "GW011"
-0235 LET HTML$="<form method='post' action='[DSN]?p=GW051'>"
-0240 CALL "CDW000",ROW$,"dcs3","<input type='submit' value='Submit'>[HOME]"
-0250 CALL "CDW000",TAB$,"r class='foot'",ROW$
-0260 CALL "CDW000",HTML$,"tc",TAB$
-0270 GOTO EOJ
+0100 rem "GW050 - 07/13/14 Golf Select Year and Half for Point Ranking
+0110 setesc 8000; seterr 8000
+0120 call "CDS095", gr03, "XXGR03", "YNY", gr03$
+0130 call "CDW000", row$, "ds3", wases.leaguename$
+0140 call "CDW000", tab$, "r class='top'", row$
+0150 call "CDW000", row$, "dcs3", "Point Ranking"
+0160 call "CDW000", tab$, "r class='title'", row$
+0170 read (gr03, knum=0, key=wases.league$ + $ff$, dom=0180)
+0180 read record(gr03, end=0230)gr03$
+0190 if gr03.league$ <> wases.league$ then goto 0230
+0200 yr$ = date(gr03.date:"%Yl")
+0210 if pos(yr$ = yrs$, 4) = 0 then
+:      call "SW404", y$, "XXGR05", gr05$, "GR05.LEAGUE$=""" + wases.league$ + """ AND GR05.DATE=" + str(gr03.date) + " AND GR05.SCORE", recs, 1;
+:      if recs then
+:        yrs$ = yrs$ + yr$
+:      fi
+:    fi
+0220 goto 0180
+0230 if len(yrs$) then
+:      gosub process
+:    else
+:      msg$ = "No Data Available";
+:      run "GW011"
+:    fi
+0235 html$ = "<form method='post' action='[DSN]?p=GW051'>"
+0240 call "CDW000", row$, "dcs3", "<input type='submit' value='Submit'>[HOME]"
+0250 call "CDW000", tab$, "r class='foot'", row$
+0260 call "CDW000", html$, "tc", tab$
+0270 goto eoj
 
-1000 PROCESS:
-1010 CALL "CDW000",ROW$,"dr","Period"
-1020 CALL "CDW000",ROW$,"d","<input type='radio' name='period' value='1' checked>1st half<br><input type='radio' name='period' value='2'>2nd half<br><input type='radio' name='period' value='3'>Entire year"
-1030 CALL "CDW000",TAB$,"r",ROW$
-1040 CALL "CDW000",ROW$,"dr","Format"
-1050 CALL "CDW000",ROW$,"d","<input type='radio' name='format' value='P' checked>PDF<br><input type='radio' name='format' value='E'>Email"
-1060 CALL "CDW000",TAB$,"r",ROW$
-1070 CALL "CDW000",ROW$,"dr","Drop round<br>with lowest points"
-1080 CALL "CDW000",ROW$,"d","<input type='radio' name='drop' value='Y' checked>Yes<br><input type='radio' name='drop' value='N'>No"
-1090 CALL "CDW000",TAB$,"r",ROW$
-1100 CALL "CDW000",ROW$,"dcs2","Year"
-1110 CALL "CDW000",TAB$,"r class='head'",ROW$
-1115 LET CHECKED$=" checked"
-1120 FOR I=1 TO LEN(YRS$) STEP 4
-1130    CALL "CDW000",ROW$,"dcs2","<input type='radio' name='year' value='"+YRS$(I,4)+"'"+CHECKED$+">"+YRS$(I,4)
-1135    LET CHECKED$=""
-1140    CALL "CDW000",TAB$,"r",ROW$
-1150 NEXT I
-1160 RETURN
+1000 process:
+1010 call "CDW000", row$, "dr", "Period"
+1020 call "CDW000", row$, "d", "<input type='radio' name='period' value='1' checked>1st half<br><input type='radio' name='period' value='2'>2nd half<br><input type='radio' name='period' value='3'>Entire year"
+1030 call "CDW000", tab$, "r", row$
+1040 call "CDW000", row$, "dr", "Format"
+1050 call "CDW000", row$, "d", "<input type='radio' name='format' value='P' checked>PDF<br><input type='radio' name='format' value='E'>Email"
+1060 call "CDW000", tab$, "r", row$
+1070 call "CDW000", row$, "dr", "Drop round<br>with lowest points"
+1080 call "CDW000", row$, "d", "<input type='radio' name='drop' value='Y' checked>Yes<br><input type='radio' name='drop' value='N'>No"
+1090 call "CDW000", tab$, "r", row$
+1100 call "CDW000", row$, "dcs2", "Year"
+1110 call "CDW000", tab$, "r class='head'", row$
+1115 checked$ = " checked"
+1120 for i = 1 to len(yrs$) step 4
+1130   call "CDW000", row$, "dcs2", "<input type='radio' name='year' value='" + yrs$(i, 4) + "'" + checked$ + ">" + yrs$(i, 4)
+1135   checked$ = ""
+1140   call "CDW000", tab$, "r", row$
+1150 next i
+1160 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDW999"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDW999"

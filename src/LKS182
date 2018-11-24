@@ -1,24 +1,24 @@
-0100 REM "LKS182 - 11/23/09 Test CDS030
-0110 SETESC DT_ERR; SETERR DT_ERR
-0120 ENTER Y$,TOBBJ$,FROMBBJ$
-0130 DIM FROMBBJ$:"INFO32:C(10)"
-0140 LET FROMBBJ.INFO32$=INFO(3,2)
-0150 WAIT 10
-0200 EXIT
+0100 rem "LKS182 - 11/23/09 Test CDS030
+0110 setesc 8000; seterr 8000
+0120 enter y$, tobbj$, frombbj$
+0130 dim frombbj$:"INFO32:C(10)"
+0140 frombbj.info32$ = info(3,2)
+0150 wait 10
+0200 exit
 
-1000 TEST:
-1010 BEGIN
-1015 PRINT 'CS',
-1020 CALL "CDS091",Y$
-1030 CALL "CDS030",Y$,"LK/LKS182",SECS,TOBBJ$,FROMBBJ$,DEBUG
-1040 PRINT FROMBBJ.INFO32$
-1050 ESCAPE
+1000 test:
+1010 begin
+1015 print 'cs', 
+1020 call "CDS091", y$
+1030 call "CDS030", y$, "LK/LKS182", secs, tobbj$, frombbj$, debug
+1040 print frombbj.info32$
+1050 escape
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"

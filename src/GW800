@@ -1,44 +1,44 @@
-0100 REM "GW800 - 05/14/17 Score File Integrity Test
-0110 SETESC DT_ERR; SETERR DT_ERR
-0111 PRINT ""
-0115 CALL "CDS095",GR05A,"XXGR05","YNX"
-0120 READ RECORD(GR05,END=EOJ)GR05$
-0124 IF GR05.DATE<JUL(2017,1,1) THEN GOTO 0120
-0125 IF GR05.DATE<=JUL(2014,9,9) AND GR05.OPP$="    " THEN GOTO 0120
-0130 LET K$=GR05.LEAGUE$+GR05.DATE$
-0140 LET K=POS(K$=KLIST$,LEN(K$))
-0150 IF K=0 THEN LET KLIST$=KLIST$+K$; GOSUB PROCESS
-0160 GOTO 0120
+0100 rem "GW800 - 05/14/17 Score File Integrity Test
+0110 setesc dt_err; seterr dt_err
+0111 print ""
+0115 call "CDS095", gr05a, "XXGR05", "YNX"
+0120 read record(gr05, end=eoj)gr05$
+0124 if gr05.date < jul(2017,1,1) then goto 0120
+0125 if gr05.date <= jul(2014,9,9) and gr05.opp$ = "    " then goto 0120
+0130 k$ = gr05.league$ + gr05.date$
+0140 k = pos(k$ = klist$, len(k$))
+0150 if k = 0 then klist$ = klist$ + k$; gosub process
+0160 goto 0120
 
-1000 PROCESS:
-1003 DIM GR05A$:FATTR(GR05$)
-1004 LET GR05A$=GR05$
-1005 PRINT K$(1,3)," ",DATE(DEC(K$(4)))
-1010 READ (GR05A,KNUM=1,KEY=K$,DOM=1020)
-1020 LET IDS$=""
-1030 READ RECORD(GR05A,END=1090)GR05$
-1040 IF GR05.LEAGUE$+GR05.DATE$<>K$ THEN GOTO 1090
-1045 IF POS(" "<>GR05.OPP$)=0
-:       THEN
-:          CALL "CDS279",GR05$,"","MNo Opponent";
-:          CALL "CDS069",0,0,0,0,"-+";
-:          IF CTL=4
-:             THEN
-:                ESCAPE
-1047 LET Z=POS(GR05.ID$=IDS$,8)
-1050 IF Z=0 THEN LET IDS$=IDS$+GR05.ID$+GR05.OPP$+GR05.OPP$+GR05.ID$; GOTO 1030
-1060 IF IDS$(Z+4,4)<>GR05.OPP$
-:       THEN
-:          PRINT "Opponent conflict",'LF',IDS$(Z,8)," ",GR05.OPP$;
-:          ESCAPE
-1070 GOTO 1030
-1090 RETURN
+1000 process:
+1003 dim gr05a$:fattr(gr05$)
+1004 gr05a$ = gr05$
+1005 print k$(1,3), " ", date(dec(k$(4)))
+1010 read (gr05a, knum=1, key=k$, dom=1020)
+1020 ids$ = ""
+1030 read record(gr05a, end=1090)gr05$
+1040 if gr05.league$ + gr05.date$ <> k$ then goto 1090
+1045 if pos(" " <> gr05.opp$) = 0 then
+:      call "CDS279", gr05$, "", "MNo Opponent";
+:      call "CDS069", 0, 0, 0, 0, "-+";
+:      if ctl = 4 then
+:        escape
+:      fi
+:    fi
+1047 z = pos(gr05.id$ = ids$, 8)
+1050 if z = 0 then ids$ = ids$ + gr05.id$ + gr05.opp$ + gr05.opp$ + gr05.id$; goto 1030
+1060 if ids$(z + 4, 4) <> gr05.opp$ then
+:      print "Opponent conflict", 'lf', ids$(z, 8), " ", gr05.opp$;
+:      escape
+:    fi
+1070 goto 1030
+1090 return
 
-8000 DT_ERR:
-8010 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
-8020 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
-8030 RETRY
+8000 dt_err:
+8010 call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+8020 if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+8030 retry
 
-9000 EOJ:
-9010 IF TCB(13) THEN EXIT
-9020 RUN "CDS001"
+9000 eoj:
+9010 if tcb(13) then exit
+9020 run "CDS001"
