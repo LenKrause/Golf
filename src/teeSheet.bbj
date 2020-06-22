@@ -1,0 +1,143 @@
+REM /**
+REM  * teeSheet.bbj
+REM  * @author len
+REM  *
+REM  */
+
+use ::DTFileRecords.bbj::DTFileRecords
+use ::DTHtmlTable.bbj::DTHtmlTable
+
+class public teeSheet
+  field private BBjString msg! = ""
+  field private BBjString html$
+  field private BBjVector players!
+  field private BBjString coursePhone$
+  
+  method public teeSheet(BBjString adminId$, BBjInt date%)
+    declare DTFileRecords gr10File!
+    declare BBjVector     gr10Recs!
+    declare DTHtmlTable   table!
+    
+    gr10File! = new DTFileRecords("LK", "GR10", "YNY")
+    gr10File!.setKeyPre(1, adminId$ + bin(date%, 3))
+    gr10Recs! = gr10File!.getAllRecords()
+    if gr10Recs!.size() = 0 then
+      #msg! = "No tee times found for admin id ' " + adminId$ + "' on " + date(date%:"%Ds %Ms %D")
+      methodret
+    fi
+    dim gr10$:gr10File!.getTemplate()
+    gr10$ = gr10Recs!.get(0).toString()
+    
+    #players! = new BBjVector()
+    
+    table! = new DTHtmlTable(BBjAPI.TRUE)
+    table!.addHeaderCell("Tee Time Manager", "cs3")
+    table!.addRow()
+    
+    table!.addHeaderCell(date(date%:"%Dl %Ms %D"), "cs3")
+    table!.addRow()
+    
+    call "SW001", "XXGR03", 0, "SAW" + bin(date%, 3), gr03$, sw001$
+    if sw001.onfile then nine$ = iff(gr03.nine$ = "F", " - Front Nine", " - Back Nine")
+    
+    call "SW001", "XXGR08", 0, gr10.gr08id$, gr08$, sw001$
+    #coursePhone$ = gr08.phone$
+    table!.addHeaderCell(cvs(gr08.name$, 2) + nine$, "cs3")
+    table!.addRow()
+    
+    table!.addHeaderCell("Time", "c")
+    table!.addHeaderCell("Player")
+    table!.addHeaderCell("Paid", "c")
+    table!.addRow()
+    
+    for i = 0 to gr10Recs!.size() - 1
+      gr10$ = gr10Recs!.get(i).toString()
+      table!.addCell(date(gr10.date, gr10.time:"%h:%mz %p"), "cR4")
+      for player = 1 to 4
+        name$ = "&nbsp;"
+        if pos(" " <> gr10.id$[player]) then
+          call "SW001", "XXGR09", 0, gr10.aid$ + gr10.id$[player], gr09$, sw001$
+          if sw001.onfile then
+            name$ = cvs(gr09.firstname$, 2) + " " + cvs(gr09.lastname$, 2)
+            #players!.add(cvs(gr09.email$, 2))
+          fi
+        fi
+        table!.addCell(name$, "l&")
+        table!.addCell("")
+        table!.addRow()
+      next player
+    next i
+    
+    table!.addTable()
+    #html$ = table!.getHtml()
+  methodend
+
+  method public void email()
+    #email(BBjAPI.FALSE)
+  methodend
+
+  method public void email(Boolean testMode!)
+    if #players!.size() = 0 then
+      #msg! = "No players scheduled"
+      methodret
+    fi
+    
+    call "CDS041", "CDS084", s084$, "YP"
+    s084.mode$      = "N"
+    s084.name$      = "MAIL"
+    s084.emailtype$ = "H"
+    s084.subject$   = "Tee Sheet"
+    s084.emailbcc$  = "len@excellware.com"
+
+    if ! testMode! then
+      s084.toname$  = "David Kinnell"
+      s084.toemail$ = "david@golfpinehills.net"
+      for i = 0 to #players!.size() - 1
+        s084.emailbcc$ = s084.emailbcc$ + "," + #players!.get(i).toString()
+      next i
+    fi
+    
+    call "CDS084", y$, y5$, u0, s084$, y6, y6$    
+    print (y6.ch)#html$
+    print (y6.ch)"<br><center>Please phone the course at " + #coursePhone$ + " to prepay by credit card.</center><br>"
+    call "CDS094", y6$, "e"
+  methodend
+  
+  method public BBjString getErrMsg()
+    methodret #msg!
+  methodend
+  
+  method public BBjString getHtml()
+    methodret #html$
+  methodend
+  
+  method public BBjString getCoursePhone()
+    methodret #coursePhone$
+  methodend
+
+classend
+
+declare teeSheet sheet!
+
+if fid(0) = "IO" then
+  sheet! = new teeSheet(argv(4), int(y.jdate + 1)); rem  Scheduled for 6pm day before play
+  if ! sheet!.getErrMsg().isEmpty() then
+    print sheet!.getErrMsg()
+  else
+    sheet!.email()
+  fi
+  call "CDS081", y$, -1
+fi
+
+begin
+y$ = "LK"
+y5$ = "Test Tee Sheet"
+call "CDS011", y$, y5$
+
+sheet! = new teeSheet("lk01", jul(2020,5,13))
+if ! sheet!.getErrMsg().isEmpty() then
+  print sheet!.getErrMsg()
+else
+  call "CDW999", sheet!.getHtml()
+fi
+sheet!.email(BBjAPI.TRUE)

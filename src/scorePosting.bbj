@@ -1,0 +1,587 @@
+REM /**
+REM  * scorePosting.bbj
+REM  * @author len
+REM  *
+REM  */
+
+use ::DTFileRecords.bbj::DTFileRecords
+use ::DTHtmlTable.bbj::DTHtmlTable
+
+class public scorePosting
+  field private BBjString code$
+  field private BBjString aid$
+  field private BBjString id$
+  field private BBjString gr08tpl$; rem  Course record
+  field private BBjString gr08$
+  field private BBjString gr04tpl$; rem  Player record
+  field private BBjString gr04$
+  field private BBjString nine$
+  field private BBjNumber start_hole
+  field private BBjVector holesByHc!
+  field private BBjVector pointsByHoleA!
+  field private BBjVector pointsByHoleB!
+  field private BBjString gr05a$
+  field private BBjString oneHalf$ = "&#189;"
+  
+  method public scorePosting(BBjString code$)
+    #code$  = code$
+    code1$  = ath(code$)
+    #aid$   = code1$(1, 4)
+    #id$    = code1$(5, 4)
+  methodend
+  
+  rem  checks for player in league system
+  method public BBjString getRecentMatches()
+    call "CDS041", "XXGR04", gr04$, "YY"
+    gr04$ = #getGr04(#aid$ + #id$)
+    if pos(" " <> gr04.id$) then methodret #getRecentRounds(gr04$)
+    methodret ""
+  methodend
+  
+  rem  returns html table and form of recent matches
+  method public BBjString getRecentRounds(BBjString gr04$)
+    declare DTFileRecords gr05File!
+    declare BBjVector     gr05Recs!
+    declare DTHtmlTable   table!
+    
+    gr05File! = new DTFileRecords("LK", "GR05", "YUY")
+    gr05File!.setKeyPre(0, "SAW" + gr04.id$)
+    gr05File!.setRecsPerPage(10)
+    gr05Recs! = gr05File!.getFirstPage()
+    if gr05Recs!.size() = 0 methodret ""
+    
+    table! = new DTHtmlTable()
+    table!.setStripe(BBjAPI.FALSE)
+    
+    table!.addCell(#getPlayerName(gr04$), "cs9")
+    table!.addRow(" class='top'")
+    
+    table!.addCell("Recent Rounds", "cs9")
+    table!.addRow(" class='title'")
+    
+    table!.addCell("Date", "c")
+    table!.addCell("Course", "c")
+    table!.addCell("Nine", "c")
+    table!.addCell("Opponent", "r")
+    table!.addCell("Score", "c")
+    table!.addCell("HC", "c")
+    table!.addCell("Net", "c")
+    table!.addCell("Putts", "c")
+    table!.addCell("Points", "c")
+    table!.addRow(" class='head'")
+    
+    dim gr05$:gr05File!.getTemplate()
+    for i = 0 to gr05Recs!.size() - 1
+      gr05$ = gr05Recs!.get(i).toString()
+      if gr05.date > jul(0,0,0) continue
+      
+      rem  alternate colors
+      bc$ = iff(mod(i, 2), "g659d32", "g76ae43")
+      
+      rem  Get League record
+      call "SW001", "LKGR01", 0, "SAW", gr01$, sw001$
+      
+      rem  Get Course for League
+      call "SW001", "LKGR08", 0, gr01.id$, gr08$, sw001$
+      
+      rem  Get PlayDate
+      call "SW001", "LKGR03", 0, "SAW" + gr05.date$, gr03$, sw001$
+
+      rem  Get Opponent name
+      call "SW001", "LKGR04", 0, "SAW" + gr05.opp$, gr04a$, sw001$
+      
+      rem  Get Opponent score
+      call "SW001", "LKGR05", 0, "SAW" + gr05.opp$ + gr05.date$, gr05a$, sw001$
+      
+      table!.addCell(date(gr05.date:"%Ds %Mz/%Dz/%Yz"), "rR2" + bc$)
+
+      table!.addCell(gr08.name$, "R2" + bc$)
+
+      table!.addCell(iff(gr03.nine$ = "F", "Front", "Back"), "R2" + bc$)
+      
+      link$ = "My Score"
+      if gr05.date >= jul(0,0,0) - 6 then
+        link$ = "<a href='" + #getUrl("getScorecardForm") + "&hexkey=" + hta(gr05$(1,10) + gr03.nine$) + "'>" + link$ + "</a>"
+      fi
+      table!.addCell(link$, "&r" + bc$)
+      table!.addCell(iff(gr05.score, str(gr05.score), ""), "c" + bc$)
+      table!.addCell(iff(gr05.score, str(gr05.hc), ""), "c" + bc$)
+      table!.addCell(iff(gr05.score, str(gr05.net), ""), "c" + bc$)
+      table!.addCell(iff(gr05.score, str(gr05.putts), ""), "c" + bc$)
+      link$ = #getPoints(gr05.points)
+      if gr05.hscore[1] then
+        link$ = "<a href='" + #getUrl("showMatch") + "&hexkey=" + hta(gr05$(1,10) + gr03.nine$) + "'>" + link$ + "</a>"
+      fi
+      table!.addCell(iff(gr05.score, link$, ""), "&c" + bc$)
+      table!.addRow()
+      
+      table!.addCell(#getPlayerName(gr04a$), "r" + bc$)
+      table!.addCell(iff(gr05a.score, str(gr05a.score), ""), "c" + bc$)
+      table!.addCell(iff(gr05a.score, str(gr05a.hc), ""), "c" + bc$)
+      table!.addCell(iff(gr05a.score, str(gr05a.net), ""), "c" + bc$)
+      table!.addCell(iff(gr05a.score, str(gr05a.putts), ""), "c" + bc$)
+      table!.addCell(iff(gr05a.score, #getPoints(gr05a.points), ""), "&c" + bc$)
+      table!.addRow()
+    next i
+    
+    table!.addTable(); rem " style='margin:0 auto 10px;border:1px solid #000000'")
+    table!.addBody("<center><button type='button' onclick='window.location=""" + #getDsn() + """'>Home</button></center>")
+    methodret table!.getBody()
+  methodend
+  
+  method public BBjString getScorecardForm(BBjString hexkey$)
+    declare DTHtmlTable table!
+    
+    key$   = ath(hexkey$)
+    nine$  = key$(11)
+    call "SW001", "XXGR05", 0, key$(1,10), gr05$
+    call "CDS095", gr10, "XXGR10", "YUY", gr10$
+    gr10s = unt
+    aid$ = #aid$; rem  select does not support field variables in where clause
+    id$  = #id$
+    select (gr10s)gr10$ from "LKGR10" where gr10.aid$ = aid$ and gr10.date = gr05.date and pos(id$ = gr10.id$[1] + gr10.id$[2] + gr10.id$[3] + gr10.id$[4], 4)
+    readrecord (gr10s, end=*next)gr10$    
+    
+    rem  No tee time made
+    if gr10.aid$ <> aid$ then
+      gr10.aid$   = aid$
+      gr10.id$[1] = id$
+    fi
+    
+    table! = new DTHtmlTable()
+    table!.setStripe(BBjAPI.FALSE)
+    
+    table!.addBody("<form method='post' action='" + #getUrl("postScorecard") + "'>")
+    
+    table!.addCell("Scorecard", "cs12")
+    table!.addRow(" class='top'")
+    
+    table!.addCell(date(gr10.date:"%Ds %Mz/%Dz/%Yz"), "cs12")
+    table!.addRow(" class='title'")
+    
+    table!.addCell("Player")
+    table!.addCell("")
+    firsthole = iff(nine$ = "F", 1, 10)
+    for hole = firsthole to firsthole + 8
+      table!.addCell(str(hole), "c")
+    next hole
+    table!.addCell("Total", "c")
+    table!.addRow(" class='head'")
+    
+    call "CDS041", "LKGR04", gr04$, "YY"
+    
+    tabindex = 0
+    j = 0
+    for i = 1 to 4
+      if pos(" " <> gr10.id$[i]) = 0 then continue
+      gr04$ = #getGr04(gr10.aid$ + gr10.id$[i])
+      call "SW001", "LKGR05", 0, "SAW" + gr04.id$ + gr10.date$, gr05$, sw001$
+      if ! sw001.onfile then continue
+      bc$ = iff(mod(j, 2), "g659d32", "g76ae43")
+      j = j + 1
+      players$ = players$ + gr04.id$
+      table!.addCell(#getPlayerName(gr04$), "R2" + bc$)
+
+      table!.addCell("Score:", bc$ + "r")
+      for hole = 1 to 9
+        cell$ = "<input tabindex='" + str(tabindex + hole * 2) + "'" + #getCell(gr04.id$, hole) + " min='0' max='9' style='text-align:center;width:3em'" + #getValue(gr05.hscore[hole]) + ">"
+        table!.addCell(cell$, bc$ + "&")
+      next hole
+      value$ = iff(gr05.score, str(gr05.score), "")
+      cell$ = "<div style='text-align:center;width:4em'" + #getCell(gr04.id$, 0) + ">" + value$ + "<div>"
+      table!.addCell(cell$, bc$ + "&")
+      table!.addRow()
+      
+      table!.addCell("Putts:", bc$ + "r")
+      for hole = 1 to 9
+        cell$ = "<input tabindex='" + str(tabindex + hole * 2 + 1) + "'" + #getCell(gr04.id$ + "P", hole) + " min='0' max='9' style='text-align:center;width:3em'" + #getValue(gr05.hputts[hole]) + ">"
+        table!.addCell(cell$, bc$ + "&")
+      next hole
+      value$ = iff(gr05.putts, str(gr05.putts), "")
+      cell$ = "<div style='text-align:center;width:4em'" + #getCell(gr04.id$ + "P", 0) + ">" + value$ + "<div>"
+      table!.addCell(cell$, bc$ + "&")
+      table!.addRow()
+      tabindex = tabindex + 18
+    next i
+    table!.addTable()
+    table!.addBody("<center><input type='submit' value='Submit'> <button type='button' onclick='window.location=""" + #getDsn() + """'>Cancel</button>" + "</center>")
+    table!.addBody("<input type='hidden' name='formid' value='" + str(gr10.date) + players$ + "'>")
+    table!.addBody("</form>")
+    
+    s$ = $0a$ + "<script>"
+    s$ = s$ + $0a$ + "function compute(id) {"
+    s$ = s$ + $0a$ + "var total = 0;"
+    s$ = s$ + $0a$ + "var i;"
+    s$ = s$ + $0a$ + "for (i = 1; i <= 9; i++) {"
+    s$ = s$ + $0a$ + "  var val = Number(document.getElementById(id + '_' + i).value)"
+    s$ = s$ + $0a$ + "  total += val"
+    s$ = s$ + $0a$ + "  }"
+    s$ = s$ + $0a$ + "document.getElementById(id + '_total').innerHTML = total;"
+    s$ = s$ + $0a$ + "}"
+    s$ = s$ + $0a$ + "</script>"
+
+    methodret table!.getBody() + s$
+  methodend
+  
+  method public BBjString getGr04(BBjString gr09$)
+    if len(gr09$) = 8 then call "SW001", "XXGR09", 0, gr09$ + "", gr09$, sw001$
+    if sw001.onfile then
+      call "CDS095", gr04, "LKGR04", "YUY", gr04$ 
+      read (gr04, knum=2, key=gr09.email$ + "SAW", dom=*next)
+      readrecord (gr04, end=*next)gr04$
+      if gr04.email$ = gr09.email$ and gr04.league$ = "SAW" then methodret gr04$
+    fi
+    methodret ""
+  methodend
+
+  method public void getPlayer(BBjString gr05$)
+    call "SW001", "XXGR04", 0, gr05.league$ + gr05.id$, gr04$, sw001$ 
+    #gr04tpl$ = fattr(gr04$)
+    #gr04$    = gr04$
+  methodend
+
+  method public BBjString postScorecard(BBjString cgi$)
+    formid$ = field(cgi$, "formid", err=*next)
+    if len(formid$) < 11 then
+      code$ = ath(field(cgi$, "code", err=*next))
+      DT.writeLog("scorePosting.bbj @ 220 code$ = '" + code$ + "' formid$ = '" + formid$ + "'")
+      methodret #getRecentMatches()
+    fi
+     
+    call "CDS095", gr05, "LKGR05", "YUY", gr05$, gr05k$
+    playdate = num(formid$(1,7))
+    for i = 8 to len(formid$) step 4
+      gr05.league$ = "SAW"
+      gr05.date    = playdate
+      if #gr08$ = "" then #getCourse(gr05$)
+      gr05.id$ = formid$(i,4)
+      extract record (gr05, key=kgen(gr05$, gr05k$, 0))gr05$
+      gr05.score = 0
+      putts = 0
+      anyzero = 0
+      for hole = 1 to 9
+        gr05.hscore[hole] = num(field(cgi$, gr05.id$ + "_" + str(hole)))
+        if gr05.hscore[hole] = 0 then anyzero = 1
+        gr05.score = gr05.score + gr05.hscore[hole]
+        gr05.hputts[hole] = num(field(cgi$, gr05.id$ + "P_" + str(hole)))
+        putts = putts + gr05.hputts[hole]
+      next hole
+      if anyzero then
+        read (gr05)
+      else
+        gr05.net   = gr05.score - gr05.hc
+        if putts then gr05.putts = putts; rem  Older scores do not have putts hole by hole
+        gr05$ = #computePoints(gr05$, gr05)
+        write record (gr05)gr05$
+      fi
+    next i
+    methodret #getRecentMatches()
+  methodend
+  
+  method public static BBjString getPlayerName(BBjString gr04$)
+    methodret cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2)
+  methodend
+
+  method public BBjString getUrl(BBjString option$)
+    methodret #getDsn() + "&p=scorePosting.bbj&mode=" + option$
+  methodend
+
+  method public BBjString getDsn()
+    methodret "http://www.scoresandcharts.com/LK/cgi-bin/ttm.cgi?code=" + #code$
+  methodend
+  
+  method public void getCourse(BBjString gr05$)
+    rem  Get League
+    call "SW001", "LKGR01", 0, gr05.league$, gr01$, sw001$
+    rem  Get Course
+    call "SW001", "LKGR08", 0, gr01.id$,     gr08$, sw001$
+    #gr08tpl$ = fattr(gr08$)
+    #gr08$    = gr08$
+    rem  Get Nine played that day
+    call "SW001", "LKGR03", 0, gr05.league$ + gr05.date$, gr03$, sw001$
+    #nine$    = gr03.nine$
+    #start_hole = iff(gr03.nine$ = "F", 1, 10)
+    
+    for hole = 1 to 9
+      hc$ = hc$ + chr(gr08.mhc[hole + #start_hole - 1]) + chr(hole)
+    next hole
+    hc$ = ssort(hc$, 2) 
+    #holesByHc! = new BBjVector()
+    for i = 1 to len(hc$) step 2
+      #holesByHc!.add(asc(hc$(i + 1, 1)))
+    next i
+  methodend
+  
+  method public BBjString computePoints(BBjString gr05$, BBjNumber gr05a)
+    #pointsByHoleA! = new BBjVector()
+    #pointsByHoleB! = new BBjVector()
+    dim gr08$:#gr08tpl$
+    gr08$ = #gr08$
+    
+    rem  Get Opponent
+    dim gr05a$:fattr(gr05$)
+    if gr05a then
+      gr05 = gr05a
+    else
+      call "CDS095", gr05, "LKGR05", "NNX"
+    fi 
+    read record(gr05, knum=0, key=gr05.league$ + gr05.opp$ + gr05.date$)gr05a$
+    #gr05a$ = gr05a$
+    
+    opp_score = (gr05a.score > 0)
+    
+    if opp_score then
+      hcvar = gr05.hc - gr05a.hc
+      if abs(hcvar) > 9 then
+        if hcvar > 0 then
+          gr05.hc = gr05a.hc + 9
+        else
+          gr05a.hc = gr05.hc + 9
+        fi
+      fi
+    fi
+    declare BBjVector hcbh1!
+    declare BBjVector hcbh2!
+    hcbh1! = #getHcByHole(gr05$)
+    if opp_score then hcbh2! = #getHcByHole(gr05a$)
+    declare BBjVector net1!
+    declare BBjVector net2!
+    net1! = new BBjVector()
+    net2! = new BBjVector()
+    for i = 0 to 8
+      net1!.add(gr05.hscore[i + 1]  - num(hcbh1!.get(i)))
+      if opp_score then 
+        net2!.add(gr05a.hscore[i + 1] - num(hcbh2!.get(i)))
+      else
+        par = gr08.par[#start_hole + i]
+        par_tot = par_tot + par
+        net2!.add(par)
+      fi
+      diff = num(net1!.get(i)) - num(net2!.get(i))
+      switch 1
+        case diff = 0
+          #pointsByHoleA!.add(.5)
+          #pointsByHoleB!.add(.5)
+          pts1 = pts1 + .5
+          pts2 = pts2 + .5
+          break
+        case diff > 0
+          #pointsByHoleA!.add(0)
+          #pointsByHoleB!.add(1)
+          pts2 = pts2 + 1
+          break
+        case diff < 0
+          #pointsByHoleA!.add(1)
+          #pointsByHoleB!.add(0)
+          pts1 = pts1 + 1
+          break
+      swend
+    next i
+    if !(opp_score) then gr05a.net = par_tot
+    switch 1
+      case gr05.net = gr05a.net
+        #pointsByHoleA!.add(1)
+        #pointsByHoleB!.add(1)
+        pts1 = pts1 + 1
+        pts2 = pts2 + 1
+        break
+      case gr05.net < gr05a.net
+        #pointsByHoleA!.add(2)
+        #pointsByHoleB!.add(0)
+        pts1 = pts1 + 2
+        break
+      case gr05.net > gr05a.net
+        #pointsByHoleA!.add(0)
+        #pointsByHoleB!.add(2)
+        pts2 = pts2 + 2
+        break
+    swend
+    if !(opp_score) then pts1 = max(pts1, 6)
+    gr05.points  = pts1
+    if opp_score then
+      gr05a.points = pts2
+      if gr05a write record(gr05a)gr05a$
+    fi
+    methodret gr05$
+  methodend
+  
+  method public BBjVector getHcByHole(BBjString gr05$)
+    declare BBjVector hcbh!
+    hc = gr05.hc
+    hcbh$ = fill(9, "0")
+    holes = 9
+    for i = 0 to 8
+      if hc <=0 then break
+      hole = num(#holesByHc!.get(i))
+      hch = hc / holes
+      if fpt(hch) then hch = int(hch) + 1
+      hc = hc - hch
+      holes = holes - 1
+      hcbh$(hole, 1) = str(hch)
+    next i
+    hcbh! = new BBjVector()
+    for i = 1 to len(hcbh$)      
+      hcbh!.add(num(hcbh$(i,1)))
+    next i
+    methodret hcbh!
+  methodend
+  
+  method public BBjString showMatch(BBjString hexkey$)
+    declare DTHtmlTable table!
+    key$   = ath(hexkey$)
+    call "SW001", "XXGR05", 0, key$(1,10), gr05$
+    #getCourse(gr05$)
+    #computePoints(gr05$, gr05)
+    dim gr08$:#gr08tpl$
+    gr08$ = #gr08$
+    
+    table! = new DTHtmlTable()
+    table!.setStripe(BBjAPI.FALSE)
+    
+    table!.addCell("Match Results", "cs12")
+    table!.addRow(" class='top'")
+    
+    table!.addCell(date(gr05.date:"%Ds %Mz/%Dz/%Yz") + " at " + cvs(gr08.name$, 2), "cs12")
+    table!.addRow(" class='title'")
+
+    table!.addCell("Hole")
+    for hole = 1 to 9
+      table!.addCell(str(hole + #start_hole - 1), "c")
+    next hole
+    table!.addCell("Match", "c")
+    table!.addCell("Total", "c")
+    table!.addRow(" class='head'")
+    
+    table!.addCell("Par")
+    for hole = 1 to 9
+      par = gr08.par[hole + #start_hole - 1]
+      total_par = total_par + par
+      table!.addCell(str(par), "c")
+    next hole
+    table!.addCell("")
+    table!.addCell(str(total_par), "c")
+    table!.addRow()
+    
+    table!.addCell("Course HC")
+    for hole = 1 to 9
+      table!.addCell(str(gr08.mhc[hole + #start_hole - 1]), "c")
+    next hole
+    table!.addCell("")
+    table!.addCell("")
+    table!.addRow()
+    
+    rem  Player
+    #addPlayer(table!, gr05$, #pointsByHoleA!)
+    
+    rem  Opponent
+    gr05$ = #gr05a$
+    #addPlayer(table!, gr05$, #pointsByHoleB!)
+    
+    table!.addTable()
+    table!.addBody("<center><button type='button' onclick='window.location=""" + #getDsn() + """'>Home</button>" + "</center>")
+    methodret table!.getBody()
+    
+  methodend  
+    
+  method private void addPlayer(DTHtmlTable table!, BBjString gr05$, BBjVector points!)
+    #getPlayer(gr05$)
+    dim gr04$:#gr04tpl$
+    gr04$ = #gr04$
+  
+    table!.addCell(#getPlayerName(gr04$))
+    if gr05.score = 0 then
+      table!.addCell("Score not posted", "cs11")
+      table!.addRow(" class='head'")
+      methodret
+    fi
+    
+    for hole = 1 to 9
+      table!.addCell(str(gr05.hscore[hole]), "c")
+    next hole
+    table!.addCell("")
+    table!.addCell(str(gr05.score), "c")
+    table!.addRow(" class='head'")
+    
+    declare BBjVector hcbh!
+    hcbh! = #getHcByHole(gr05$)
+    table!.addCell("Handicap")
+    tothc = 0 
+    for hole = 1 to 9
+      hc = num(hcbh!.get(hole - 1))
+      tothc = tothc + hc
+      table!.addCell(str(hc), "c")
+    next hole
+    table!.addCell("")
+    table!.addCell(str(tothc), "c")
+    table!.addRow()
+    
+    table!.addCell("Net")
+    totnet = 0
+    for hole = 1 to 9
+      net = gr05.hscore[hole] - num(hcbh!.get(hole - 1))
+      totnet = totnet + net
+      table!.addCell(str(net), "c")
+    next hole
+    table!.addCell("")
+    table!.addCell(str(totnet), "c")
+    table!.addRow()
+
+    table!.addCell("Points")
+    totpoints = 0
+    for hole = 1 to 9
+      points = num(points!.get(hole - 1))
+      totpoints = totpoints + points
+      table!.addCell(#getPoints(points), "c&")
+    next hole
+    table!.addCell(str(gr05.points - totpoints), "c")
+    table!.addCell(str(gr05.points), "c")
+    table!.addRow()
+  methodend
+  
+  method public BBjString getPoints(BBjNumber points)
+    if fpt(points) = 0 then methodret str(points)
+    points = int(points)
+    methodret iff(points, str(points) + #oneHalf$, #oneHalf$) 
+  methodend
+  
+  method private BBjString getValue(BBjNumber value)
+    if value then
+      methodret " value='" + str(value) + "'"
+    else
+      methodret ""
+    fi 
+  methodend
+  
+  method private BBjString getCell(BBjString pre$, BBjNumber hole)
+    val$ = "'" + pre$ + "_" + iff(hole, str(hole), "total") + "'"
+    out$ = " type='number' id=" + val$
+    if hole out$ = out$ + " name=" + val$ + " onChange='compute(""" + pre$ + """)'"
+    methodret out$ 
+  methodend
+  
+classend
+
+rem  Program is run from GW010
+declare scorePosting score!
+
+switch cgi.mode$
+  case "getRecentMatches"
+    score! = new scorePosting(cgi.code$)
+    html$  = score!.getRecentMatches()
+    break
+  case "getScorecardForm"
+    score! = new scorePosting(cgi.code$)
+    hexkey$ = cgi.hexkey$
+    html$ = score!.getScorecardForm(hexkey$)
+    break
+  case "postScorecard"
+    score! = new scorePosting(cgi.code$)
+    html$ = score!.postScorecard(cgi$)
+    break
+  case "showMatch"
+    score! = new scorePosting(cgi.code$)
+    hexkey$ = cgi.hexkey$
+    html$ = score!.showMatch(hexkey$)
+    break
+swend
+run "CDW999"

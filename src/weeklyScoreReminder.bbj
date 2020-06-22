@@ -1,0 +1,161 @@
+REM /**
+REM  * weeklyScoreReminder.bbj
+REM  * @author len
+REM  *
+REM  */
+
+use ::DTFileRecords.bbj::DTFileRecords
+use ::ttm.bbj::ttm
+
+class public weeklyScoreReminder
+  field private BBjString  gr01$
+  field private BBjString  gr01tpl$
+  field private BBjString  gr03$
+  field private BBjString  gr03tpl$
+  field private BBjString  msg! = ""
+  field private BBjString  aid$ = "lk01"
+  
+  method public weeklyScoreReminder(BBjString league$)
+    call "SW001", "XXGR01", 0, league$, gr01$, sw001$
+    if ! sw001.onfile then
+      #msg! = "League ' " + league$ + "' not on file"
+      methodret
+    fi
+    #gr01tpl$ = fattr(gr01$)
+    #gr01$    = gr01$
+    
+    call "CDS095", gr03, "XXGR03", "NNY", gr03$
+    #gr03tpl$ = fattr(gr03$)
+    gr03s = unt
+    select (gr03s)gr03$ from "LKGR03" where gr03.league$ = league$ and gr03.date > jul(0,0,0) - 7 and gr03.date < jul(0,0,0)
+    readrecord (gr03s, end=*next)gr03$
+    if gr03.date = 0 then
+      #msg! = "Play date within one week of today not found"
+      methodret
+    fi
+    #gr03$ = gr03$
+  methodend
+    
+  method public BBjString getErrMsg()
+    methodret #msg!
+  methodend
+  
+  method public BBjNumber getPlayDate()
+    dim gr03$:#gr03tpl$
+    gr03$ = #gr03$
+    methodret gr03.date
+  methodend
+  
+  method public BBjString getLeague()
+    dim gr01$:#gr01tpl$
+    gr01$ = #gr01$
+    methodret gr01.league$
+  methodend
+
+  method public BBjVector sendReminderEmails()
+    declare BBjVector noScore!
+    noScore! = new BBjVector()
+    call "CDS095", gr05, "LKGR05", "NNY", gr05$
+    league$  = #getLeague()
+    playdate = #getPlayDate()
+    gr05s = unt
+    select (gr05s)gr05$ from "LKGR05" where gr05.league$ = league$ and gr05.date = playdate and gr05.score = 0
+    repeat
+      readrecord (gr05s, end=*break)gr05$
+      call "SW001", "LKGR04", 0, #getLeague() + gr05.id$, gr04$, sw001$
+      if ! sw001.onfile then continue
+      aidid$ = #getGr09(gr04.email$)
+      if pos(" " <> aidid$) = 0 continue
+      aid$ = aidid$(1,4)
+      id$  = aidid$(5,4)
+      if #scheduled(aid$, id$) then
+        #sendReminderEmail(gr04$, gr05$, aid$, id$)
+        noScore!.add(#getPlayerName(gr04$))
+      fi
+    until 0
+    methodret noScore!
+  methodend
+  
+  method public void sendReminderEmail(BBjString gr04$, BBjString gr05$, BBjString aid$, BBjString id$)
+    link$ = ttm.getLink(aid$, id$)
+    call "CDS041", "CDS084", s084$, "YP"
+    s084.name$      = "MAIL"
+    s084.mode$      = "N"
+    s084.subject$   = "Golf Score Entry Reminder"
+    s084.toname$    = #getPlayerName(gr04$)
+    s084.toemail$   = "len@excellware.com"
+    s084.emailtype$ = "H"
+    call "CDS084", y$, s084.subject$, u0, s084$, y6, y6$
+    print (y6.ch)cvs(gr04.firstname$, 2) + "-"
+    print (y6.ch)"If you played golf on " + date(gr05.date:"%Dl %Ml %D") + ",<br>please click <a href='" + link$ + "'>here</a> to enter your score."
+    print (y6.ch)"<br><br>Thanks"
+    call "CDS094", y6$, "E"
+  methodend
+  
+  method public BBjString getGr09(BBjString email$)
+    call "CDS095", gr09, "LKGR09", "NNY", gr09$
+    gr09s = unt
+    select (gr09s)gr09$ from "LKGR09" where gr09.email$ = pad(cvs(email$, 8), 50)
+    readrecord (gr09s, end=*next)gr09$
+    close (gr09s)
+    close (gr09)
+    methodret gr09.aid$ + gr09.id$
+  methodend
+  
+  method public Boolean scheduled(BBjString aid$, BBjString id$)
+    playdate = #getPlayDate()
+    call "CDS095", gr10, "LKGR10", "NNY", gr10$
+    gr10s = unt
+    select (gr10s)gr10$ from "LKGR10" where gr10.aid$ = aid$ and gr10.date = playdate and pos(id$ = gr10.id$[1] + gr10.id$[2] + gr10.id$[3] + gr10.id$[4], 4)
+    readrecord (gr10s, end=*next)gr10$
+    close (gr10s)
+    close (gr10)
+    methodret cast(Boolean, gr10.date > 0)
+  methodend
+  
+  method public static BBjString getPlayerName(BBjString gr04$)
+    methodret cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2)
+  methodend
+
+classend
+
+rem  Run from cron
+
+if len(y$) = 0 call "CDS091", y$
+
+league$ = "SAW"
+
+declare weeklyScoreReminder wsr!
+wsr! = new weeklyScoreReminder(league$)
+if ! wsr!.getErrMsg().isEmpty() then
+  print wsr!.getErrMsg()
+  run "CDS001"
+fi
+
+playdate = wsr!.getPlayDate()
+
+rem  Email players with tee time but no score
+declare BBjVector noScore!
+noScore! = wsr!.sendReminderEmails()
+
+if fid(0) = "IO" then
+  call "CDS041", "CDS084", s084$, "YP"
+  s084.name$      = "MAIL"
+  s084.mode$      = "N"
+  s084.subject$   = "Weekly Golf Score Entry Reminders"
+  s084.toname$    = "Len Krause"
+  s084.toemail$   = "len@excellware.com"
+  call "CDS084", y$, s084.subject$, u0, s084$, y6, y6$
+  print (y6.ch)"Sent " + str(noScore!.size()) + " emails reminding players to enter their scores for play date " + date(playdate:"%Dl %Ml %D")
+  if noScore!.size() then
+    for i = 0 to noScore!.size() - 1
+      print (y6.ch)noScore!.get(i).toString()
+    next i
+  fi
+  call "CDS094", y6$, "E"
+else
+  print 'cs', date(playdate), 'lf', noScore!.toString()
+  call "CDS069"
+fi
+
+run "CDS001"

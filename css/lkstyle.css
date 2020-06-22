@@ -1,0 +1,146 @@
+html,table tr td {
+        font-size:100%;
+        }
+
+media screen and (min-width: 60em) {
+    html,table tr td {font-size:100%}
+    table {width:100%}
+    }
+
+body	{
+	font-family: Verdana,Tahoma,Arial;
+	background-color:#c0c0c0;
+	margin:0
+	padding:0
+	}
+
+.msg {
+	color:#A62A2A;
+	padding:15px;
+	background-color:#ffcccc;
+	border-radius:15px;
+	text-align:center;
+	}
+
+.note {
+	color:#a90000;
+	}
+
+.players, .players tr td {
+	padding: 1px;
+	border: 0;
+	}
+
+.playercheck {
+	width:25px;
+ 	padding-left:25px;
+	}
+
+.checkbox {
+	margin-right:5px;
+	}
+
+.course {
+	color:#00ffff;
+	}
+
+table, td {
+	font-family: Verdana,Tahoma,Arial;
+	border: 1px solid #8FBC8F;
+	border-collapse:collapse;
+	background-color:#659D32;
+	color:#fff;
+	padding:5px;
+	}
+
+table	{
+	border:2px solid #008000;
+	}
+
+tr.rowodd td {
+  background-color: #548c21;
+}
+
+tr.top td {
+	text-align:center;
+	font-size:110%;
+	color:#ccff00;
+	border:0;
+	}
+
+tr.title td {
+	text-align:center;
+	font-size:110%;
+	color:#22ff22;
+	border:0;
+	}
+
+tr.head td {
+	font-size:110%;
+	color:#ffcc33;
+	}
+
+.head {
+        color:#ffcc33;
+	}
+
+tr.foot td	{
+	color:#ffffff;
+	}
+
+table.plain td, table.menu td {
+	border: 0;
+	padding-left: 15px;
+	padding-right: 15px;
+	}
+
+a {
+        text-decoration:none;
+        background-color: #346904;
+        color:#fff;
+        border-radius:4px;
+        padding:1px 5px 1px 5px;
+        white-space:nowrap;
+        display:block;
+        }
+
+a.dw_link, table.menu tr td a {
+        display:block;
+        }
+
+a:hover {
+        color:#ccff00;
+        }
+
+table.menu td a {
+        padding:8px;
+        }
+
+table.menu td a:hover, a.dw_link:hover {
+        color:#ccff00;
+        }
+
+table.menu td {
+        border-radius:3px;
+        }
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+	}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #3870a1;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    top:15px;
+    z-index: 1;
+	}
+

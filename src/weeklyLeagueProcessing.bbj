@@ -1,0 +1,133 @@
+REM /**
+REM  * weeklyLeagueProcessing.bbj
+REM  * @author len
+REM  *
+REM  */
+
+use ::DTFileRecords.bbj::DTFileRecords
+
+class public weeklyLeagueProcessing
+  field private BBjString  gr01$
+  field private BBjString  gr01tpl$
+  field private BBjString  gr03$
+  field private BBjString  gr03tpl$
+  field private BBjString  msg! = ""
+  field private BBjString  aid$ = "lk01"
+  
+  method public weeklyLeagueProcessing(BBjString league$)
+    call "SW001", "XXGR01", 0, league$, gr01$, sw001$
+    if ! sw001.onfile then
+      #msg! = "League ' " + league$ + "' not on file"
+      methodret
+    fi
+    #gr01tpl$ = fattr(gr01$)
+    #gr01$    = gr01$
+    
+    call "CDS095", gr03, "XXGR03", "NNY", gr03$
+    #gr03tpl$ = fattr(gr03$)
+    gr03s = unt
+    select (gr03s)gr03$ from "LKGR03" where gr03.league$ = league$ and gr03.date > jul(0,0,0) and gr03.date < jul(0,0,0) + 7
+    readrecord (gr03s, end=*next)gr03$
+    if gr03.date = 0 then
+      #msg! = "Play date within one week of today not found"
+      methodret
+    fi
+    #gr03$ = gr03$
+    
+    call "SW004", "XXGR10", 1, #aid$ + gr03.date$, recs
+    if recs = 0 #addTeeTimes(gr01$, gr03$) 
+  methodend
+    
+  method public BBjString getErrMsg()
+    methodret #msg!
+  methodend
+  
+  method public BBjNumber getPlayDate()
+    dim gr03$:#gr03tpl$
+    gr03$ = #gr03$
+    methodret gr03.date
+  methodend
+
+  method private void addTeeTimes(BBjString gr01$, BBjString gr03$)
+    declare DTFileRecords      gr10File!
+    declare BBjTemplatedString gr10!
+    gr10File! = new DTFileRecords("LK", "GR10", "NNY")
+    gr10! = gr10File!.getRec()
+    
+    gr10!.setFieldValue("aid", #aid$)
+    gr10!.setFieldValue("gr08id", gr01.id$); rem  Course
+    gr10!.setFieldValue("date", gr03.date)
+    
+    gr10!.setFieldValue("time", #fixTime(12, 45))
+    gr10!.setFieldValue("id", 1, "js01")
+    gr10!.setFieldValue("id", 2, "mf01")
+    gr10!.setFieldValue("id", 3, "dr01")
+    gr10File!.addUniqueRecord(gr10!)
+    
+    for i = 1 to 3
+      gr10!.setFieldValue("id", i, "")
+    next i
+    
+    gr10!.setFieldValue("time", #fixTime(01, 00)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(01, 15)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(01, 30)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 00)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 10)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 20)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 30)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 40)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 50)); gr10File!.addUniqueRecord(gr10!)
+  methodend
+  
+  method public BBjNumber fixTime(BBjNumber hour, BBjNumber minute)
+    precision 6
+    time$ = str(hour:"00") + str(minute:"00")
+    time = hour + minute / 60
+    timeout$ = date(0, time:"%hz%mz")
+    while timeout$ <> time$
+      time = time + .000001
+      timeout$ = date(0, time:"%hz%mz")
+    wend
+    precision 2
+    if int(time) < 7 then time = time + 12
+    methodret time
+  methodend
+classend
+
+rem  Run from cron
+
+if len(y$) = 0 call "CDS091", y$
+
+league$ = "SAW"
+
+declare weeklyLeagueProcessing wlp!
+wlp! = new weeklyLeagueProcessing(league$)
+if ! wlp!.getErrMsg().isEmpty() then
+  print wlp!.getErrMsg()
+  run "CDS001"
+fi
+
+playdate = wlp!.getPlayDate()
+
+rem  Build Handicap Listing pdf file for playdate
+call "GW045", y$, league$, playdate, pdffile$
+
+rem  Email each player
+call "GW062.bbj", y$, league$, playdate, pdffile$, msg$
+
+if fid(0) = "IO" then
+  call "CDS041", "CDS084", s084$, "YP"
+  s084.name$      = "MAIL"
+  s084.mode$      = "N"
+  s084.subject$   = "Weekly Golf Processing"
+  s084.toname$    = "Len Krause"
+  s084.toemail$   = "len@excellware.com"
+  call "CDS084", y$, "Weekly Golf Processing", u0, s084$, y6, y6$
+  print (y6.ch)msg$
+  call "CDS094", y6$, "E"
+else
+  print 'cs', date(playdate), 'lf', msg$
+  call "CDS069" 
+fi
+
+run "CDS001"

@@ -1,0 +1,80 @@
+REM /**
+REM  * ttm.bbj
+REM  * @author len
+REM  *
+REM  */
+
+use ::DTFileRecords.bbj::DTFileRecords
+
+class public ttm
+    rem  Instance methods
+    
+    
+    
+    
+    
+    rem  Static methods
+    method public static BBjString getLink(BBjTemplatedString gr09!)
+      methodret #getLink(gr09!.getFieldAsString("aid"), gr09!.getFieldAsString("id"))
+    methodend
+
+    method public static BBjString getLink(BBjString email$)
+      declare DTFileRecords gr09File!
+      declare BBjVector     gr09Recs!
+      gr09File! = new DTFileRecords("LK", "GR09", "YNY")
+      gr09File!.setKeyPre(1, pad(cvs(email$, 8), 50))
+      gr09Recs! = gr09File!.getAllRecords()
+      gr09File!.close()
+      if gr09Recs!.size() = 0 then methodret ""
+      dim gr09$:gr09File!.getTemplate()
+      gr09$ = cast(BBjString, gr09Recs!.get(0))
+      methodret #getLink(gr09.aid$, gr09.id$)
+    methodend
+
+    method public static BBjString getLink(BBjString aid$, BBjString id$)
+      methodret "http://www.scoresandcharts.com/LK/cgi-bin/ttm.cgi?code=" + hta(aid$ + id$ + hsh(aid$ + id$))
+    methodend
+
+    method public static void sendEmailLink(BBjString gr09a$)
+      call "CDS041", "LKGR09", gr09$, "YNY"
+      #sendEmailLink(DT.toTemplatedString(gr09a$, fattr(gr09$)))
+    methodend
+    
+    method public static void sendEmailLink(BBjTemplatedString gr09!)
+      call "CDS041", "CDS084", s084$, "YP"
+      s084.mode$ = "N"
+      s084.name$ = "MAIL"
+      s084.subject$ = "Access Link"
+      tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
+      s084.fromname$ = "Tee Time Manager"
+      s084.fromemail$ = "webmaster@scoresandcharts.com"
+      s084.emailtype$ = "H"
+      s084.toname$  = cvs(gr09!.getFieldAsString("firstname"), 2) + " " + cvs(gr09!.getFieldAsString("lastname"), 2)
+      s084.toemail$ = cvs(gr09!.getFieldAsString("email"), 2)
+      s084.emailbcc$ = s084.fromemail$
+      call "CDS084", y$, y5$, u0, s084$, y6, y6$
+      print (y6.ch)"<style>body{color:green;}</style>"
+      print (y6.ch)"<body>"
+      if gr09!.getFieldAsString("id") = "lk01" then
+        declare DTFileRecords gr09File!
+        gr09File! = new DTFileRecords("LK", "GR09", "YNY")
+        gr09File!.setKeyPre("lk01")
+        declare BBjVector gr09Recs!
+        gr09Recs! = gr09File!.getAllRecords()
+        for j = 0 to gr09Recs!.size() - 1
+          gr09! = gr09File!.getRec()
+          gr09!.setString(cast(BBjString, gr09Recs!.get(j)))
+          print (y6.ch)gr09!.getFieldAsString("firstname"), " ", gr09!.getFieldAsString("lastname")," <a href=""" + #getLink(gr09!) + """>link</a><br>"
+        next j
+      else
+        print (y6.ch)cvs(gr09!.getFieldAsString("firstname"), 2) + "-<br><br>"
+        print (y6.ch)"Click <a href=""" + #getLink(gr09!) + """>here</a> or on the link below to login<br>"
+        print (y6.ch)#getLink(gr09!)
+      fi
+      call "CDS094", y6$, "E"
+    methodend
+classend
+
+test:
+print ttm.getLink("ls01","ls01")
+
