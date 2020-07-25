@@ -34,7 +34,7 @@ class public scorePosting
   method public BBjString getRecentMatches()
     call "CDS041", "XXGR04", gr04$, "YY"
     gr04$ = #getGr04(#aid$ + #id$)
-    if pos(" " <> gr04.id$) then methodret #getRecentRounds(gr04$)
+    if len(gr04$) and pos(" " <> gr04.id$) then methodret #getRecentRounds(gr04$)
     methodret ""
   methodend
   

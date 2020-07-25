@@ -59,9 +59,10 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("date", gr03.date)
     
     gr10!.setFieldValue("time", #fixTime(12, 45))
-    gr10!.setFieldValue("id", 1, "js01")
-    gr10!.setFieldValue("id", 2, "mf01")
-    gr10!.setFieldValue("id", 3, "dr01")
+    gr10!.setFieldValue("id", 1, "js01"); rem  Jim Sterley
+    gr10!.setFieldValue("id", 2, "mf01"); rem  Mike Fee
+    gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regain
+    gr10!.setFieldValue("id", 3, "ks02"); rem  Keith Sterley
     gr10File!.addUniqueRecord(gr10!)
     
     for i = 1 to 3

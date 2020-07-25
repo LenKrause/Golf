@@ -1,4 +1,4 @@
-REM "GW111 - 03/14/18 Tee Time Manager Menu
+REM "GW111 - 07/08/20 Tee Time Manager Menu
 
 use ::scorePosting.bbj::scorePosting
 
@@ -68,11 +68,11 @@ repeat
       if seq < 1 or seq > 4 or fpt(seq) continue
       extract record (gr10, knum=0, key=gr10.ttid$, err=*continue)gr10$
       if pos(" " <> gr10.id$[seq]) then
-        msg$ = msg$ + "The tee time on " + date(gr10.date, gr10.time:"%Ds %Ms %D at %h:%mz %p") + "<br>has already been claimed<br>"
+        msg$ = msg$ + "The tee time on " + fndatetime$(gr10$) + "<br>has already been claimed<br>"
       else
         gr10.id$[seq] = gr09.id$
         write record (gr10)gr10$
-        msg$ = msg$ + "You are now scheduled to play<br>on " + date(gr10.date, gr10.time:"%Ds %Ms %D at %h:%mz %p") + "<br>"
+        msg$ = msg$ + "You are now scheduled to play<br>on " + fndatetime$(gr10$) + "<br>"
       fi
     next claim
   fi
@@ -94,7 +94,7 @@ repeat
       if seq < 1 or seq > 4 or fpt(seq) continue
       extract record (gr10, knum=0, key=gr10.ttid$, err=*continue)gr10$
       if pos(" " <> gr10.id$[seq]) = 0 then
-        msg$ = msg$ + "Your tee time on " + date(gr10.date, gr10.time:"%Ds %Ms %D at %h:%mz %p") + "<br>has already been cancelled<br>"
+        msg$ = msg$ + "Your tee time on " + fndatetime$(gr10$) + "<br>has already been cancelled<br>"
       else
         for i = seq to 4
           if i = 4 then
@@ -104,7 +104,7 @@ repeat
           fi
         next i
         write record (gr10)gr10$
-        msg$ = msg$ + "Your tee time on " + date(gr10.date, gr10.time:"%Ds %Ms %D at %h:%mz %p") + "<br>has been cancelled<br>"
+        msg$ = msg$ + "Your tee time on " + fndatetime$(gr10$) + "<br>has been cancelled<br>"
       fi
     next cancel
   fi
@@ -148,22 +148,24 @@ repeat
       cancel$ = field(cgi$, "cancel" + ttid$, err=*next)
       if cancel$ = "y" then
         remove (gr10, key=gr10.ttid$, dom=*continue)
-        msg$ = msg$ + "<br>Tee Time on " + date(gr10.date, gr10.time:"%Ds %Ms %D at %h:%mz %p") + "<br>has been cancelled"
+        msg$ = msg$ + "<br>Tee Time on " + fndatetime$(gr10$) + "<br>has been cancelled"
       else
         gr10.date = num(field(cgi$, "date" + ttid$))
         hour      = num(field(cgi$, "hour" + ttid$))
         minute    = num(field(cgi$, "minute" + ttid$))
-        precision 6
-        time$ = str(hour:"00") + str(minute:"00")
-        time = hour + minute / 60
-        timeout$ = date(0, time:"%hz%mz")
-        while timeout$ <> time$
-          time = time + .000001
+        if hour or minute then
+          precision 6
+          time$ = str(hour:"00") + str(minute:"00")
+          time = hour + minute / 60
           timeout$ = date(0, time:"%hz%mz")
-        wend
-        precision 2
-        if int(time) < 7 then time = time + 12
-        gr10.time = time
+          while timeout$ <> time$
+            time = time + .000001
+            timeout$ = date(0, time:"%hz%mz")
+          wend
+          precision 2
+          if time and int(time) < 7 then time = time + 12
+          gr10.time = time
+        fi
   
         gr10.gr08id$ = field(cgi$, "course" + ttid$, err=*continue)
         if ttid then
@@ -453,12 +455,13 @@ repeat
   readrecord (gr08, knum=0, key=gr10.gr08id$, dom=*next)gr08$
   if pos(" " <> gr08.name$) = 0 gr08.name$ = "Course code " + gr10.gr08id$ + " not on file"
   
-  call "CDW000", row$, "dc class='course'", date(gr10.DATE, gr10.TIME:"%Ds %Ms %D %h:%mz %p") + "<br>" + gr08.name$
+  call "CDW000", row$, "dc class='course'", fndatetime$(gr10$) + "<br>" + gr08.name$
   call "CDW000", tab$, "r", row$
 
   col1$ = ""
   col2$ = ""
   time_box = 0
+  foursome$ = ""
   for i = 1 to 4
     redim gr09a$
     if pos(" " <> gr10.id$[i]) then
@@ -468,7 +471,9 @@ repeat
     switch 1
       case gr10.id$[i] = gr09.id$
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='window.location=""" + dsn$ + "&cancel=" + str(gr10.ttid) + "-" + str(i) + """'>"
-        col2$ = "<span class='head'>" + fnn$(gr09$) + "</span>"
+        col2$ = "<span class='head'>" + fnn$(gr09$)
+        if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
+        col2$ = col2$ + "</span>"
         break
       case playing =0 and time_box = 0 and gr10.id$[i] = "    " 
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
@@ -478,6 +483,7 @@ repeat
       case gr10.id$[i] <> "    "
         col1$ = ""
         col2$ = fnn$(gr09a$)
+        if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         break
       case default
         col1$ = ""
@@ -487,6 +493,7 @@ repeat
     call "CDW000", player_row$, "dr class='playercheck'", col1$
     call "CDW000", player_row$, "d", col2$
     call "CDW000", player_tab$, "r", player_row$
+    if pos(" " <> gr10.id$[i]) then foursome$ = foursome$ + gr10.id$[i]
   next i
   call "CDW000", player_html$, "t class='players'", player_tab$
   call "CDW000", row$, "d", player_html$
@@ -587,11 +594,12 @@ repeat
   ldate = gr10.date
   call "CDW000", row$, "dr", fnttid$(gr10$) + fndate$(gr10$, "")
 
-  hour = num(date(0, gr10.time:"%h"))
+  hour = iff(gr10.time, num(date(0, gr10.time:"%h")), 0)
   hour$ = ""
   for hr = 6 to 12
     hour$ = fnopt$(hour$, hr, hour)
   next hr
+  if gr10.aid$ = "lk01" hour$ = fnopt$(hour$, 0, hour)
   for hr = 1 to 5
     hour$ = fnopt$(hour$, hr, hour)
   next hr
@@ -627,7 +635,7 @@ redim gr10$
 
 if ldate then
   gr10.date = ldate
-  minute = minute + 9
+  if hour then minute = minute + 9
   if minute >= 60 then hour = hour + 1, minute = minute - 60
 else
   gr10.date = y.jdate + 1
@@ -641,6 +649,7 @@ hour$ = ""
 for hr = 6 to 12
   hour$ = fnopt$(hour$, hr, hour)
 next hr
+if gr09.aid$ = "lk01" or hour = 0 hour$ = fnopt$(hour$, 0, hour)
 for hr = 1 to 5
   hour$ = fnopt$(hour$, hr, hour)
 next hr
@@ -793,6 +802,14 @@ DEF FND(FLDNAM$) = (CVS(FIELD(CGI$, FLDNAM$), 2) <> CVS(FIELD(GR04$, FLDNAM$), 2
 def fnn$(rec09$) = cvs(field(rec09$,"firstname"), 2) + " " + cvs(field(rec09$,"lastname"), 2)
 
 def fni$(fldnam$, size) = "<input type='" + iff(fldnam$ = "email", "email", "text") + "' name='" + fldnam$ + gr09a.id$ + "' size=" + str(size) + " maxlength=" + str(size) + " value='" + cvs(field(gr09a$, fldnam$), 2) + "'>"
+
+def fndatetime$(gr10$)
+if gr10.time then 
+  return date(gr10.date, gr10.time, "%Ds %Ms %D at %h:%mz %p")
+else
+  return date(gr10.date, "%Ds %Ms %D")
+fi
+fnend
 
 DT_ERR:
 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)

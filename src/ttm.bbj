@@ -51,7 +51,7 @@ class public ttm
       s084.emailtype$ = "H"
       s084.toname$  = cvs(gr09!.getFieldAsString("firstname"), 2) + " " + cvs(gr09!.getFieldAsString("lastname"), 2)
       s084.toemail$ = cvs(gr09!.getFieldAsString("email"), 2)
-      s084.emailbcc$ = s084.fromemail$
+REM       s084.emailbcc$ = s084.fromemail$
       call "CDS084", y$, y5$, u0, s084$, y6, y6$
       print (y6.ch)"<style>body{color:green;}</style>"
       print (y6.ch)"<body>"
