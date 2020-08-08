@@ -57,15 +57,16 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("aid", #aid$)
     gr10!.setFieldValue("gr08id", gr01.id$); rem  Course
     gr10!.setFieldValue("date", gr03.date)
-    
+
+if jul(0,0,0) <> jul(2020,8,8) then    
     gr10!.setFieldValue("time", #fixTime(12, 45))
     gr10!.setFieldValue("id", 1, "js01"); rem  Jim Sterley
     gr10!.setFieldValue("id", 2, "mf01"); rem  Mike Fee
     gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regain
-    gr10!.setFieldValue("id", 3, "ks02"); rem  Keith Sterley
+    gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
     gr10File!.addUniqueRecord(gr10!)
     
-    for i = 1 to 3
+    for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
     next i
     
@@ -73,11 +74,19 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("time", #fixTime(01, 15)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(01, 30)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 00)); gr10File!.addUniqueRecord(gr10!)
+fi
+
     gr10!.setFieldValue("time", #fixTime(04, 10)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 20)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 30)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 40)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 50)); gr10File!.addUniqueRecord(gr10!)
+
+    gr10!.setFieldValue("time", #fixTime(05, 00)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(05, 10)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(05, 20)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(05, 30)); gr10File!.addUniqueRecord(gr10!)
+
   methodend
   
   method public BBjNumber fixTime(BBjNumber hour, BBjNumber minute)
