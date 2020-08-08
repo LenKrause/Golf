@@ -177,6 +177,7 @@ class public scorePosting
     next i
     for i = 1 to 4
       if pos(" " <> gr10.id$[i]) = 0 then continue; rem  No player
+      if i > 1 and pos(gr10.id$[i] = ids$, 4) <> 1 + (4 * (i - 1)) 
       gr04$ = #getGr04(gr10.aid$ + gr10.id$[i])
       call "SW001", "LKGR05", 0, "SAW" + gr04.id$ + gr10.date$, gr05$, sw001$
       if ! sw001.onfile then continue
@@ -254,7 +255,6 @@ class public scorePosting
     call "CDS095", gr05, "LKGR05", "YUY", gr05$, gr05k$
     playdate = num(formid$(1,7))
     for i = 8 to len(formid$) step 4
-      if i > 8 and pos(formid$(i,4) = formid$(8), 4) <> i + 7 then continue; rem  Guest
       gr05.league$ = "SAW"
       gr05.date    = playdate
       if #gr08$ = "" then #getCourse(gr05$)
