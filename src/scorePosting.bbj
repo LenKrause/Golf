@@ -177,7 +177,6 @@ class public scorePosting
     next i
     for i = 1 to 4
       if pos(" " <> gr10.id$[i]) = 0 then continue; rem  No player
-      if i > 1 and pos(gr10.id$[i] = ids$, 4) <> 4 * i - 3 then continue; rem  Guest 
       gr04$ = #getGr04(gr10.aid$ + gr10.id$[i])
       call "SW001", "LKGR05", 0, "SAW" + gr04.id$ + gr10.date$, gr05$, sw001$
       if ! sw001.onfile then continue
