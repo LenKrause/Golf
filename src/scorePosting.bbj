@@ -385,7 +385,7 @@ class public scorePosting
           if opp_score gr05a.hpoints[i] = 1
           break
       swend
-      gr05.points = gr05.points + gr05.hpoints[i]
+      gr05.points  = gr05.points  + gr05.hpoints[i]
       gr05a.points = gr05a.points + gr05a.hpoints[i]
     next i
     if opp_score then
@@ -407,7 +407,7 @@ class public scorePosting
         if opp_score gr05a.matchpoints = 2
         break
     swend 
-    gr05.points = gr05.points = gr05.matchpoints
+    gr05.points = gr05.points + gr05.matchpoints
     if opp_score then
       gr05a.points = gr05a.points + gr05a.matchpoints
     else
