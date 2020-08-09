@@ -493,7 +493,7 @@ class public scorePosting
 
     table!.addCell("Course HC")
     for hole = 1 to 9
-      shade$ = iff(gr05.hstrokes[i] or gr05a.hstrokes[i], "g008000", "")
+      shade$ = iff(gr05.hstrokes[hole] or gr05a.hstrokes[hole], "g008000", "")
       table!.addCell(str(gr08.mhc[hole + #start_hole - 1]), "c" + shade$)
     next hole
     table!.addCell("")
