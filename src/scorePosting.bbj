@@ -597,6 +597,22 @@ class public scorePosting
     methodret out$ 
   methodend
   
+  method public scorePosting(BBjString league$, BBjNumber year)
+    call "CDS095", gr05, "LKGR05", "YUY", gr05$
+    gr05s = unt
+    select (gr05s)gr05$ from "LKGR05" where gr05.league$ = league$ and gr05.date >= jul(year, 1, 1) and gr05.date <= jul(year, 12, 31)
+    repeat
+      read record (gr05s, end=*break)gr05$
+      #getCourse(gr05$)
+      gr05$ = #computePoints(gr05$, gr05)
+      writerecord(gr05)gr05$
+      if go = 0 then
+        call "CDS279", gr05$
+        call "CDS069", 0, 1, 0, 0, "0=next, 1=finish+", "0", g0
+      fi
+    until ctl = 4
+  methodend
+  
 classend
 
 rem  Program is run from GW010
@@ -623,3 +639,6 @@ switch cgi.mode$
     break
 swend
 run "CDW999"
+
+recompute:
+score! = new scorePosting("SAW", 2020)
