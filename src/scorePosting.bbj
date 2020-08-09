@@ -488,9 +488,13 @@ class public scorePosting
     table!.addCell(str(total_par), "c")
     table!.addRow()
     
+    dim gr05a$:fattr(gr05$)
+    gr05a$ = #gr05a$
+    
     table!.addCell("Course HC")
     for hole = 1 to 9
-      table!.addCell(str(gr08.mhc[hole + #start_hole - 1]), "c")
+      shade$ = iff(gr05.hstroke[i] or gr05a.hstroke[i], "g008000", "")
+      table!.addCell(str(gr08.mhc[hole + #start_hole - 1]), "c" + shade$)
     next hole
     table!.addCell("")
     table!.addCell("")
