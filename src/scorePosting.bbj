@@ -600,7 +600,7 @@ class public scorePosting
   method public scorePosting(BBjString league$, BBjNumber year)
     call "CDS095", gr05, "LKGR05", "YUY", gr05$
     gr05s = unt
-    select (gr05s)gr05$ from "LKGR05" where gr05.league$ = league$ and gr05.date >= jul(year, 1, 1) and gr05.date <= jul(year, 12, 31)
+    select (gr05s)gr05$ from "LKGR05" where gr05.league$ = league$ and gr05.date >= jul(year, 1, 1) and gr05.date <= jul(year, 12, 31) and gr05.score
     repeat
       read record (gr05s, end=*break)gr05$
       #getCourse(gr05$)
