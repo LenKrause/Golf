@@ -532,6 +532,14 @@ class public scorePosting
     table!.addCell(str(gr05.score), "c")
     table!.addRow(" class='head'")
     
+    table!.addCell("Putts")
+    for hole = 1 to 9
+      table!.addCell(str(gr05.hputts[hole]), "c")
+    next hole
+    table!.addCell("")
+    table!.addCell(str(gr05.putts), "c")
+    table!.addRow()
+    
     declare BBjVector hcbh!
     hcbh! = #getHcByHole(gr05$)
     table!.addCell("Handicap")
