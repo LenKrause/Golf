@@ -481,9 +481,11 @@ class public scorePosting
     dim gr05a$:fattr(gr05$)
     gr05a$ = #gr05a$
 
+    rem  0 = normal format with shaded HC holes, 1 = no opponent and my hc > 9 with extra rows for strokes + net
+    format = (gr05a.score = 0 and gr05.hc > 9) 
     table!.addCell("Course HC")
     for hole = 1 to 9
-      shade$ = iff(gr05a.score and (gr05.hstrokes[hole] or gr05a.hstrokes[hole]), "g008000", "")
+      shade$ = iff(format = 0 and (gr05.hstrokes[hole] or gr05a.hstrokes[hole]), "g008000", "")
       table!.addCell(str(gr08.mhc[hole + #start_hole - 1]), "c" + shade$)
     next hole
     table!.addCell("")
@@ -492,10 +494,10 @@ class public scorePosting
     table!.addRow()
     
     rem  Player
-    #addPlayer(table!, gr05$, gr05a.score)
+    #addPlayer(table!, gr05$, format)
     
     rem  Opponent
-    #addPlayer(table!, gr05a$, gr05.score)
+    #addPlayer(table!, gr05a$, format)
     
     table!.addTable()
     table!.addBody("<center><button type='button' onclick='window.location=""" + #getDsn() + """'>Home</button>" + "</center>")
@@ -503,7 +505,7 @@ class public scorePosting
     
   methodend  
     
-  method private void addPlayer(DTHtmlTable table!, BBjString gr05$, BBjNumber opp_score)
+  method private void addPlayer(DTHtmlTable table!, BBjString gr05$, BBjNumber format)
     #getPlayer(gr05$)
     dim gr04$:#gr04tpl$
     gr04$ = #gr04$
@@ -532,7 +534,7 @@ class public scorePosting
     table!.addCell("")
     table!.addRow()
     
-    if ! opp_score then
+    if format then
       table!.addCell("Strokes")
       for hole = 1 to 9
         table!.addCell(str(gr05.hstrokes[hole]), "c")
