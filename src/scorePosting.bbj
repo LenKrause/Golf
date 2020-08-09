@@ -18,8 +18,6 @@ class public scorePosting
   field private BBjString nine$
   field private BBjNumber start_hole
   field private BBjVector holesByHc!
-  field private BBjVector pointsByHoleA!
-  field private BBjVector pointsByHoleB!
   field private BBjString gr05a$
   field private BBjString oneHalf$ = "&#189;"
   
@@ -418,16 +416,6 @@ class public scorePosting
     fi
     if gr05a write record(gr05a)gr05a$
 
-    rem  ToDo Remove old logic once Match Results no longer depends on fields
-    #pointsByHoleA! = new BBjVector()
-    #pointsByHoleB! = new BBjVector()
-    for i = 1 to 9
-      #pointsByHoleA!.add(gr05.hpoints[i])
-      #pointsByHoleB!.add(gr05a.hpoints[i])
-    next i
-    #pointsByHoleA!.add(gr05.matchpoints)
-    #pointsByHoleB!.add(gr05a.matchpoints)
-
     methodret gr05$
   methodend
   
@@ -504,11 +492,10 @@ class public scorePosting
     table!.addRow()
     
     rem  Player
-    #addPlayer(table!, gr05$, #pointsByHoleA!)
+    #addPlayer(table!, gr05$, gr05a.score)
     
     rem  Opponent
-    gr05$ = #gr05a$
-    #addPlayer(table!, gr05$, #pointsByHoleB!)
+    #addPlayer(table!, gr05a$, gr05.score)
     
     table!.addTable()
     table!.addBody("<center><button type='button' onclick='window.location=""" + #getDsn() + """'>Home</button>" + "</center>")
@@ -516,7 +503,7 @@ class public scorePosting
     
   methodend  
     
-  method private void addPlayer(DTHtmlTable table!, BBjString gr05$, BBjVector points!)
+  method private void addPlayer(DTHtmlTable table!, BBjString gr05$, BBjNumber opp_score)
     #getPlayer(gr05$)
     dim gr04$:#gr04tpl$
     gr04$ = #gr04$
@@ -545,29 +532,25 @@ class public scorePosting
     table!.addCell("")
     table!.addRow()
     
-REM     declare BBjVector hcbh!
-REM     hcbh! = #getHcByHole(gr05$)
-REM     table!.addCell("Handicap")
-REM     tothc = 0 
-REM     for hole = 1 to 9
-REM       hc = num(hcbh!.get(hole - 1))
-REM       tothc = tothc + hc
-REM       table!.addCell(str(hc), "c")
-REM     next hole
-REM     table!.addCell("")
-REM     table!.addCell(str(tothc), "c")
-REM     table!.addRow()
-REM     
-REM     table!.addCell("Net")
-REM     totnet = 0
-REM     for hole = 1 to 9
-REM       net = gr05.hscore[hole] - num(hcbh!.get(hole - 1))
-REM       totnet = totnet + net
-REM       table!.addCell(str(net), "c")
-REM     next hole
-REM     table!.addCell("")
-REM     table!.addCell(str(totnet), "c")
-REM     table!.addRow()
+    if ! opp_score then
+      table!.addCell("Strokes")
+      for hole = 1 to 9
+        table!.addCell(str(gr05.hstrokes[hole]), "c")
+      next hole
+      table!.addCell("")
+      table!.addCell("")
+      table!.addCell("")
+      table!.addRow()
+      
+      table!.addCell("Net")
+      for hole = 1 to 9
+        table!.addCell(str(gr05.hscore[hole] - gr05.hstrokes[hole]), "c")
+      next hole
+      table!.addCell("")
+      table!.addCell("")
+      table!.addCell("")
+      table!.addRow()
+    fi
 
     table!.addCell("Points")
     for hole = 1 to 9
