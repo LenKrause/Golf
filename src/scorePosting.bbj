@@ -317,8 +317,7 @@ class public scorePosting
   methodend
   
   method public BBjString computePoints(BBjString gr05$, BBjNumber gr05a)
-    #pointsByHoleA! = new BBjVector()
-    #pointsByHoleB! = new BBjVector()
+    rem  Get Course Info
     dim gr08$:#gr08tpl$
     gr08$ = #gr08$
     
@@ -335,77 +334,100 @@ class public scorePosting
     opp_score = (gr05a.score > 0)
     
     if opp_score then
-      hcvar = gr05.hc - gr05a.hc
-      if abs(hcvar) > 9 then
-        if hcvar > 0 then
-          gr05.hc = gr05a.hc + 9
-        else
-          gr05a.hc = gr05.hc + 9
-        fi
+      hcdiff = abs(gr05.hc - gr05a.hc)
+
+      rem  Determine holes where player gets a stroke, max of 1 stroke per hole
+      if hcdiff then
+        for i = 1 to min(hcdiff, 9)
+          holeno = num(#holesByHc!.get(i - 1))
+          if gr05.hc < gr05a.hc then
+            gr05a.hstrokes[holeno] = 1
+            gr05.hstrokes[holeno] = 0
+          else
+            gr05.hstrokes[holeno] = 1
+            gr05a.hstrokes[holeno] = 0
+          fi
+        next i
       fi
+    else
+      rem  Determine strokes per hole when playing the course
+      hcbal = gr05.hc
+      holesbal = 9
+      for i = 1 to 9
+        strokes = hcbal / holesbal
+        if fpt(strokes) then strokes = int(strokes) + 1
+        holesbal = holesbal - 1
+        hcbal = hcbal - strokes
+        gr05.hstrokes[num(#holesByHc!.get(i - 1))] = strokes
+      next i
     fi
-    declare BBjVector hcbh1!
-    declare BBjVector hcbh2!
-    hcbh1! = #getHcByHole(gr05$)
-    if opp_score then hcbh2! = #getHcByHole(gr05a$)
-    declare BBjVector net1!
-    declare BBjVector net2!
-    net1! = new BBjVector()
-    net2! = new BBjVector()
-    for i = 0 to 8
-      net1!.add(gr05.hscore[i + 1]  - num(hcbh1!.get(i)))
-      if opp_score then 
-        net2!.add(gr05a.hscore[i + 1] - num(hcbh2!.get(i)))
+
+    rem  Determine points per hole
+    gr05.points = 0
+    gr05a.points = 0
+    for i = 1 to 9
+      if opp_score then
+        scoreDiff = (gr05.hscore[i] - gr05.hstrokes[i]) - (gr05a.hscore[i] - gr05a.hstrokes[i])
       else
-        par = gr08.par[#start_hole + i]
-        par_tot = par_tot + par
-        net2!.add(par)
+        scoreDiff = (gr05.hscore[i] - gr05.hstrokes[i]) - gr08.par[#start_hole + i - 1]
       fi
-      diff = num(net1!.get(i)) - num(net2!.get(i))
       switch 1
-        case diff = 0
-          #pointsByHoleA!.add(.5)
-          #pointsByHoleB!.add(.5)
-          pts1 = pts1 + .5
-          pts2 = pts2 + .5
+        case scoreDiff = 0
+          gr05.hpoints[i] = .5
+          if opp_score gr05a.hpoints[i] = .5
           break
-        case diff > 0
-          #pointsByHoleA!.add(0)
-          #pointsByHoleB!.add(1)
-          pts2 = pts2 + 1
+        case scoreDiff < 0
+          gr05.hpoints[i] = 1
+          if opp_score gr05a.hpoints[i] = 0
           break
-        case diff < 0
-          #pointsByHoleA!.add(1)
-          #pointsByHoleB!.add(0)
-          pts1 = pts1 + 1
+        case scoreDiff > 0
+          gr05.hpoints[i] = 0
+          if opp_score gr05a.hpoints[i] = 1
           break
       swend
+      gr05.points = gr05.points + gr05.hpoints[i]
+      gr05a.points = gr05a.points + gr05a.hpoints[i]
     next i
-    if !(opp_score) then gr05a.net = par_tot
-    switch 1
-      case gr05.net = gr05a.net
-        #pointsByHoleA!.add(1)
-        #pointsByHoleB!.add(1)
-        pts1 = pts1 + 1
-        pts2 = pts2 + 1
-        break
-      case gr05.net < gr05a.net
-        #pointsByHoleA!.add(2)
-        #pointsByHoleB!.add(0)
-        pts1 = pts1 + 2
-        break
-      case gr05.net > gr05a.net
-        #pointsByHoleA!.add(0)
-        #pointsByHoleB!.add(2)
-        pts2 = pts2 + 2
-        break
-    swend
-    if !(opp_score) then pts1 = max(pts1, 6)
-    gr05.points  = pts1
     if opp_score then
-      gr05a.points = pts2
-      if gr05a write record(gr05a)gr05a$
+      netDiff = gr05.net - gr05a.net
+    else
+      netDiff = gr05.net - iff(#start_hole = 1, gr08.parf, gr08.parb)
     fi
+    switch 1
+      case netDiff = 0
+        gr05.matchpoints = 1
+        if opp_score gr05a.matchpoints = 1
+        break
+      case netDiff < 0
+        gr05.matchpoints = 2
+        if opp_score gr05a.matchpoints = 0
+        break
+      case netDiff > 0
+        gr05.matchpoints = 0
+        if opp_score gr05a.matchpoints = 2
+        break
+    swend 
+    gr05.points = gr05.points = gr05.matchpoints
+    if opp_score then
+      gr05a.points = gr05a.points + gr05a.matchpoints
+    else
+      if gr05.points < 6 then
+        gr05.matchpoints = gr05.matchpoints + (6 - gr05.points)
+        gr05.points = 6
+      fi
+    fi
+    if gr05a write record(gr05a)gr05a$
+
+    rem  ToDo Remove old logic once Match Results no longer depends on fields
+    #pointsByHoleA! = new BBjVector()
+    #pointsByHoleB! = new BBjVector()
+    for i = 1 to 9
+      #pointsByHoleA!.add(gr05.hpoints[i])
+      #pointsByHoleB!.add(gr05a.hpoints[i])
+    next i
+    #pointsByHoleA!.add(gr05.matchpoints)
+    #pointsByHoleB!.add(gr05a.matchpoints)
+
     methodret gr05$
   methodend
   
