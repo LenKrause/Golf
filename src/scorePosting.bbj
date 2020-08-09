@@ -608,7 +608,7 @@ class public scorePosting
       writerecord(gr05)gr05$
       if go = 0 then
         call "CDS279", gr05$
-        call "CDS069", 0, 1, 0, 0, "0=next, 1=finish+", "0", g0
+        call "CDS069", 0, 1, 0, 0, "0=next, 1=finish+", "0", go
       fi
     until ctl = 4
   methodend
