@@ -464,18 +464,19 @@ class public scorePosting
     table! = new DTHtmlTable()
     table!.setStripe(BBjAPI.FALSE)
     
-    table!.addCell("Match Results", "cs12")
+    table!.addCell("Match Results", "cs13")
     table!.addRow(" class='top'")
     
-    table!.addCell(date(gr05.date:"%Ds %Mz/%Dz/%Yz") + " at " + cvs(gr08.name$, 2), "cs12")
+    table!.addCell(date(gr05.date:"%Ds %Mz/%Dz/%Yz") + " at " + cvs(gr08.name$, 2), "cs13")
     table!.addRow(" class='title'")
 
     table!.addCell("Hole")
     for hole = 1 to 9
       table!.addCell(str(hole + #start_hole - 1), "c")
     next hole
-    table!.addCell("Match", "c")
     table!.addCell("Total", "c")
+    table!.addCell("HC/Match", "c")
+    table!.addCell("Net", "c")
     table!.addRow(" class='head'")
     
     table!.addCell("Par")
@@ -484,8 +485,9 @@ class public scorePosting
       total_par = total_par + par
       table!.addCell(str(par), "c")
     next hole
-    table!.addCell("")
     table!.addCell(str(total_par), "c")
+    table!.addCell("")
+    table!.addCell("")
     table!.addRow()
     
     dim gr05a$:fattr(gr05$)
@@ -498,6 +500,7 @@ class public scorePosting
     next hole
     table!.addCell("")
     table!.addCell("")
+    table!.addCell("")    
     table!.addRow()
     
     rem  Player
@@ -520,7 +523,7 @@ class public scorePosting
   
     table!.addCell(#getPlayerName(gr04$))
     if gr05.score = 0 then
-      table!.addCell("Score not posted", "cs11")
+      table!.addCell("Score not posted", "cs12")
       table!.addRow(" class='head'")
       methodret
     fi
@@ -528,50 +531,50 @@ class public scorePosting
     for hole = 1 to 9
       table!.addCell(str(gr05.hscore[hole]), "c")
     next hole
-    table!.addCell("")
     table!.addCell(str(gr05.score), "c")
+    table!.addCell(str(gr05.hc), "c")
+    table!.addCell(str(gr05.net), "c")
     table!.addRow(" class='head'")
     
     table!.addCell("Putts")
     for hole = 1 to 9
       table!.addCell(str(gr05.hputts[hole]), "c")
     next hole
-    table!.addCell("")
     table!.addCell(str(gr05.putts), "c")
+    table!.addCell("")
+    table!.addCell("")
     table!.addRow()
     
-    declare BBjVector hcbh!
-    hcbh! = #getHcByHole(gr05$)
-    table!.addCell("Handicap")
-    tothc = 0 
-    for hole = 1 to 9
-      hc = num(hcbh!.get(hole - 1))
-      tothc = tothc + hc
-      table!.addCell(str(hc), "c")
-    next hole
-    table!.addCell("")
-    table!.addCell(str(tothc), "c")
-    table!.addRow()
-    
-    table!.addCell("Net")
-    totnet = 0
-    for hole = 1 to 9
-      net = gr05.hscore[hole] - num(hcbh!.get(hole - 1))
-      totnet = totnet + net
-      table!.addCell(str(net), "c")
-    next hole
-    table!.addCell("")
-    table!.addCell(str(totnet), "c")
-    table!.addRow()
+REM     declare BBjVector hcbh!
+REM     hcbh! = #getHcByHole(gr05$)
+REM     table!.addCell("Handicap")
+REM     tothc = 0 
+REM     for hole = 1 to 9
+REM       hc = num(hcbh!.get(hole - 1))
+REM       tothc = tothc + hc
+REM       table!.addCell(str(hc), "c")
+REM     next hole
+REM     table!.addCell("")
+REM     table!.addCell(str(tothc), "c")
+REM     table!.addRow()
+REM     
+REM     table!.addCell("Net")
+REM     totnet = 0
+REM     for hole = 1 to 9
+REM       net = gr05.hscore[hole] - num(hcbh!.get(hole - 1))
+REM       totnet = totnet + net
+REM       table!.addCell(str(net), "c")
+REM     next hole
+REM     table!.addCell("")
+REM     table!.addCell(str(totnet), "c")
+REM     table!.addRow()
 
     table!.addCell("Points")
-    totpoints = 0
     for hole = 1 to 9
-      points = num(points!.get(hole - 1))
-      totpoints = totpoints + points
-      table!.addCell(#getPoints(points), "c&")
+      table!.addCell(#getPoints(gr05.hpoints[hole]), "c&")
     next hole
-    table!.addCell(str(gr05.points - totpoints), "c")
+    table!.addCell(str(gr05.points - gr05.matchpoints), "c")
+    table!.addCell(str(gr05.matchpoints), "c")
     table!.addCell(str(gr05.points), "c")
     table!.addRow()
   methodend
