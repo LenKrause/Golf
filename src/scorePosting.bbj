@@ -558,9 +558,9 @@ class public scorePosting
     for hole = 1 to 9
       table!.addCell(#getPoints(gr05.hpoints[hole]), "c&")
     next hole
-    table!.addCell(str(gr05.points - gr05.matchpoints), "c")
-    table!.addCell(str(gr05.matchpoints), "c")
-    table!.addCell(str(gr05.points), "c")
+    table!.addCell(#getPoints(gr05.points - gr05.matchpoints), "c&")
+    table!.addCell(#getPoints(gr05.matchpoints), "c&")
+    table!.addCell(#getPoints(gr05.points), "c&")
     table!.addRow()
   methodend
   
