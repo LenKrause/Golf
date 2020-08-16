@@ -346,6 +346,11 @@ class public scorePosting
             gr05a.hstrokes[holeno] = 0
           fi
         next i
+      else
+        for i = 1 to 9
+          gr05.hstrokes[i] = 0
+          gr05a.hstrokes[i] = 0
+        next i
       fi
     else
       rem  Determine strokes per hole when playing the course
