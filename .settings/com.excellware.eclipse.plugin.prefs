@@ -1,5 +1,5 @@
+COMPANY_CODES=[CD, LK]
 eclipse.preferences.version=1
 other/check_on_save=false
 other/use_dt_y=false
-suggestions/space_function_args=false
-COMPANY_CODES=[CD, LK]
+suggestions/space_function_args=true

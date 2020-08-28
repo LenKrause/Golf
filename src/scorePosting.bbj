@@ -144,6 +144,7 @@ class public scorePosting
     if gr10.aid$ <> aid$ then
       gr10.aid$   = aid$
       gr10.id$[1] = id$
+      gr10.date$  = key$(8,3)
     fi
     
     table! = new DTHtmlTable()
