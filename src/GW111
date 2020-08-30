@@ -1,4 +1,4 @@
-REM "GW111 - 07/08/20 Tee Time Manager Menu
+REM "GW111 - 08/30/20 Tee Time Manager Menu
 
 use ::scorePosting.bbj::scorePosting
 
@@ -442,7 +442,7 @@ repeat
     dim gr10a$:fattr(gr10$)
     read record (gr10a, knum=1, key=kgen(gr10$, gr10k$, 1))gr10a$
     repeat
-      if pos(gr09.id$ = gr10a.id$[1] + gr10a.id$[2] + gr10a.id$[3] + gr10.id$[4], 4) then
+      if pos(gr09.id$ = gr10a.id$[1] + gr10a.id$[2] + gr10a.id$[3] + gr10a.id$[4], 4) then
         playing = 1
         break
       fi
@@ -461,6 +461,7 @@ repeat
   col1$ = ""
   col2$ = ""
   time_box = 0
+  guest_box = 0
   foursome$ = ""
   for i = 1 to 4
     redim gr09a$
@@ -469,17 +470,26 @@ repeat
       readrecord (gr09, knum=0, key=gr09.aid$ + gr10.id$[i], dom=*next)gr09a$
     fi
     switch 1
+      rem  Cancel my time or my guest
       case gr10.id$[i] = gr09.id$
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='window.location=""" + dsn$ + "&cancel=" + str(gr10.ttid) + "-" + str(i) + """'>"
         col2$ = "<span class='head'>" + fnn$(gr09$)
         if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         col2$ = col2$ + "</span>"
         break
-      case playing =0 and time_box = 0 and gr10.id$[i] = "    " 
+      rem  Claim my time - not playing, first available spot in this foursome
+      case gr10.id$[i] = "    " and playing = 0 and time_box = 0 
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
         col2$ = "Check this box to play"
         time_box = 1
         break
+      rem  Claim time for my guest - I'm in this foursome, first available spot in this foursome
+      case gr10.id$[i] = "    " and pos(gr09.id$ = foursome$, 4) and guest_box = 0 
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col2$ = "Check for your Guest"
+        guest_box = 1
+        break
+      rem  Show some other player, or their guest
       case gr10.id$[i] <> "    "
         col1$ = ""
         col2$ = fnn$(gr09a$)
