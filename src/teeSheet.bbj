@@ -12,6 +12,7 @@ class public teeSheet
   field private BBjString html$
   field private BBjVector players!
   field private BBjString coursePhone$
+  field private BBjString courseId$
   
   method public teeSheet(BBjString adminId$, BBjInt date%)
     declare DTFileRecords gr10File!
@@ -40,7 +41,8 @@ class public teeSheet
     call "SW001", "XXGR03", 0, "SAW" + bin(date%, 3), gr03$, sw001$
     if sw001.onfile then nine$ = iff(gr03.nine$ = "F", " - Front Nine", " - Back Nine")
     
-    call "SW001", "XXGR08", 0, gr10.gr08id$, gr08$, sw001$
+    #courseId$ = gr10.gr08id$
+    call "SW001", "XXGR08", 0, courseId$, gr08$, sw001$
     #coursePhone$ = gr08.phone$
     table!.addHeaderCell(cvs(gr08.name$, 2) + nine$, "cs3")
     table!.addRow()
@@ -92,8 +94,10 @@ class public teeSheet
     s084.emailbcc$  = "len@excellware.com"
 
     if ! testMode! then
-      s084.toname$  = "David Kinnell"
-      s084.toemail$ = "david@golfpinehills.net"
+      if #courseId$ = "PH " then
+        s084.toname$  = "David Kinnell"
+        s084.toemail$ = "david@golfpinehills.net"
+      fi
       for i = 0 to #players!.size() - 1
         s084.emailbcc$ = s084.emailbcc$ + "," + #players!.get(i).toString()
       next i
@@ -104,7 +108,7 @@ class public teeSheet
       print (y6.ch)"<p>Cost for round and cart at Grey Hawk on Sunday is $50.<br><br>After golf we will meet at Paninis Bar & Grill<br>3520 Center Rd, Brunswick, OH  44212</p>"
     fi
     print (y6.ch)#html$
-if 0     print (y6.ch)"<br><center>Please phone the course at " + #coursePhone$ + " to prepay by credit card.</center><br>"
+    if #courseId$ = "PH " then print (y6.ch)"<br><center>Please phone the course at " + #coursePhone$ + " to prepay by credit card.</center><br>"
     call "CDS094", y6$, "e"
   methodend
   
@@ -145,4 +149,4 @@ if ! sheet!.getErrMsg().isEmpty() then
 else
   call "CDW999", sheet!.getHtml()
 fi
-sheet!.email(BBjAPI.TRUE)
+sheet!.email(BBjAPI.FALSE)
