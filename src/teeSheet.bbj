@@ -100,11 +100,11 @@ class public teeSheet
     fi
     
     call "CDS084", y$, y5$, u0, s084$, y6, y6$    
-    if jul(0,0,0) = jul(2020,8,19) then
-      print (y6.ch)"<p>Note revised early tee times for all golfers<br>Course is busy until 1:15pm</p>"
+    if jul(0,0,0) = jul(2020,9,10) then
+      print (y6.ch)"<p>Cost for round and cart at Grey Hawk on Sunday is $50.<br><br>After golf we will meet at Paninis Bar & Grill<br>3520 Center Rd, Brunswick, OH  44212</p>"
     fi
     print (y6.ch)#html$
-    print (y6.ch)"<br><center>Please phone the course at " + #coursePhone$ + " to prepay by credit card.</center><br>"
+if 0     print (y6.ch)"<br><center>Please phone the course at " + #coursePhone$ + " to prepay by credit card.</center><br>"
     call "CDS094", y6$, "e"
   methodend
   
@@ -139,10 +139,10 @@ y$ = "LK"
 y5$ = "Tee Sheet"
 call "CDS011", y$, y5$
 
-sheet! = new teeSheet("lk01", jul(2020,8,19))
+sheet! = new teeSheet("lk01", jul(2020,9,13))
 if ! sheet!.getErrMsg().isEmpty() then
   print sheet!.getErrMsg()
 else
   call "CDW999", sheet!.getHtml()
 fi
-sheet!.email(BBjAPI.FALSE)
+sheet!.email(BBjAPI.TRUE)
