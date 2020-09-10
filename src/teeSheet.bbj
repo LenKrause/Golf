@@ -42,7 +42,7 @@ class public teeSheet
     if sw001.onfile then nine$ = iff(gr03.nine$ = "F", " - Front Nine", " - Back Nine")
     
     #courseId$ = gr10.gr08id$
-    call "SW001", "XXGR08", 0, courseId$, gr08$, sw001$
+    call "SW001", "XXGR08", 0, #courseId$, gr08$, sw001$
     #coursePhone$ = gr08.phone$
     table!.addHeaderCell(cvs(gr08.name$, 2) + nine$, "cs3")
     table!.addRow()
