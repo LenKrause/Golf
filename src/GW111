@@ -1,4 +1,4 @@
-REM "GW111 - 08/30/20 Tee Time Manager Menu
+REM "GW111 - 11/19/20 Tee Time Manager Menu
 
 use ::scorePosting.bbj::scorePosting
 
@@ -291,6 +291,10 @@ repeat
       print (y6.ch)"<style>body{color:green;}</style>"
       print (y6.ch)"<body>"
       print (y6.ch)cvs(gr09a.firstname$, 2) + "-<br><br>"
+      if jul(0,0,0) = jul(2020,11,1) then
+        print (y6.ch)"Although we are back to Standard Time, the weather looks promising for Wednesday,"
+        print (y6.ch)"  and several expresed an interest in playing, so<br>"
+      fi
       print (y6.ch)"Tee Times have been made.<br><br>"
       link$ = "http://www.scoresandcharts.com/LK/cgi-bin/ttm.cgi?code=" + hta(gr09a.aid$ + gr09a.id$ + hsh(gr09a.aid$ + gr09a.id$))
       print (y6.ch)"Click <a href='" + link$ + "'>here</a> to sign up<br><br>"
@@ -692,7 +696,7 @@ goto EOJ
 def fndate$(gr10$, af$)
   date$ = ""
   jdate = y.jdate
-  for i = 1 to 28
+  for i = 1 to 56
     selected$ = iff(jdate = gr10.date, " selected", "")
     date$ = date$ + "<option value='" + str(jdate) + "'" + selected$ + ">"+ date(jdate:"%Ds %Mz/%Dz/%Yz") + "</option>" + $0a$
     jdate = jdate + 1    
