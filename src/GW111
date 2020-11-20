@@ -693,7 +693,8 @@ w069.defaultval$ = lcourse$
 call "CDW069", w069$, course$
 
 call "CDW000", row$, "d", course$
-call "CDW000", row$, "ds2", ""
+call "CDW000", row$, "d", ""
+call "CDW000", row$, "dc", "<input type='checkbox' name='cancel_0' value='y'>"
 call "CDW000", tab$, "r", row$
 
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
