@@ -652,7 +652,7 @@ if ldate then
   gr10.date = ldate
   interval = 0
   if len(lcourse$) then
-    if gr08.gr08id$ = lcourse$ then
+    if gr08.id$ = lcourse$ then
       interval = gr08.interval
     else
       readrecord (gr08, knum=0, key=lcourse$, dom=*endif)gr08$
