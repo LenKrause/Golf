@@ -650,7 +650,17 @@ redim gr10$
 
 if ldate then
   gr10.date = ldate
-  if hour then minute = minute + 10
+  interval = 0
+  if len(lcourse$) then
+    if gr08.gr08id$ = lcourse$ then
+      interval = gr08.interval
+    else
+      readrecord (gr08, knum=0, key=lcourse$, dom=*endif)gr08$
+      interval = gr08.interval
+    fi
+  fi
+  if interval = 0 then interval = 10 
+  if hour then minute = minute + interval
   if minute >= 60 then hour = hour + 1, minute = minute - 60
 else
   gr10.date = y.jdate + 1
