@@ -605,7 +605,8 @@ repeat
   readrecord (gr10, end=*break)gr10$
   if gr10.aid$ <> gr09.aid$ break
 
-  ldate = gr10.date
+  ldate    = gr10.date
+  lcourse$ = gr10.gr08id$
   call "CDW000", row$, "dr", fnttid$(gr10$) + fndate$(gr10$, "")
 
   hour = iff(gr10.time, num(date(0, gr10.time:"%h")), 0)
@@ -649,7 +650,7 @@ redim gr10$
 
 if ldate then
   gr10.date = ldate
-  if hour then minute = minute + 9
+  if hour then minute = minute + 10
   if minute >= 60 then hour = hour + 1, minute = minute - 60
 else
   gr10.date = y.jdate + 1
@@ -678,7 +679,7 @@ minute$ = "<select name='minute_" + str(gr10.ttid) + "'>" + $0a$ + minute$ + "</
 call "CDW000", row$, "dr", hour$ + minute$
 
 w069.formfld$ = "course-0"
-w069.defaultval$ = ""
+w069.defaultval$ = lcourse$
 call "CDW069", w069$, course$
 
 call "CDW000", row$, "d", course$
