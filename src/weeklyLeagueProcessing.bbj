@@ -58,8 +58,7 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("gr08id", gr01.id$); rem  Course
     gr10!.setFieldValue("date", gr03.date)
 
-if jul(0,0,0) <> jul(2020,8,8) then    
-    gr10!.setFieldValue("time", #fixTime(12, 45))
+    gr10!.setFieldValue("time", #fixTime(12, 36))
     gr10!.setFieldValue("id", 1, "js01"); rem  Jim Sterley
     gr10!.setFieldValue("id", 2, "mf01"); rem  Mike Fee
     gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regain
@@ -70,22 +69,24 @@ if jul(0,0,0) <> jul(2020,8,8) then
       gr10!.setFieldValue("id", i, "")
     next i
     
+    gr10!.setFieldValue("time", #fixTime(12, 48)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(01, 00)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(01, 15)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(01, 30)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(04, 00)); gr10File!.addUniqueRecord(gr10!)
-fi
+REM     gr10!.setFieldValue("time", #fixTime(01, 30)); gr10File!.addUniqueRecord(gr10!)
+REM     gr10!.setFieldValue("time", #fixTime(04, 00)); gr10File!.addUniqueRecord(gr10!)
 
-    gr10!.setFieldValue("time", #fixTime(04, 10)); gr10File!.addUniqueRecord(gr10!)
+if gr03.date >= jul(2021, 4, 21) then
     gr10!.setFieldValue("time", #fixTime(04, 20)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 30)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 40)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 50)); gr10File!.addUniqueRecord(gr10!)
+fi
 
     gr10!.setFieldValue("time", #fixTime(05, 00)); gr10File!.addUniqueRecord(gr10!)
-REM     gr10!.setFieldValue("time", #fixTime(05, 10)); gr10File!.addUniqueRecord(gr10!)
-REM     gr10!.setFieldValue("time", #fixTime(05, 20)); gr10File!.addUniqueRecord(gr10!)
-REM     gr10!.setFieldValue("time", #fixTime(05, 30)); gr10File!.addUniqueRecord(gr10!)
+if gr03.date >= jul(2021, 4, 21) then
+    gr10!.setFieldValue("time", #fixTime(05, 10)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(05, 20)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(05, 30)); gr10File!.addUniqueRecord(gr10!)
+fi
 
   methodend
   
@@ -120,7 +121,9 @@ fi
 playdate = wlp!.getPlayDate()
 
 rem  Build Handicap Listing pdf file for playdate
-call "GW045", y$, league$, playdate, pdffile$
+if playdate >= jul(2021, 4, 28) then
+  call "GW045", y$, league$, playdate, pdffile$
+fi
 
 rem  Email each player
 call "GW062.bbj", y$, league$, playdate, pdffile$, msg$
