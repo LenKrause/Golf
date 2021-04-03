@@ -47,6 +47,10 @@ class public weeklyLeagueProcessing
     gr03$ = #gr03$
     methodret gr03.date
   methodend
+  
+  method public BBjTemplatedString getPlayDateRecord()
+    methodret DT.toTemplatedString(#gr03tpl$, #gr03$)
+  methodend
 
   method private void addTeeTimes(BBjString gr01$, BBjString gr03$)
     declare DTFileRecords      gr10File!
@@ -116,15 +120,19 @@ if ! wlp!.getErrMsg().isEmpty() then
   run "CDS001"
 fi
 
-playdate = wlp!.getPlayDate()
+declare BBjTemplatedString gr03!
+gr03! = wlp!.getPlayDateRecord()
+playdate = gr03!.getFieldAsNumber("date")
 
-rem  Build Handicap Listing pdf file for playdate
-if playdate >= jul(2021, 4, 28) then
+if gr03!.getFieldAsNumber("half")
+  rem  Build Handicap Listing pdf file for playdate
   call "GW045", y$, league$, playdate, pdffile$
+  rem  Email each player with a match
+  call "GW062.bbj", y$, league$, playdate, pdffile$, msg$
+else
+  rem  Email each player who has either played recently or is set to play this year
+  call "PracticeRoundEmail.bbj", y$, league$, playdate, msg$
 fi
-
-rem  Email each player
-call "GW062.bbj", y$, league$, playdate, pdffile$, msg$
 
 if fid(0) = "IO" then
   call "CDS041", "CDS084", s084$, "YP"

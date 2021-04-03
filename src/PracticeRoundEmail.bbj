@@ -1,0 +1,65 @@
+REM /**
+REM  * PracticeRoundEmail.bbj
+REM  * @author len
+REM  *
+REM  */
+enter y$, league$, playdate, msg$, err=*next
+if len(y$) = 0 then
+  call "CDS091", y$
+  league$ = "SAW"
+  playdate = jul(2021,4,7)
+  testmode = 1
+fi
+use ::ttm.bbj::ttm
+call "CDS041", "CDS084", s084$, "YP"
+sent = 0
+s084.MODE$      = "E"
+s084.NAME$      = "MAIL"
+s084.EMAILTYPE$ = "H"
+s084.FROMNAME$ = "ScoresAndCharts.com"
+s084.FROMEMAIL$ = "webmaster@scoresandcharts.com"
+call "CDS095", gr04, "XXGR04", "YNY", gr04$
+call "CDS095", gr05, "XXGR05", "YNY", gr05$
+call "SW001", "XXGR01", 0, league$, gr01$, sw001$
+call "SW001", "XXGR08", 0, gr01.ID$, GR08$, sw001$
+s084.SUBJECT$ = gr01.NAME$
+read (gr04, knum=3, key=league$, dom=*next)
+repeat
+  readrecord (gr04, end=*break)gr04$
+  if gr04.league$ <> league$ then break
+  if pos(" " <> gr04.email$) then 
+    link$ = ttm.getLink(gr04.EMAIL$)
+    if len(link$) on gr04.playthisyear$ = "Y" gosub played_recently, send
+  fi 
+until 0 or (testmode and sent = 2)
+msg$ = "Job Completed, " + STR(sent) + " emails sent."
+if testing then
+  print msg$
+  escape
+fi
+exit
+
+send:
+s084.TONAME$ = fnn$(gr04$)
+s084.TOEMAIL$ = gr04.EMAIL$
+if testmode THEN s084.TOEMAIL$ = "len@excellware.com"
+call "CDS084", y$, y5$, u0, s084$, y6, y6$
+print (y6.ch)"<p><strong>Click <a href='" + link$ + "'>here</a> to select your practice round tee time.</p>"
+print (y6.ch)"<p>If no tee times are available,<br>Call the course to schedule a tee time, <br>and reply to this email with the time, so it can be added to the site.</p?"
+call "CDS094", y6$, "e"
+sent = sent + 1
+return
+
+played_recently:
+close (gr05)
+select (gr05)gr05$ from "LKGR05" where gr05.league$ = league$ and gr05.id$ = gr04.id$ and gr05.date > jul(0,0,0) - 365
+readrecord (gr05, end=*return)gr05$
+gosub send
+return
+
+FUNCTIONS:
+def fnn$(rec$)
+dim rec1$:fattr(gr04$)
+rec1$ = rec$
+return cvs(cvs(rec1.firstname$, 2) + " " + cvs(rec1.lastname$, 2), 1)
+fnend
