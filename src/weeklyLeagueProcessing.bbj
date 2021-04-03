@@ -61,7 +61,7 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("time", #fixTime(12, 36))
     gr10!.setFieldValue("id", 1, "js01"); rem  Jim Sterley
     gr10!.setFieldValue("id", 2, "mf01"); rem  Mike Fee
-player$ = iff(gr03.date = jul(2020, 4, 7), "lk01", "dr01")
+player$ = iff(gr03.date = jul(2021, 4, 7), "lk01", "dr01")
     gr10!.setFieldValue("id", 3, player$); rem  Dave Regain
     gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
     gr10File!.addUniqueRecord(gr10!)
