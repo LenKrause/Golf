@@ -1,6 +1,7 @@
 0100 REM "GW062.bbj - 04/03/21 Golf Weekly Email - cron version
 0110 SETESC 8000; SETERR 8000
-0112 enter y$, league$, playdate, pdf$, msg$
+0112 enter y$, league$, playdate, pdf$, msg$, err=*next
+0113 if len(y$) = 0 then call "CDS091", y$; league$ = "SAW", playdate=jul(2021,4,7), pdf$="", msg$=""
 0115 use ::ttm.bbj::ttm
 0120 LET TMP$=STBL("WMS_CDW000","D")
 0125 LET Y.PASSPARM$="E"
