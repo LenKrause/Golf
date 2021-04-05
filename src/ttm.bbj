@@ -18,6 +18,7 @@ class public ttm
       methodret #getLink(gr09!.getFieldAsString("aid"), gr09!.getFieldAsString("id"))
     methodend
 
+    rem  Return ttm link if player is marked 'active'
     method public static BBjString getLink(BBjString email$)
       declare DTFileRecords gr09File!
       declare BBjVector     gr09Recs!
@@ -28,7 +29,11 @@ class public ttm
       if gr09Recs!.size() = 0 then methodret ""
       dim gr09$:gr09File!.getTemplate()
       gr09$ = cast(BBjString, gr09Recs!.get(0))
-      methodret #getLink(gr09.aid$, gr09.id$)
+      if gr09.active$ = "Y" then
+        methodret #getLink(gr09.aid$, gr09.id$)
+      else
+        methodret ""
+      fi
     methodend
 
     method public static BBjString getLink(BBjString aid$, BBjString id$)
