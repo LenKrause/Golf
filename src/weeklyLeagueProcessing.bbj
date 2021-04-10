@@ -49,7 +49,7 @@ class public weeklyLeagueProcessing
   methodend
   
   method public BBjTemplatedString getPlayDateRecord()
-    methodret DT.toTemplatedString(#gr03tpl$, #gr03$)
+    methodret DT.toTemplatedString(#gr03$, #gr03tpl$)
   methodend
 
   method private void addTeeTimes(BBjString gr01$, BBjString gr03$)
