@@ -77,25 +77,24 @@ class public weeklyLeagueProcessing
 REM     gr10!.setFieldValue("time", #fixTime(01, 30)); gr10File!.addUniqueRecord(gr10!)
 REM     gr10!.setFieldValue("time", #fixTime(04, 00)); gr10File!.addUniqueRecord(gr10!)
 
-if gr03.date = jul(2021, 4, 14) then
-    gr10!.setFieldValue("time", #fixTime(04, 24))
-    gr10!.setFieldValue("id", 1, "sh01"); rem  Steve Halcisak
-    gr10!.setFieldValue("id", 2, "pc01"); rem  Paul Consiglio
-    gr10!.setFieldValue("id", 3, "ds01"); rem  Dave Schweiterman
-    gr10File!.addUniqueRecord(gr10!)
-    for i = 1 to 4
-      gr10!.setFieldValue("id", i, "")
-    next i
-fi
+REM if gr03.date = jul(2021, 4, 14) then
+REM     gr10!.setFieldValue("time", #fixTime(04, 24))
+REM     gr10!.setFieldValue("id", 1, "sh01"); rem  Steve Halcisak
+REM     gr10!.setFieldValue("id", 2, "pc01"); rem  Paul Consiglio
+REM     gr10!.setFieldValue("id", 3, "ds01"); rem  Dave Schweiterman
+REM     gr10File!.addUniqueRecord(gr10!)
+REM     for i = 1 to 4
+REM       gr10!.setFieldValue("id", i, "")
+REM     next i
+REM fi
 
 if gr03.date >= jul(2021, 4, 21) then
-    gr10!.setFieldValue("time", #fixTime(04, 24)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(04, 32)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 20)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 30)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 40)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(04, 48)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(04, 56)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(05, 04)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(05, 12)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 50)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(05, 00)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(05, 10)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(05, 20)); gr10File!.addUniqueRecord(gr10!)
 fi
 
