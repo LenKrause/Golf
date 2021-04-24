@@ -41,7 +41,7 @@
 0440 GOSUB CHART
 0445 GOSUB BESTROUNDS
 0450 LET S084.TONAME$=FNN$(GR04$),S084.TOEMAIL$=GR04.EMAIL$
-0460 IF 0 THEN LET S084.TOEMAIL$="len@excellware.com"
+0460 IF 1 THEN LET S084.TOEMAIL$="len@excellware.com"
 0470 IF 0 THEN CALL "CDW999",HTML$; RUN "GW011"
 0480 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
 0490 if 0 LET NOTE$=CGI.NOTE$
@@ -49,7 +49,7 @@
 0492 if 0 CALL "SW002",NOTE$,$E28099$,"'"
 0494 if 0 LET CGI.NOTE$=NOTE$
 0500 if 0 CALL "SW002",NOTE$,$0D0A$,"<br>"
-0505 if jul(0,0,0)=jul(2020,8,8) then note$="<p>No early rounds this week due to high school tournament at Pine Hills.</p>"
+0505 if jul(0,0,0)<=jul(2021,4,28) then note$="<p>We had some additional last minute roster changes, so here is the updated match info.</p>"
 0510 if len(note$) PRINT (Y6.CH)NOTE$
 0520 if 0 CALL "CDS257",Y$,league$+"e","","XXGR02","W",0,0,0,0,"","","","",CGI.NOTE$
 0524 link$ = ttm.getLink(gr04.EMAIL$)
@@ -69,7 +69,7 @@
 0625 if len(pdf$) call "CDS184", Y$, y6$, pdf$, "HandicapListing.pdf"
 0630 CALL "CDS094",Y6$,"e"
 0640 LET SENT=SENT+1
-0650 IF 0 THEN LET TS=TS+1; IF TS=2 THEN GOTO EOJ
+0650 IF 1 THEN LET TS=TS+1; IF TS=2 THEN GOTO EOJ
 0660 GOTO 0250
 
 1000 WEEK:
