@@ -154,6 +154,7 @@ fi
 
 if fid(0) = "IO" then
   call "CDS041", "CDS084", s084$, "YP"
+  tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
   s084.name$      = "MAIL"
   s084.mode$      = "N"
   s084.subject$   = "Weekly Golf Processing"
