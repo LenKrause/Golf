@@ -142,6 +142,9 @@ declare BBjTemplatedString gr03!
 gr03! = wlp!.getPlayDateRecord()
 playdate = gr03!.getFieldAsNumber("date")
 
+rem  Set symbol in subject for emails sent
+tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
+
 if gr03!.getFieldAsNumber("half")
   rem  Build Handicap Listing pdf file for playdate
   call "GW045", y$, league$, playdate, pdffile$
@@ -154,7 +157,6 @@ fi
 
 if fid(0) = "IO" then
   call "CDS041", "CDS084", s084$, "YP"
-  tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
   s084.name$      = "MAIL"
   s084.mode$      = "N"
   s084.subject$   = "Weekly Golf Processing"
