@@ -89,7 +89,17 @@ REM     next i
 REM fi
 
 if gr03.date >= jul(2021, 4, 21) then
-    gr10!.setFieldValue("time", #fixTime(04, 20)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(04, 20))
+    
+    gr10!.setFieldValue("id", 1, "jm01"); rem  Jim Mindek
+    gr10!.setFieldValue("id", 2, "bp01"); rem  Bernie
+REM     gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regain
+REM     gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
+    gr10File!.addUniqueRecord(gr10!)
+    for i = 1 to 4
+      gr10!.setFieldValue("id", i, "")
+    next i
+    
     gr10!.setFieldValue("time", #fixTime(04, 30)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 40)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(04, 50)); gr10File!.addUniqueRecord(gr10!)
