@@ -82,4 +82,12 @@ classend
 
 test:
 print ttm.getLink("ls01","ls01")
+escape
 
+sendall:
+declare DTFileRecords      gr09File!
+declare BBjTemplatedString gr09!
+gr09File! = new DTFileRecords("LK", "GR09", "YNY")
+gr09! = gr09File!.getRecord(0, "lk01lk01")
+ttm.sendEmailLink(gr09!)
+escape
