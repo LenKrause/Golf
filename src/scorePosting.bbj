@@ -98,7 +98,7 @@ class public scorePosting
       table!.addCell(iff(gr03.nine$ = "F", "Front", "Back"), "R2" + bc$)
       
       link$ = "My Score"
-      if gr05.date >= jul(0,0,0) - 6 then
+      if gr05.date >= jul(0,0,0) - 6 - 14 then
         link$ = "<a href='" + #getUrl("getScorecardForm") + "&hexkey=" + hta(gr05$(1,10) + gr03.nine$) + "'>" + link$ + "</a>"
       fi
       table!.addCell(link$, "&r" + bc$)
