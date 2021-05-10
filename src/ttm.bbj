@@ -61,6 +61,7 @@ REM       s084.emailbcc$ = s084.fromemail$
       print (y6.ch)"<style>body{color:green;}</style>"
       print (y6.ch)"<body>"
       if gr09!.getFieldAsString("id") = "lk01" then
+        so84.subject$ = "Tee Time Manager Access Links"
         declare DTFileRecords gr09File!
         gr09File! = new DTFileRecords("LK", "GR09", "YNY")
         gr09File!.setKeyPre("lk01")
@@ -69,7 +70,8 @@ REM       s084.emailbcc$ = s084.fromemail$
         for j = 0 to gr09Recs!.size() - 1
           gr09! = gr09File!.getRec()
           gr09!.setString(cast(BBjString, gr09Recs!.get(j)))
-          print (y6.ch)gr09!.getFieldAsString("firstname"), " ", gr09!.getFieldAsString("lastname")," <a href=""" + #getLink(gr09!) + """>link</a><br>"
+          inactive$ = iff(gr09!.getFieldAsString("active") = "Y", "", " Inactive")
+          print (y6.ch)"<a href=""" + #getLink(gr09!) + """>" + gr09!.getFieldAsString("firstname").trim() + " " + gr09!.getFieldAsString("lastname").trim() + "</a>" + inactive$ + "<br>"
         next j
       else
         print (y6.ch)cvs(gr09!.getFieldAsString("firstname"), 2) + "-<br><br>"
