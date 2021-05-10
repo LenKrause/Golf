@@ -61,7 +61,7 @@ REM       s084.emailbcc$ = s084.fromemail$
       print (y6.ch)"<style>body{color:green;}</style>"
       print (y6.ch)"<body>"
       if gr09!.getFieldAsString("id") = "lk01" then
-        so84.subject$ = "Tee Time Manager Access Links"
+        s084.subject$ = "Access Links"
         declare DTFileRecords gr09File!
         gr09File! = new DTFileRecords("LK", "GR09", "YNY")
         gr09File!.setKeyPre("lk01")
