@@ -62,8 +62,12 @@ repeat
     gosub week
   fi
   call "CDW000", html$, "t", tab$
+  
+  if len(html$[5]) then html$ = html$ + "<br>" + html$[5]; rem  Weekly Prizes
+  
   z = pos(gr05.flt$ = flts$)
-  if z then html$ = html$ + "<br>" + html$[z] + "<br>"
+  if z and len(html$[z]) then html$ = html$ + html$[z] + "<br>"; rem  Flight Point Ranking
+   
   html$ = "<div style='font-family:verdana,tahoma,sans-serif'>" + html$ + "</div>"
   html$ = html$ + "<div style='font-size:0;height:5px;'></div>"
   gosub chart

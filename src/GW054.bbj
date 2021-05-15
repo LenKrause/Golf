@@ -124,7 +124,7 @@ return
 prizes:
 html$ = ""
 pz$ = ssort(pz$, 7)
-call "CDW000", row$, "hs4c", "Prize Winners " + date(playdate - 7:"%Ds %Ms %D")
+call "CDW000", row$, "hs4c", "Prize Winners - " + date(playdate - 7:"%Ds %Ms %D")
 call "CDW000", tab$, "r class='title'", row$
 call "CDW000", row$, "hc", "Flt"
 call "CDW000", row$, "hc", "Skill"
@@ -177,7 +177,7 @@ escape
 
 testh:
 for i = 1 to 5
-  if len(html$[i]) then html$ = html$ + html$[i] + "<br>"
+  if len(html$[i]) then call "CDW000", html$, "t", html$[i] + "<br>"
 next i
 call "CDW999", html$
 return
