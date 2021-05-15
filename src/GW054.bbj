@@ -171,13 +171,15 @@ return
 test:
 begin
 call "CDS091", y$
-call pgm(-1), y$, "SAW", jul(2021,5,19), flts$, html$[all]
+for jdate = jul(2021,5,5) to jul(2021,5,19) step 7
+  call pgm(-1), y$, "SAW", jul(2021,5,19), flts$, html$[all]
+next jdate
 if len(flts$) then gosub testh
 escape
 
 testh:
 for i = 1 to 5
-  if len(html$[i]) then call "CDW000", html$, "t", html$[i] + "<br>"
+  if i = 5 and len(html$[i]) then call "CDW000", html$, "t", html$[i] + "<br>"
 next i
 call "CDW999", html$
 return
