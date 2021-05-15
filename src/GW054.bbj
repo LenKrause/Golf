@@ -154,7 +154,7 @@ return
 
 addname:
   if gr04 = 0 call "CDS095", gr04, "XXGR04", "YUY", gr04$
-  read record (gr04, knum=0, key=id$, dom=*return)gr04$
+  read record (gr04, knum=0, key=league$ + id$, dom=*return)gr04$
   if len(names$) names$ = names$ + ","
   name$ = names$ + cvs(gr04.firstname$, 3) + " " + cvs(gr04.lastname$, 3)  
 return
