@@ -124,7 +124,7 @@ return
 prizes:
 html$ = ""
 pz$ = ssort(pz$, 7)
-call "CDW000", row$, "hs4c", "Prize Winners"
+call "CDW000", row$, "hs4c", "Prize Winners " + date(playdate - 7:"%Ds %Ms %D")
 call "CDW000", tab$, "r class='title'", row$
 call "CDW000", row$, "hc", "Flt"
 call "CDW000", row$, "hc", "Skill"
@@ -171,7 +171,7 @@ return
 test:
 begin
 call "CDS091", y$
-call pgm(-1), y$, "SAW", jul(2021,5,12), flts$, html$[all]
+call pgm(-1), y$, "SAW", jul(2021,5,19), flts$, html$[all]
 if len(flts$) then gosub testh
 escape
 
