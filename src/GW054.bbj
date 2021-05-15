@@ -134,6 +134,8 @@ flt$ = "", skill$ = "", names$ = ""
 for i = 1 to len(pz$) step 7
   if pz$(i,2) <> flt$ + skill$ then
     if len(names$) then gosub add_prize_row
+    flt$   = pz$(i, 1)
+    skill$ = pz$(i + 1, 1)
     score = asc(pz$(i + 2, 1))
     id$ = pz$(i + 3, 4)
     gosub addname
@@ -168,7 +170,7 @@ return
 test:
 begin
 call "CDS091", y$
-call pgm(-1), y$, "SAW", jul(2020,5,12), flts$, html$[all]
+call pgm(-1), y$, "SAW", jul(2021,5,12), flts$, html$[all]
 if len(flts$) then gosub testh
 escape
 
