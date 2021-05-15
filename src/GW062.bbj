@@ -1,254 +1,280 @@
-0100 REM "GW062.bbj - 04/03/21 Golf Weekly Email - cron version
-0110 SETESC 8000; SETERR 8000
-0112 enter y$, league$, playdate, pdf$, msg$, err=*next
-0113 if len(y$) = 0 then call "CDS091", y$; league$ = "SAW", playdate=jul(2021,4,7), pdf$="", msg$=""
-0115 use ::ttm.bbj::ttm
-0120 LET TMP$=STBL("WMS_CDW000","D")
-0125 LET Y.PASSPARM$="E"
-0130 CALL "GW054.bbj", Y$, league$, playdate + 0, FLTS$, HTML$[ALL]
-0140 CALL "CDS041","CDS084",S084$,"YY"
-0150 LET SENT=0
-0160 LET S084.MODE$="E",S084.NAME$="MAIL",S084.EMAILTYPE$="H"
-0170 LET S084.FROMNAME$="ScoresAndCharts.com",S084.FROMEMAIL$="webmaster@scoresandcharts.com"
-0180 CALL "CDS095",GR03,"XXGR03","YNY",GR03$
-0190 CALL "CDS095",GR04,"XXGR04","YNY",GR04$
-0200 CALL "CDS095",GR05,"XXGR05","YNY",GR05$,GR05K$
-0210 CALL "SW001","XXGR01",0,league$,GR01$,SW001$
-0212 CALL "SW001","XXGR03",0,league$+BIN(playdate,3),GR03$,SW001$
-0213 CALL "SW001","XXGR03",0,league$+BIN(playdate-7,3),GR03A$,SW001$
-0215 CALL "SW001","XXGR08",0,GR01.ID$,GR08$,SW001$
-0220 LET S084.SUBJECT$=GR01.NAME$
-0230 LET GR05S=UNT
-0240 SELECT (GR05S)GR05$ FROM Y.COMPCODE$+"GR05" WHERE GR05.LEAGUE$=league$ AND GR05.DATE=playdate
-0250 READ RECORD(GR05S,END=EOJ)GR05$
-0260 READ RECORD(GR04,KNUM=0,KEY=GR05.LEAGUE$+GR05.ID$)GR04$
-0270 IF POS(" "<>GR04.EMAIL$)=0 THEN GOTO 0250
-0280 LET HTML$="",TAB$="",ROW$=""
-0290 IF GR03.HALF=1 OR GR03.HALF=2 OR GR03A.HALF=1 OR GR03A.HALF=2 THEN CALL "CDW000",ROW$,"hbcs3",GR01.NAME$; CALL "CDW000",TAB$,"r",ROW$
-0310 DIM GR05A$:FATTR(GR05$)
-0320 LET GR05A.LEAGUE$=GR05.LEAGUE$
-0330 LET GR05A.ID$=GR05.ID$
-0340 LET GR05A.DATE=playdate-7; REM  ToDo - modify to use last round actually played by using SELECT where score is posted sorted by highest data first, limit 1
-0350 READ RECORD(GR05,KNUM=0,KEY=KGEN(GR05A$,GR05K$,0),DOM=0360)GR05A$; GOTO 0370
-0360 READ RECORD(GR05,END=0380)GR05A$
-0370 IF GR05A.LEAGUE$=GR05.LEAGUE$ AND GR05A.ID$=GR05.ID$ AND (GR03A.HALF=1 OR GR03.HALF=2) THEN LET WK=1,TIT$="Last Round"; GOSUB WEEK
-0380 IF GR03.HALF=1 OR GR03.HALF=2 THEN LET GR05A$=GR05$,WK=2,TIT$="Next Round - " + iff(gr03.NINE$ = "F", "FRONT", "BACK") +  " NINE"; GOSUB WEEK
-0390 CALL "CDW000",HTML$,"t",TAB$
-0400 LET Z=POS(GR05.FLT$=FLTS$)
-0410 IF Z THEN LET HTML$=HTML$+"<br>"+HTML$[Z]+"<br>"
-0420 LET HTML$="<div style='font-family:verdana,tahoma,sans-serif'>"+HTML$+"</div>"
-0430 LET HTML$=HTML$+"<div style='font-size:0;height:5px;'></div>"
-0440 GOSUB CHART
-0445 GOSUB BESTROUNDS
-0450 LET S084.TONAME$=FNN$(GR04$),S084.TOEMAIL$=GR04.EMAIL$
-0460 IF 0 THEN LET S084.TOEMAIL$="len@excellware.com"
-0470 IF 0 THEN CALL "CDW999",HTML$; RUN "GW011"
-0480 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
-0490 if 0 LET NOTE$=CGI.NOTE$
-0491 if 0 CALL "SW002",NOTE$,$E2809D$,""""
-0492 if 0 CALL "SW002",NOTE$,$E28099$,"'"
-0494 if 0 LET CGI.NOTE$=NOTE$
-0500 if 0 CALL "SW002",NOTE$,$0D0A$,"<br>"
-0505 if jul(0,0,0)<=jul(2021,4,28) then note$="<p>We had some additional last minute roster changes, so here is the updated match info.</p>"
-0510 if len(note$) PRINT (Y6.CH)NOTE$
-0520 if 0 CALL "CDS257",Y$,league$+"e","","XXGR02","W",0,0,0,0,"","","","",CGI.NOTE$
-0524 link$ = ttm.getLink(gr04.EMAIL$)
-0525 if len(link$) then print (y6.ch)"<p><strong>Click <a href='" + link$ + "'>here</a> to select your tee time.</p>"
-0530 if 0 PRINT (Y6.CH)"<p><strong>Please call or email your opponent if you can't play this week.</strong></p>"
-0540 if 0 IF POS(" "<>GR08.NAME$) AND POS(" "<>GR08.PHONE$) THEN PRINT (Y6.CH)"<p><strong>Call "+CVS(GR08.NAME$,2)+" at "+GR08.PHONE$+" if you can't play and did not get in touch with your opponent.</strong></p>"
-0550 PRINT (Y6.CH)"<p>You can login to <a href='http://scoresandcharts.com'>ScoresAndCharts.com</a> anytime to:</p>"
-0560 PRINT (Y6.CH)"<ul>"
-0565 PRINT (Y6.CH)"<li>Enter scorecard,</li>"
-0570 PRINT (Y6.CH)"<li>View results of last round,</li>"
-0580 PRINT (Y6.CH)"<li>View next opponent info,</li>"
-0585 PRINT (Y6.CH)"<li>View point ranking,</li>"
-0590 PRINT (Y6.CH)"<li>Change information including your email address &amp; phone#, and</li>"
-0600 PRINT (Y6.CH)"<li>View latest charts and your best 10 rounds!</li>"
-0610 PRINT (Y6.CH)"</ul>"
-0620 PRINT (Y6.CH)HTML$
-0625 if len(pdf$) call "CDS184", Y$, y6$, pdf$, "HandicapListing.pdf"
-0630 CALL "CDS094",Y6$,"e"
-0640 LET SENT=SENT+1
-0650 IF 0 THEN LET TS=TS+1; IF TS=2 THEN GOTO EOJ
-0660 GOTO 0250
+rem "GW062.bbj - 05/15/21 Golf Weekly Email - cron version
+use ::ttm.bbj::ttm
+setesc DT_ERR; seterr DT_ERR
+enter y$, league$, playdate, pdf$, msg$, err=*next
 
-1000 WEEK:
-1010 DIM GR04A$:FATTR(GR04$)
-1020 READ RECORD(GR04,KNUM=0,KEY=GR05.LEAGUE$+GR05A.OPP$,DOM=1030)GR04A$
-1030 DIM GR05B$:FATTR(GR05$)
-1040 READ RECORD(GR05,KNUM=0,KEY=GR05.LEAGUE$+GR05A.OPP$+GR05A.DATE$,DOM=1050)GR05B$
-1050 CALL "CDW000",ROW$,"hcs3",TIT$
-1060 CALL "CDW000",TAB$,"r",ROW$
-1070 CALL "CDW000",ROW$,"dr",DATE(GR05A.DATE:"%Ds %Mz/%Dz/%Yz")
-1080 CALL "CDW000",ROW$,"dc",FNN$(GR04$)
-1090 CALL "CDW000",ROW$,"dc",FNN$(GR04A$)
-1100 CALL "CDW000",TAB$,"r",ROW$
-1110 IF WK=1 THEN CALL "CDW000",ROW$,"dr","Gross"; CALL "CDW000",ROW$,"dc",FNS$(GR05A.SCORE); CALL "CDW000",ROW$,"dc",FNS$(GR05B.SCORE); CALL "CDW000",TAB$,"r",ROW$
-1120 CALL "CDW000",ROW$,"dr","Handicap"; CALL "CDW000",ROW$,"dc",FNS$(GR05A.HC); CALL "CDW000",ROW$,"dc",FNS$(GR05B.HC); CALL "CDW000",TAB$,"r",ROW$
-1130 IF WK=1 THEN CALL "CDW000",ROW$,"dr","Net"; CALL "CDW000",ROW$,"dc",FNS$(GR05A.NET); CALL "CDW000",ROW$,"dc",FNS$(GR05B.NET); CALL "CDW000",TAB$,"r",ROW$
-1140 IF WK=1 THEN CALL "CDW000",ROW$,"dr","Putts"; CALL "CDW000",ROW$,"dc",FNS$(GR05A.PUTTS); CALL "CDW000",ROW$,"dc",FNS$(GR05B.PUTTS); CALL "CDW000",TAB$,"r",ROW$
-1150 IF WK=1 THEN CALL "CDW000",ROW$,"dr","Points"; CALL "CDW000",ROW$,"dc",FNS$(GR05A.POINTS); CALL "CDW000",ROW$,"dc",FNS$(GR05B.POINTS); CALL "CDW000",TAB$,"r",ROW$
-1160 IF WK=2 THEN CALL "CDW000",ROW$,"dr","Email"; CALL "CDW000",ROW$,"dc",GR04.EMAIL$; CALL "CDW000",ROW$,"dc","<a href='mailto:"+CVS(GR04A.EMAIL$,3)+"?subject=Golf'>"+GR04A.EMAIL$+"</a>"; CALL "CDW000",TAB$,"r",ROW$
-1170 IF WK=2 THEN CALL "CDW000",ROW$,"dr","Phone#"; CALL "CDW000",ROW$,"dc",GR04.PHONE$; CALL "CDW000",ROW$,"dc",GR04A.PHONE$; CALL "CDW000",TAB$,"r",ROW$
-1180 RETURN
+if len(y$) = 0 then
+  call "CDS091", y$
+  league$ = "SAW"
+  playdate = jul(2021,4,7)
+  pdf$ = ""
+  msg$ = ""
+fi
 
-1200 FUNCTIONS:
-1210 DEF FNN$(REC$)
-1220 DIM REC1$:FATTR(GR04$); LET REC1$=REC$
-1230 LET NAM$=CVS(CVS(REC1.FIRSTNAME$,2)+" "+CVS(REC1.LASTNAME$,2),1)
-1240 RETURN NAM$
-1250 FNEND
+tmp$ = stbl("WMS_CDW000", "D")
+y.passparm$ = "E"
 
-1260 DEF FNS$(VAL)
-1270 IF VAL THEN LET OUT$=STR(VAL) ELSE LET OUT$=""
-1280 RETURN OUT$
-1290 FNEND
+rem  Get League Points Ranking by Flight
+call "GW054.bbj", y$, league$, playdate + 0, flts$, html$[all]
 
-1300 DEF FNB$(TXT$)
-1310 WHILE POS(" "=TXT$)
-1320 LET TXT$(POS(" "=TXT$),1)="+"
-1330 WEND
-1340 RETURN TXT$
-1350 FNEND
+call "CDS041", "CDS084", s084$, "YY"
+sent = 0
+s084.mode$ = "E", s084.name$ = "MAIL", s084.emailtype$ = "H"
+s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "webmaster@scoresandcharts.com"
+call "CDS095", gr03, "XXGR03", "YNY", gr03$
+call "CDS095", gr04, "XXGR04", "YNY", gr04$
+call "CDS095", gr05, "XXGR05", "YNY", gr05$, gr05k$
+call "SW001", "XXGR01", 0, league$, gr01$, sw001$
+call "SW001", "XXGR03", 0, league$ + bin(playdate, 3), gr03$, sw001$
+call "SW001", "XXGR03", 0, league$ + bin(playdate - 7, 3), gr03a$, sw001$
+call "SW001", "XXGR08", 0, gr01.id$, gr08$, sw001$
+s084.subject$ = gr01.name$
 
-1400 CHART:
-1410 LET TMP$=STBL("WMS_CDW000_RC",""); REM "Disable odd/even row background
-1420 DIM R$:"S:C(2*),STOT:B,SRND:B,SMIN:B,SMAX:B,P:C(2*),PTOT:B,PRND:B,PMIN:B,PMAX:B,H:C(2*),HTOT:B,HRND:B,HMIN:B,HMAX:B"
-1430 LET R.SMIN=99,R.PMIN=99,R.HMIN=99
-1440 DIM L$:FATTR(R$); LET L$=R$
-1450 DIM YY$:FATTR(R$); LET YY$=R$
-1460 LET CHXL0$="",CHXL1$="",CHXL2$="",CHXL0Y$="",YSCORES$="",YPUTTS$="",YHC$="",GR05C=UNT,TOTS=0,TOTP=0,TOTH=0,RNDP=0,RNDH=0,MINS=99,MAXS=0,MINP=99,MAXP=0,MINH=99,MAXH=0,CY=0,YTOTS=0,YTOTP=0,YTOTH=0,YRNDS=0,YRNDP=0,YRNDH=0,YS$="",YP$="",YH$="",YRS=0
-1470 DIM GR05C$:FATTR(GR05$)
-1480 SELECT (GR05C)GR05C$ FROM Y.COMPCODE$+"GR05" WHERE GR05C.LEAGUE$=GR05.LEAGUE$ AND GR05C.ID$=GR04.ID$ AND GR05C.SCORE
-1490 READ RECORD(GR05C,END=1570)GR05C$
-1500 IF L.SRND<20 THEN GOSUB LATEST
-1510 LET TY=NUM(DATE(GR05C.DATE:"%Yl"))
-1520 IF TY<>CY AND CY THEN GOSUB NEWYR
-1530 LET CY=TY,YTOTS=YTOTS+GR05C.SCORE,YRNDS=YRNDS+1
-1540 IF GR05C.PUTTS THEN LET YTOTP=YTOTP+GR05C.PUTTS,YRNDP=YRNDP+1
-1550 IF GR05C.HC THEN LET YTOTH=YTOTH+GR05C.HC,YRNDH=YRNDH+1
-1560 GOTO 1490
-1570 CLOSE (GR05C)
-1580 GOSUB NEWYR
-1590 LET R$=L$; GOSUB ADJ; LET L$=R$
-1600 LET R$=YY$; GOSUB ADJ; LET YY$=R$
-1610 IF L.SRND THEN LET AVGV=ROUND(L.STOT/L.SRND,1),TIT$="Scores",MINV=L.SMIN,MAXV=L.SMAX,DELTA=5,VAL$=L.S$,CLR$="3072F3"; GOSUB DOCHL
-1620 IF YY.SRND THEN LET AVGV=ROUND(YY.STOT/YY.SRND,1),TIT$="Scores",MINV=YY.SMIN,MAXV=YY.SMAX,DELTA=1,VAL$=YY.S$,CLR$="3072F3"; GOSUB DOCHY
-1630 IF L.SRND OR YY.SRND THEN CALL "CDW000",TAB$,"r style='padding:0px'",ROW$
-1640 IF L.PRND THEN LET AVGV=ROUND(L.PTOT/L.PRND,1),TIT$="Putts",MINV=L.PMIN-1,MAXV=L.PMAX+1,DELTA=1,VAL$=L.P$,CLR$="33cc33"; GOSUB DOCHL
-1650 IF YY.PRND THEN LET AVGV=ROUND(YY.PTOT/YY.PRND,1),TIT$="Putts",MINV=YY.PMIN-1,MAXV=YY.PMAX+1,DELTA=1,VAL$=YY.P$,CLR$="33cc33"; GOSUB DOCHY
-1660 IF L.PRND OR YY.PRND THEN CALL "CDW000",TAB$,"r style='padding:0px'",ROW$
-1670 IF L.HRND THEN LET AVGV=ROUND(L.HTOT/L.HRND,1),TIT$="Handicap",MINV=L.HMIN-1,MAXV=L.HMAX+1,DELTA=1,VAL$=L.H$,CLR$="ff9900"; GOSUB DOCHL
-1680 IF YY.HRND THEN LET AVGV=ROUND(YY.HTOT/YY.HRND,1),TIT$="Handicap",MINV=YY.HMIN-1,MAXV=YY.HMAX+1,DELTA=1,VAL$=YY.H$,CLR$="ff9900"; GOSUB DOCHY
-1690 IF L.HRND OR YY.HRND THEN CALL "CDW000",TAB$,"r style='padding:0px'",ROW$
-1700 CALL "CDW000",HTML$,"t style='border:0px'",TAB$
-1710 RETURN
+gr05s = unt
+select (gr05s)gr05$ from y.compcode$ + "GR05" where gr05.league$ = league$ and gr05.date = playdate
 
-1800 ADJ:
-1810 IF R.SRND THEN LET R.S$="_"+R.S$+",_",R.P$="_"+R.P$+",_",R.H$="_"+R.H$+",_"
-1820 LET R.SMIN=R.SMIN-MOD(R.SMIN,5)
-1830 LET R.SMAX=R.SMAX-MOD(R.SMAX,5)+5
-1840 LET R.PMIN=R.PMIN-MOD(R.PMIN,1)-0
-1850 LET R.PMAX=R.PMAX-MOD(R.PMAX,1)+0
-1860 LET R.HMIN=R.HMIN-MOD(R.HMIN,1)-0
-1870 LET R.HMAX=R.HMAX-MOD(R.HMAX,1)+0
-1880 RETURN
+repeat
+  read record(gr05s, end=eoj)gr05$
+  read record(gr04, knum=0, key=gr05.league$ + gr05.id$)gr04$
+  if pos(" " <> gr04.email$) = 0 then continue
+  html$ = "", tab$ = "", row$ = ""
+  if gr03.half = 1 or gr03.half = 2 or gr03a.half = 1 or gr03a.half = 2 then
+    call "CDW000", row$, "hbcs3", gr01.name$
+    call "CDW000", tab$, "r", row$
+  fi
+  dim gr05a$:fattr(gr05$)
+  gr05a.league$ = gr05.league$
+  gr05a.id$ = gr05.id$
+  gr05a.date = playdate - 7; rem  todo - modify to use last round actually played by using select where score is posted sorted by highest data first, limit 1
+  read record(gr05, knum=0, key=kgen(gr05a$, gr05k$, 0), dom=*next)gr05a$; goto L370
+  read record(gr05, end=L380)gr05a$
+  L370:
+  if gr05a.league$ = gr05.league$ and gr05a.id$ = gr05.id$ and (gr03a.half = 1 or gr03.half = 2) then
+    wk = 1
+    tit$ = "Last Round"
+    gosub week
+  fi
+  L380:
+  if gr03.half = 1 or gr03.half = 2 then
+    gr05a$ = gr05$
+    wk = 2
+    tit$ = "Next Round - " + iff(gr03.NINE$ = "F", "FRONT", "BACK") +  " NINE"
+    gosub week
+  fi
+  call "CDW000", html$, "t", tab$
+  z = pos(gr05.flt$ = flts$)
+  if z then html$ = html$ + "<br>" + html$[z] + "<br>"
+  html$ = "<div style='font-family:verdana,tahoma,sans-serif'>" + html$ + "</div>"
+  html$ = html$ + "<div style='font-size:0;height:5px;'></div>"
+  gosub chart
+  gosub bestrounds
+  s084.toname$ = fnn$(gr04$), s084.toemail$ = gr04.email$
+  if 0 then s084.toemail$ = "len@excellware.com"
+  if 0 then call "CDW999", html$; run "GW011"
+  call "CDS084", y$, y5$, u0, s084$, y6, y6$
+  if 0 then note$ = cgi.note$
+  if 0 then call "SW002", note$, $e2809d$, """"
+  if 0 then call "SW002", note$, $e28099$, "'"
+  if 0 then cgi.note$ = note$
+  if 0 then call "SW002", note$, $0d0a$, "<br>"
+  if jul(0,0,0) <= jul(2021,4,28) then note$ = "<p>We had some additional last minute roster changes, so here is the updated match info.</p>"
+  if len(note$) then print (y6.ch)note$
+  if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
+  link$ = ttm.getLink(gr04.EMAIL$)
+  if len(link$) then print (y6.ch)"<p><strong>Click <a href='" + link$ + "'>here</a> to select your tee time.</p>"
+  if 0 then print (y6.ch)"<p><strong>Please call or email your opponent if you can't play this week.</strong></p>"
+  if 0 then if pos(" " <> gr08.name$) and pos(" " <> gr08.phone$) then print (y6.ch)"<p><strong>Call " + cvs(gr08.name$, 2) + " at " + gr08.phone$ + " if you can't play and did not get in touch with your opponent.</strong></p>"
+  print (y6.ch)"<p>You can login to <a href='http://scoresandcharts.com'>ScoresAndCharts.com</a> anytime to:</p>"
+  print (y6.ch)"<ul>"
+  print (y6.ch)"<li>Enter scorecard,</li>"
+  print (y6.ch)"<li>View results of last round,</li>"
+  print (y6.ch)"<li>View next opponent info,</li>"
+  print (y6.ch)"<li>View point ranking,</li>"
+  print (y6.ch)"<li>Change information including your email address &amp; phone#, and</li>"
+  print (y6.ch)"<li>View latest charts and your best 10 rounds!</li>"
+  print (y6.ch)"</ul>"
+  print (y6.ch)html$
+  if len(pdf$) then call "CDS184", y$, y6$, pdf$, "HandicapListing.pdf"
+  call "CDS094", y6$, "e"
+  sent = sent + 1
+  if 0 then ts = ts + 1; if ts = 2 then goto eoj
+until 0
 
-1900 LATEST:
-1910 LET CHXL0$="|"+DATE(GR05C.DATE:"%Mz")+CHXL0$
-1920 LET CHXL1$="|"+DATE(GR05C.DATE:"%Dz")+CHXL1$
-1930 LET CHXL2$="|"+DATE(GR05C.DATE:"%Yz")+CHXL2$
-1940 LET R$=L$,S=GR05C.SCORE,P=GR05C.PUTTS,H=GR05C.HC; GOSUB TOTS; LET L$=R$
-1950 RETURN
+week:
+  dim gr04a$:fattr(gr04$)
+  read record(gr04, knum=0, key=gr05.league$ + gr05a.opp$, dom=*next)gr04a$
+  dim gr05b$:fattr(gr05$)
+  read record(gr05, knum=0, key=gr05.league$ + gr05a.opp$ + gr05a.date$, dom=*next)gr05b$
+  call "CDW000", row$, "hcs3", tit$
+  call "CDW000", tab$, "r", row$
+  call "CDW000", row$, "dr", date(gr05a.date:"%Ds %Mz/%Dz/%Yz")
+  call "CDW000", row$, "dc", fnn$(gr04$)
+  call "CDW000", row$, "dc", fnn$(gr04a$)
+  call "CDW000", tab$, "r", row$
+  if wk = 1 then call "CDW000", row$, "dr", "Gross"; call "CDW000", row$, "dc", fns$(gr05a.score); call "CDW000", row$, "dc", fns$(gr05b.score); call "CDW000", tab$, "r", row$
+  call "CDW000", row$, "dr", "Handicap"; call "CDW000", row$, "dc", fns$(gr05a.hc); call "CDW000", row$, "dc", fns$(gr05b.hc); call "CDW000", tab$, "r", row$
+  if wk = 1 then call "CDW000", row$, "dr", "Net"; call "CDW000", row$, "dc", fns$(gr05a.net); call "CDW000", row$, "dc", fns$(gr05b.net); call "CDW000", tab$, "r", row$
+  if wk = 1 then call "CDW000", row$, "dr", "Putts"; call "CDW000", row$, "dc", fns$(gr05a.putts); call "CDW000", row$, "dc", fns$(gr05b.putts); call "CDW000", tab$, "r", row$
+  if wk = 1 then call "CDW000", row$, "dr", "Points"; call "CDW000", row$, "dc", fns$(gr05a.points); call "CDW000", row$, "dc", fns$(gr05b.points); call "CDW000", tab$, "r", row$
+  if wk = 2 then call "CDW000", row$, "dr", "Email"; call "CDW000", row$, "dc", gr04.email$; call "CDW000", row$, "dc", "<a href='mailto:" + cvs(gr04a.email$, 3) + "?subject=Golf'>" + gr04a.email$ + "</a>"; call "CDW000", tab$, "r", row$
+  if wk = 2 then call "CDW000", row$, "dr", "Phone#"; call "CDW000", row$, "dc", gr04.phone$; call "CDW000", row$, "dc", gr04a.phone$; call "CDW000", tab$, "r", row$
+return
 
-2000 TOTS:
-2010 LET R.S$=","+STR(S)+R.S$
-2020 LET R.STOT=R.STOT+S
-2030 LET R.SRND=R.SRND+1
-2040 LET R.SMIN=MIN(R.SMIN,S)
-2050 LET R.SMAX=MAX(R.SMAX,S)
-2060 IF P THEN LET R.P$=","+STR(P)+R.P$; LET R.PTOT=R.PTOT+P; LET R.PRND=R.PRND+1; LET R.PMIN=MIN(R.PMIN,P); LET R.PMAX=MAX(R.PMAX,P) ELSE LET R.P$=",_"+R.P$
-2070 IF H THEN LET R.H$=","+STR(H)+R.H$; LET R.HTOT=R.HTOT+H; LET R.HRND=R.HRND+1; LET R.HMIN=MIN(R.HMIN,H); LET R.HMAX=MAX(R.HMAX,H) ELSE LET R.H$=",_"+R.H$
-2080 RETURN
+functions:
+def fnn$(rec$)
+  dim rec1$:fattr(gr04$); rec1$ = rec$
+  nam$ = cvs(cvs(rec1.firstname$, 2) + " " + cvs(rec1.lastname$, 2), 1)
+  return nam$
+fnend
 
-2100 NEWYR:
-2110 IF YRNDS=0 THEN RETURN
-2120 LET CHXL0Y$="|"+STR(CY)+CHXL0Y$
-2130 LET R$=YY$,S=ROUND(YTOTS/YRNDS,1),P=ROUND(YTOTP/MAX(1,YRNDP),1),H=ROUND(YTOTH/MAX(1,YRNDH),1); GOSUB TOTS; LET YY$=R$
-2140 LET YTOTS=0,YRNDS=0,YTOTP=0,YRNDP=0,YTOTH=0,YRNDH=0
-2150 LET YRS=YRS+1
-2160 RETURN
+def fns$(val)
+  if val then out$ = str(val) else out$ = ""
+  return out$
+fnend
 
-2200 DOCHL:
-2210 LET CH$="<img src='http://chart.apis.google.com/chart"
-2220 LET CH$=CH$+"?chf=bg,s,FFFF99"
-2230 LET CH$=CH$+"&chxl=0:|"+CHXL0$+"||1:|"+CHXL1$+"||2:|"+CHXL2$+"||4:|Avg+"+STR(AVGV)
-2240 LET CH$=CH$+"&chxp=4,"+STR(AVGV)
-2250 LET CH$=CH$+"&chxr=3,"+STR(MINV)+","+STR(MAXV)+","+STR(DELTA)+"|4,"+STR(MINV)+","+STR(MAXV)
-2260 LET CH$=CH$+"&chxs=3,676767,11.5,0,lt,676767|4,FF0000,11.5,0,lt,FF0000"
-2270 LET CH$=CH$+"&chxt=x,x,x,y,r"
-2280 LET CH$=CH$+"&chxtc=3,-600|4,-600"
-2290 LET CH$=CH$+"&chs=500x250"
-2300 LET CH$=CH$+"&cht=lxy"
-2310 LET CH$=CH$+"&chco="+CLR$
-2320 LET CH$=CH$+"&chds="+STR(MINV)+","+STR(MAXV)+","+STR(MINV)+","+STR(MAXV)
-2330 LET CH$=CH$+"&chd=t:-1|"+VAL$
-2340 LET CH$=CH$+"&chls=3"
-2350 LET CH$=CH$+"&chma=25,60,0,50"
-2360 LET CH$=CH$+"&chm=s,"+CLR$+",0,-1,5"
-2370 LET CH$=CH$+"&chtt="+TIT$+"+-+Latest+Rounds'"
-2380 GOSUB REP
-2390 LET CH$=CH$+" style='border:1px solid #c0c0c0' width=500 height=250>"
-2400 CALL "CDW000",ROW$,"d style='padding:0px'",CH$
-2410 RETURN
+def fnb$(txt$)
+  while pos(" " = txt$)
+    txt$(pos(" " = txt$), 1) = "+"
+  wend
+  return txt$
+fnend
 
-2500 DOCHY:
-2510 LET WID=230+(MAX(0,YRS-3))*40
-2520 LET CH$="<img src='http://chart.apis.google.com/chart"
-2530 LET CH$=CH$+"?chf=bg,s,FFFF99"
-2540 LET CH$=CH$+"&chxl=0:|"+CHXL0Y$+"||2:|Avg+"+STR(AVGV)
-2550 LET CH$=CH$+"&chxp=2,"+STR(AVGV)
-2560 LET CH$=CH$+"&chxr=1,"+STR(MINV)+","+STR(MAXV)+","+STR(DELTA)+"|2,"+STR(MINV)+","+STR(MAXV)
-2570 LET CH$=CH$+"&chxs=1,676767,11.5,0,lt,676767|2,FF0000,11.5,0,lt,FF0000"
-2580 LET CH$=CH$+"&chxt=x,y,r"
-2590 LET CH$=CH$+"&chxtc=1,-600|2,-600"
-2600 LET CH$=CH$+"&chs="+STR(WID)+"x250"
-2610 LET CH$=CH$+"&cht=lxy"
-2620 LET CH$=CH$+"&chco="+CLR$
-2630 LET CH$=CH$+"&chds="+STR(MINV)+","+STR(MAXV)+","+STR(MINV)+","+STR(MAXV)
-2640 LET CH$=CH$+"&chd=t:-1|"+VAL$
-2650 LET CH$=CH$+"&chls=3"
-2660 LET CH$=CH$+"&chma=25,60,0,50"
-2670 LET CH$=CH$+"&chm=s,"+CLR$+",0,-1,5"
-2680 LET CH$=CH$+"&chtt="+TIT$+"+-+Year+by+Year'"
-2690 GOSUB REP
-2700 LET CH$=CH$+" style='border:1px solid #c0c0c0' width="+STR(WID)+" height=250>"
-2710 CALL "CDW000",ROW$,"d style='padding:0px'",CH$
-2720 RETURN
+chart:
+tmp$ = stbl("WMS_CDW000_RC", ""); rem "Disable odd/even row background
+dim r$:"S:C(2*),STOT:B,SRND:B,SMIN:B,SMAX:B,P:C(2*),PTOT:B,PRND:B,PMIN:B,PMAX:B,H:C(2*),HTOT:B,HRND:B,HMIN:B,HMAX:B"
+r.smin = 99, r.pmin = 99, r.hmin = 99
+dim l$:fattr(r$); l$ = r$
+dim yy$:fattr(r$); yy$ = r$
+chxl0$ = "", chxl1$ = "", chxl2$ = "", chxl0y$ = "", yscores$ = "", yputts$ = "", yhc$ = "", gr05c = unt, tots = 0, totp = 0, toth = 0, rndp = 0, rndh = 0, mins = 99, maxs = 0, minp = 99, maxp = 0, minh = 99, maxh = 0, cy = 0, ytots = 0, ytotp = 0, ytoth = 0, yrnds = 0, yrndp = 0, yrndh = 0, ys$ = "", yp$ = "", yh$ = "", yrs = 0
+dim gr05c$:fattr(gr05$)
+select (gr05c)gr05c$ from y.compcode$ + "GR05" where gr05c.league$ = gr05.league$ and gr05c.id$ = gr04.id$ and gr05c.score
+repeat
+  read record(gr05c, end=*break)gr05c$
+  if l.srnd < 20 then gosub latest
+  ty = num(date(gr05c.date:"%Yl"))
+  if ty <> cy and cy then gosub newyr
+  cy = ty, ytots = ytots + gr05c.score, yrnds = yrnds + 1
+  if gr05c.putts then ytotp = ytotp + gr05c.putts, yrndp = yrndp + 1
+  if gr05c.hc then ytoth = ytoth + gr05c.hc, yrndh = yrndh + 1
+until 0
+close (gr05c)
+gosub newyr
+r$ = l$; gosub adj; l$ = r$
+r$ = yy$; gosub adj; yy$ = r$
+if l.srnd then avgv = round(l.stot / l.srnd, 1), tit$ = "Scores", minv = l.smin, maxv = l.smax, delta = 5, val$ = l.s$, clr$ = "3072F3"; gosub dochl
+if yy.srnd then avgv = round(yy.stot / yy.srnd, 1), tit$ = "Scores", minv = yy.smin, maxv = yy.smax, delta = 1, val$ = yy.s$, clr$ = "3072F3"; gosub dochy
+if l.srnd or yy.srnd then call "CDW000", tab$, "r style='padding:0px'", row$
+if l.prnd then avgv = round(l.ptot / l.prnd, 1), tit$ = "Putts", minv = l.pmin - 1, maxv = l.pmax + 1, delta = 1, val$ = l.p$, clr$ = "33cc33"; gosub dochl
+if yy.prnd then avgv = round(yy.ptot / yy.prnd, 1), tit$ = "Putts", minv = yy.pmin - 1, maxv = yy.pmax + 1, delta = 1, val$ = yy.p$, clr$ = "33cc33"; gosub dochy
+if l.prnd or yy.prnd then call "CDW000", tab$, "r style='padding:0px'", row$
+if l.hrnd then avgv = round(l.htot / l.hrnd, 1), tit$ = "Handicap", minv = l.hmin - 1, maxv = l.hmax + 1, delta = 1, val$ = l.h$, clr$ = "ff9900"; gosub dochl
+if yy.hrnd then avgv = round(yy.htot / yy.hrnd, 1), tit$ = "Handicap", minv = yy.hmin - 1, maxv = yy.hmax + 1, delta = 1, val$ = yy.h$, clr$ = "ff9900"; gosub dochy
+if l.hrnd or yy.hrnd then call "CDW000", tab$, "r style='padding:0px'", row$
+call "CDW000", html$, "t style='border:0px'", tab$
+return
 
-2800 REP:
-2810 CALL "SW002",CH$,"|","%7c"
-2820 IF 0 THEN CALL "SW002",CH$,":","%3a"
-2830 RETURN
+adj:
+  if r.srnd then r.s$ = "_" + r.s$ + ",_", r.p$ = "_" + r.p$ + ",_", r.h$ = "_" + r.h$ + ",_"
+  r.smin = r.smin - mod(r.smin, 5)
+  r.smax = r.smax - mod(r.smax, 5) + 5
+  r.pmin = r.pmin - mod(r.pmin, 1) - 0
+  r.pmax = r.pmax - mod(r.pmax, 1) + 0
+  r.hmin = r.hmin - mod(r.hmin, 1) - 0
+  r.hmax = r.hmax - mod(r.hmax, 1) + 0
+return
 
-2900 BESTROUNDS:
-2905 CALL "CDS041","CDW038",W038$,"YY"
-2906 LET W038.USECLASS$="N"
-2907 LET Y.COMPNAME$=""
-2910 CALL "CDW038",Y$,"Best 10 Scores",Y5A$,HTMLBEST$,W038$,"XXGR05",0,"","","GR05.DATE|SCORE|HC|NET|PUTTS","GR05.LEAGUE$="""+league$+""" AND GR05.ID$="""+GR04.ID$+""" and GR05.NET","REC.SCORE$+NOT(REC.DATE$)","",10
-2920 LET HTML$=HTML$+"<br>"+HTMLBEST$
-2990 RETURN
+latest:
+  chxl0$ = "|" + date(gr05c.date:"%Mz") + chxl0$
+  chxl1$ = "|" + date(gr05c.date:"%Dz") + chxl1$
+  chxl2$ = "|" + date(gr05c.date:"%Yz") + chxl2$
+  r$ = l$, s = gr05c.score, p = gr05c.putts, h = gr05c.hc; gosub tots; l$ = r$
+return
 
-8000 REM "Call Error/Escape Routine
-8010 CALL "CDS063",STR(TCB(5)),Y$,PGM(-2)
-8020 ON Y.ERRSTS GOTO 8030,8040,8050,8060
-8030 SETERR 0
-8040 RETRY
-8050 RETURN
-8060 RETRY
+tots:
+  r.s$ = "," + str(s) + r.s$
+  r.stot = r.stot + s
+  r.srnd = r.srnd + 1
+  r.smin = min(r.smin, s)
+  r.smax = max(r.smax, s)
+  if p then r.p$ = "," + str(p) + r.p$; r.ptot = r.ptot + p; r.prnd = r.prnd + 1; r.pmin = min(r.pmin, p); r.pmax = max(r.pmax, p) else r.p$ = ",_" + r.p$
+  if h then r.h$ = "," + str(h) + r.h$; r.htot = r.htot + h; r.hrnd = r.hrnd + 1; r.hmin = min(r.hmin, h); r.hmax = max(r.hmax, h) else r.h$ = ",_" + r.h$
+return
 
-9000 EOJ:
-9003 LET TMP$=STBL("!CLEAR","WMS_CDW000")
-9004 LET HTML$=""
-9005 IF SENT THEN LET MSG$="Job Completed, "+STR(SENT)+" emails sent." ELSE LET MSG$="Select 'Golf Score Posting Sheets' before 'Weekly Email'"
-9010 exit
+newyr:
+  if yrnds = 0 then return
+  chxl0y$ = "|" + str(cy) + chxl0y$
+  r$ = yy$, s = round(ytots / yrnds, 1), p = round(ytotp / max(1, yrndp), 1), h = round(ytoth / max(1, yrndh), 1); gosub tots; yy$ = r$
+  ytots = 0, yrnds = 0, ytotp = 0, yrndp = 0, ytoth = 0, yrndh = 0
+  yrs = yrs + 1
+return
+
+dochl:
+  ch$ = "<img src='http://chart.apis.google.com/chart"
+  ch$ = ch$ + "?chf=bg,s,FFFF99"
+  ch$ = ch$ + "&chxl=0:|" + chxl0$ + "||1:|" + chxl1$ + "||2:|" + chxl2$ + "||4:|Avg+" + str(avgv)
+  ch$ = ch$ + "&chxp=4," + str(avgv)
+  ch$ = ch$ + "&chxr=3," + str(minv) + "," + str(maxv) + "," + str(delta) + "|4," + str(minv) + "," + str(maxv)
+  ch$ = ch$ + "&chxs=3,676767,11.5,0,lt,676767|4,FF0000,11.5,0,lt,FF0000"
+  ch$ = ch$ + "&chxt=x,x,x,y,r"
+  ch$ = ch$ + "&chxtc=3,-600|4,-600"
+  ch$ = ch$ + "&chs=500x250"
+  ch$ = ch$ + "&cht=lxy"
+  ch$ = ch$ + "&chco=" + clr$
+  ch$ = ch$ + "&chds=" + str(minv) + "," + str(maxv) + "," + str(minv) + "," + str(maxv)
+  ch$ = ch$ + "&chd=t:-1|" + val$
+  ch$ = ch$ + "&chls=3"
+  ch$ = ch$ + "&chma=25,60,0,50"
+  ch$ = ch$ + "&chm=s," + clr$ + ",0,-1,5"
+  ch$ = ch$ + "&chtt=" + tit$ + "+-+Latest+Rounds'"
+  gosub rep
+  ch$ = ch$ + " style='border:1px solid #c0c0c0' width=500 height=250>"
+  call "CDW000", row$, "d style='padding:0px'", ch$
+return
+
+dochy:
+  wid = 230 + (max(0, yrs - 3)) * 40
+  ch$ = "<img src='http://chart.apis.google.com/chart"
+  ch$ = ch$ + "?chf=bg,s,FFFF99"
+  ch$ = ch$ + "&chxl=0:|" + chxl0y$ + "||2:|Avg+" + str(avgv)
+  ch$ = ch$ + "&chxp=2," + str(avgv)
+  ch$ = ch$ + "&chxr=1," + str(minv) + "," + str(maxv) + "," + str(delta) + "|2," + str(minv) + "," + str(maxv)
+  ch$ = ch$ + "&chxs=1,676767,11.5,0,lt,676767|2,FF0000,11.5,0,lt,FF0000"
+  ch$ = ch$ + "&chxt=x,y,r"
+  ch$ = ch$ + "&chxtc=1,-600|2,-600"
+  ch$ = ch$ + "&chs=" + str(wid) + "x250"
+  ch$ = ch$ + "&cht=lxy"
+  ch$ = ch$ + "&chco=" + clr$
+  ch$ = ch$ + "&chds=" + str(minv) + "," + str(maxv) + "," + str(minv) + "," + str(maxv)
+  ch$ = ch$ + "&chd=t:-1|" + val$
+  ch$ = ch$ + "&chls=3"
+  ch$ = ch$ + "&chma=25,60,0,50"
+  ch$ = ch$ + "&chm=s," + clr$ + ",0,-1,5"
+  ch$ = ch$ + "&chtt=" + tit$ + "+-+Year+by+Year'"
+  gosub rep
+  ch$ = ch$ + " style='border:1px solid #c0c0c0' width=" + str(wid) + " height=250>"
+  call "CDW000", row$, "d style='padding:0px'", ch$
+return
+
+rep:
+  call "SW002", ch$, "|", "%7c"
+  if 0 then call "SW002", ch$, ":", "%3a"
+return
+
+bestrounds:
+  call "CDS041", "CDW038", w038$, "YY"
+  w038.useclass$ = "N"
+  y.compname$ = ""
+  call "CDW038", y$, "Best 10 Scores", y5a$, htmlbest$, w038$, "XXGR05", 0, "", "", "GR05.DATE|SCORE|HC|NET|PUTTS", "GR05.LEAGUE$=""" + league$ + """ AND GR05.ID$=""" + gr04.id$ + """ and GR05.NET", "REC.SCORE$+NOT(REC.DATE$)", "", 10
+  html$ = html$ + "<br>" + htmlbest$
+return
+
+dt_err:
+call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+retry
+
+eoj:
+tmp$ = stbl("!CLEAR", "WMS_CDW000")
+html$ = ""
+if sent then msg$ = "Job Completed, " + str(sent) + " emails sent." else msg$ = "Select 'Golf Score Posting Sheets' before 'Weekly Email'"
+exit

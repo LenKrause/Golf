@@ -1,0 +1,217 @@
+rem "GW054.bbj - 05/15/21 Weekly Golf Point Ranking & Prize Winners - cron version
+setesc DT_ERR; seterr DT_ERR
+enter y$, league$, playdate, flts$, html$[all]
+html$ = "", flts$ = ""
+rem  1:4 point ranking flights A, B, C, D
+rem  5 prize winners all flights
+dim html$[1:8]
+
+call "CDS095", gr03, "XXGR03", "YNY", gr03$
+jdate = playdate
+read record(gr03, knum=0, key=league$ + bin(jdate - 7, 3), dom=eoj)gr03$; rem "Need to know what half the last round this year was played in
+half  = gr03.half
+jdate = gr03.date
+if half then
+  sdate = jul(num(date(jdate:"%Yl")), 1, 1)
+else
+  sdate = jdate - 7
+fi
+call "CDS095", gr04, "XXGR04", "YNY", gr04$
+gr03s = unt
+select (gr03s)gr03$ from y.compcode$ + "GR03" where gr03.league$ = league$ and gr03.date >= sdate and gr03.date <= jdate and gr03.half = half
+repeat
+  read record(gr03s, end=*break)gr03$
+  dates$ = dates$ + gr03.date$
+until 0
+close (gr03s)
+if len(dates$) = 0 then exit
+dates$ = ssort(dates$, 3)
+
+call "CDS095", gr05, "XXGR05", "YNY", gr05$
+if half then
+  dim g0$:"ID:C(4),FLT:C(1),POINTS:N(5),ROUNDS:N(2),RANK:N(2),TIE:C(1)"
+  dim g0a$:fattr(g0$)
+else
+  dim g0$:"ID:C(4),FLT:C(1),ROUNDS:N(1),SORT:N(3),RANK:N(2),TIE:C(1),GROSS[3]:N(3),HC[3]:N(2),NET[3]:N(3)"
+  dim g0a$:fattr(g0$)
+fi
+gr05s = unt
+select (gr05s)gr05$ from y.compcode$ + "GR05" where gr05.league$ = league$ and pos(gr05.date$ = dates$, 3) and gr05.score and gr05.flt$ <> " "
+
+repeat
+  read record(gr05s, end=*break)gr05$
+  z = pos(gr05.id$ = g$, len(g0$))
+  if z then
+    g0$ = g$(z, len(g0$))
+  else
+    dim g0$:fattr(g0$)
+    z = len(g$) + 1
+    g0.id$  = gr05.id$
+    g0.flt$ = gr05.flt$
+    g$ = g$ + g0$
+  fi
+  if half then
+    g0.rounds = g0.rounds + 1
+    g0.points$ = str(g0.points + gr05.points:"###.0")
+  else
+    gosub tourney
+  fi
+  g$(z, len(g0$)) = g0$
+  if gr05.date = playdate - 7 and gr05.net then
+    pz$ = pz$ + gr05.flt$ + "N" + bin(gr05.net)   + gr05.id$
+    pz$ = pz$ + gr05.flt$ + "P" + bin(gr05.putts) + gr05.id$
+  fi
+until 0
+close (gr05s)
+if len(g$) = 0 then exit
+if half then sortkey$ = $0000$ + bin(4,2) + chr(1) + $00$ + $0000$ + $0000$ + bin(5,2) + chr(5) + $01$ + $0000$ + $ff$ else sortkey$ = $0000$ + bin(4,2) + chr(1) + $00$ + $0000$ + $0000$ + bin(5,2) + chr(1) + $01$ + $0000$ + $0000$ + bin(6,2) + chr(3) + $00$ + $0000$ + $ff$
+g$ = ssort(g$, len(g0$), sortkey$, 0)
+
+lastflt$ = ""
+for i = 1 to len(g$) step len(g0$)
+  g0$ = g$(i, len(g0$))
+  if g0.flt$ <> lastflt$ then lastflt$ = g0.flt$, lastsrt = -1, rank = 0, tie = 0
+  if half then srt = g0.points else srt = g0.sort
+  if srt <> lastsrt then rank = rank + tie + 1, tie = 0 else tie = tie + 1, g0.tie$ = "T"; if rank > 0 then g0a$ = g$(i - len(g0$), len(g0$)), g0a.tie$ = "T", g$(i - len(g0$), len(g0$)) = g0a$
+  g0.rank = rank, lastsrt = srt
+  g$(i, len(g0$)) = g0$
+next i
+
+lastflt$ = ""
+for i = 1 to len(g$) step len(g0$)
+  g0$ = g$(i, len(g0$))
+  if g0.flt$ <> lastflt$ then
+    if len(lastflt$) then gosub finishflt
+    gosub newflt
+  fi
+  call "CDW000", row$, "dc", cvs(g0.rank$, 3) + cvs(g0.tie$, 1)
+  dim gr04$:fattr(gr04$)
+  read record(gr04, knum=0, key=league$ + g0.id$, dom=*next)gr04$
+  call "CDW000", row$, "d", cvs(gr04.firstname$, 3) + " " + cvs(gr04.lastname$, 3)
+  if half then
+    call "CDW000", row$, "dc", g0.points$
+    call "CDW000", row$, "dc", str(g0.rounds)
+  else
+    gosub tourney_html
+  fi
+  call "CDW000", tab$, "r", row$
+next i
+gosub finishflt
+
+if len(pz$) then gosub prizes
+exit
+
+newflt:
+html$ = "", tab$ = "", row$ = "", flts$ = flts$ + g0.flt$, lastflt$ = g0.flt$
+if half then h$ = "Point", span$ = "s4" else h$ = "Tournament"; if len(dates$) = 3 then span$ = "s5" else span$ = "s11"
+txt$ = h$ + " Ranking"
+if len(flts$) > 1 then txt$ = txt$ + " - " + g0.flt$ + " Flight"
+if y.passparm$ = "E" then type$ = "h" else type$ = "d"; rem "Use th for email for style
+call "CDW000", row$, type$ + "c" + span$, txt$
+call "CDW000", tab$, "r class='title'", row$
+if half = 0 then rs$ = " rowspan=2"
+call "CDW000", row$, type$ + "c" + rs$, "Rank"
+call "CDW000", row$, type$ + rs$, "Name"
+if half then call "CDW000", row$, type$ + "c", "Points"; call "CDW000", row$, type$ + "c", "Rounds Played" else gosub tourney_head
+call "CDW000", tab$, "r class='head'", row$
+return
+
+finishflt:
+call "CDW000", html$, "t", tab$
+html$[len(flts$)] = html$
+return
+
+prizes:
+pz$ = ssort(pz$, 7)
+call "CDW000", row$, "hs4c", "Prize Winners"
+call "CDW000", tab$, "r class='title'", row$
+call "CDW000", row$, "hc", "Flt"
+call "CDW000", row$, "hc", "Skill"
+call "CDW000", row$, "hc", "Score"
+call "CDW000", row$, "hc", "Winners"
+call "CDW000", tab$, "r class='title'", row$
+flt$ = "", skill$ = "", names$ = ""
+for i = 1 to len(pz$) step 7
+  if pz$(i,2) <> flt$ + skill$ then
+    if len(names$) then gosub add_prize_row
+    score = asc(pz$(i + 2, 1))
+    id$ = pz$(i + 3, 4)
+    gosub addname
+  else
+    if pz$(i,3) = flt$ + skill$ + chr(score) then
+      id$ = pz$(i + 3 , 4)
+      gosub addname
+    fi
+  fi
+next i
+if len(names$) then gosub add_prize_row
+call "CDW000", html$, "t", tab$
+html$[5] = html$
+return
+
+addname:
+  if gr04 = 0 call "CDS095", gr04, "XXGR04", "YUY", gr04$
+  read record (gr04, knum=0, key=id$, dom=*return)gr04$
+  if len(names$) names$ = names$ + ","
+  name$ = names$ + cvs(gr04.firstname$, 3) + " " + cvs(gr04.lastname$, 3)  
+return
+
+add_prize_row:
+  call "CDW000", row$, "dc", flt$
+  call "CDW000", row$, "dc", iff(skill$ = "N", "Low Net", "Low Putts")
+  call "CDW000", row$, "dc", str(score)
+  call "CDW000", row$, "d", names$
+  call "CDW000", tab$, "r", row$
+  name$ = ""
+return  
+
+test:
+begin
+call "CDS091", y$
+call pgm(-1), y$, "SAW", jul(2020,5,12), flts$, html$[all]
+if len(flts$) then gosub testh
+escape
+
+testh:
+for i = 1 to 5
+  if len(html$[i]) then html$ = html$ + html$[i] + "<br>"
+next i
+call "CDW999", html$
+return
+
+tourney:
+ind=2 - (gr05.date$ = dates$(1,3))
+g0.gross[ind] = gr05.score, g0.gross[3] = g0.gross[3] + gr05.score
+g0.hc[ind] = gr05.hc, g0.hc[3] = g0.hc[3] + gr05.hc
+g0.net[ind] = gr05.net, g0.net[3] = g0.net[3] + gr05.net
+g0.sort$ = str(g0.net[3]:"000")
+g0.rounds = g0.rounds + 1
+return
+
+tourney_html:
+for ind=1 to 1 + 2 * (len(dates$) > 3)
+  if g0.gross[ind] then gr$ = str(g0.gross[ind]), hc$ = str(g0.hc[ind]), nt$ = str(g0.net[ind]) else gr$ = "", hc$ = "", nt$ = ""
+  call "CDW000", row$, "dc", gr$
+  call "CDW000", row$, "dc", hc$
+  call "CDW000", row$, "dc", nt$
+next ind
+return
+
+tourney_head:
+call "CDW000", row$, "dcs3", "Week 1"
+if len(dates$) > 3 then call "CDW000", row$, "dcs3", "Week 2"; call "CDW000", row$, "dcs3", "Total"
+call "CDW000", tab$, "r class='head'", row$
+for ind=1 to 1 + 2 * (len(dates$) > 3)
+  call "CDW000", row$, "dc", "Gross"
+  call "CDW000", row$, "dc", "HC"
+  call "CDW000", row$, "dc", "Net"
+next ind
+return
+
+dt_err:
+call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+retry
+
+eoj:
+exit
