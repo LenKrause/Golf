@@ -122,6 +122,7 @@ html$[len(flts$)] = html$
 return
 
 prizes:
+html$ = ""
 pz$ = ssort(pz$, 7)
 call "CDW000", row$, "hs4c", "Prize Winners"
 call "CDW000", tab$, "r class='title'", row$
