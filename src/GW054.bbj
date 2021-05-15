@@ -173,16 +173,13 @@ begin
 call "CDS091", y$
 for jdate = jul(2021,5,5) to jul(2021,5,19) step 7
   call pgm(-1), y$, "SAW", jul(2021,5,19), flts$, html$[all]
+  if len(html$[5]) then html$ = html$ + html$[5] + "<br>"
 next jdate
-if len(flts$) then gosub testh
+if len(html$) then
+  call "CDw000", out$, "t", html$
+  call "CDW999", out$
+fi
 escape
-
-testh:
-for i = 1 to 5
-  if i = 5 and len(html$[i]) then call "CDW000", html$, "t", html$[i] + "<br>"
-next i
-call "CDW999", html$
-return
 
 tourney:
 ind=2 - (gr05.date$ = dates$(1,3))
