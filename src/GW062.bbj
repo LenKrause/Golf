@@ -63,7 +63,7 @@ repeat
   fi
   call "CDW000", html$, "t", tab$
   
-  if len(html$[5]) then html$ = html$ + "<br>" + html$[5]; rem  Weekly Prizes
+  if len(html$[5]) then html$ = html$ + "<br>" + html$[5] + "<br>"; rem  Weekly Prizes
   
   z = pos(gr05.flt$ = flts$)
   if z and len(html$[z]) then html$ = html$ + html$[z] + "<br>"; rem  Flight Point Ranking
