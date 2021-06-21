@@ -74,6 +74,7 @@ class public weeklyLeagueProcessing
     
     gr10!.setFieldValue("time", #fixTime(12, 48)); gr10File!.addUniqueRecord(gr10!)
     gr10!.setFieldValue("time", #fixTime(01, 00)); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime(01, 12)); gr10File!.addUniqueRecord(gr10!)
 REM     gr10!.setFieldValue("time", #fixTime(01, 30)); gr10File!.addUniqueRecord(gr10!)
 REM     gr10!.setFieldValue("time", #fixTime(04, 00)); gr10File!.addUniqueRecord(gr10!)
 
