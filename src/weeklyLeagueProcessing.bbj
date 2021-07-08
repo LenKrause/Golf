@@ -146,7 +146,7 @@ playdate = gr03!.getFieldAsNumber("date")
 rem  Set symbol in subject for emails sent
 tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
 
-if gr03!.getFieldAsNumber("half")
+if pos(str(gr03!.getFieldAsNumber("half")) = "12")
   rem  Build Handicap Listing pdf file for playdate
   call "GW045", y$, league$, playdate, pdffile$
   rem  Email each player with a match

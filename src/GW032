@@ -1,4 +1,4 @@
-0100 rem "GW032 - 09/06/14 Date with Last Week Indicator
+0100 rem "GW032 - 07/03/21 Date with Last Week Indicator
 0110 setesc 8000; seterr 8000
 0120 enter y$, gr03$, gw032$
 0130 glb$ = "GW032_" + gr03.league$
@@ -6,11 +6,11 @@
 0160 if len(tmp$) >= 3 and tmp$(1,3) = gr03.date$ then
 :      gw032.lastweektext$ = "Yes", gw032.lastweek = 1
 :    fi
-0170 if gr03.half then
-:      gw032.half$ = str(gr03.half)
-:    else
-:      gw032.half$ = "Tournament"
-:    fi
+0170 switch gr03.half
+0171   case 0;       gw032.half$ = "Tournament";   break
+0172   case 3;       gw032.half$ = "Rain Out";     break
+0173   case default; gw032.half$ = str(gr03.half); break
+0174 swend
 0180 exit
 
 1000 build:
