@@ -75,7 +75,7 @@ class public teeSheet
       next player
     next i
     
-    table!.addPageStyle("th a {text-decoration:none;background-color:#346904;color:#fffffe;border-radius:4px;padding:1px 5px 1px 5px;white-space:nowrap;display:block;} th a:hover {color:#ffffcc;}")
+    table!.addPageStyle("th a {text-decoration:none;background-color:#346904;color:#fefefe;border-radius:4px;padding:1px 5px 1px 5px;white-space:nowrap;display:block;} th a:hover {color:#ffffcc;}")
     table!.addTable()
     #html$ = table!.getHtml()
   methodend
