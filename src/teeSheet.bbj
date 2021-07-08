@@ -153,6 +153,5 @@ if ! sheet!.getErrMsg().isEmpty() then
   print sheet!.getErrMsg()
 else
   call "CDW999", sheet!.getHtml()
-  sheet!.email(BBjAPI.TRUE)  
+  sheet!.email(BBjAPI.FALSE)  
 fi
-
