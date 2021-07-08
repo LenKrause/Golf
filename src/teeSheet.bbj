@@ -76,7 +76,7 @@ class public teeSheet
     next i
     
     table!.addTable()
-    #html$ = "<style>a:hover {color:yellow}</style>" + table!.getHtml()
+    #html$ = table!.getHtml() + "<style>a:hover {color:yellow}</style>"
   methodend
 
   method public void email()
