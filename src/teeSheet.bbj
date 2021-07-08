@@ -75,7 +75,7 @@ class public teeSheet
       next player
     next i
     
-    table!.addPageStyle("a:hover {color:#ffff00;}")
+    table!.addPageStyle("th a:hover {color:#ffff00;}")
     table!.addTable()
     #html$ = table!.getHtml()
   methodend
