@@ -75,8 +75,9 @@ class public teeSheet
       next player
     next i
     
+    table!.addStyle("a:hover {color:yellow}")
     table!.addTable()
-    #html$ = table!.getHtml() + "<style>a:hover {color:yellow}</style>"
+    #html$ = table!.getHtml()
   methodend
 
   method public void email()
