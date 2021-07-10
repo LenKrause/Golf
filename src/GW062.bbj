@@ -151,7 +151,7 @@ dim l$:fattr(r$); l$ = r$
 dim yy$:fattr(r$); yy$ = r$
 chxl0$ = "", chxl1$ = "", chxl2$ = "", chxl0y$ = "", yscores$ = "", yputts$ = "", yhc$ = "", gr05c = unt, tots = 0, totp = 0, toth = 0, rndp = 0, rndh = 0, mins = 99, maxs = 0, minp = 99, maxp = 0, minh = 99, maxh = 0, cy = 0, ytots = 0, ytotp = 0, ytoth = 0, yrnds = 0, yrndp = 0, yrndh = 0, ys$ = "", yp$ = "", yh$ = "", yrs = 0
 dim gr05c$:fattr(gr05$)
-select (gr05c)gr05c$ from y.compcode$ + "GR05" where gr05c.league$ = gr05.league$ and gr05c.id$ = gr04.id$ and gr05c.score and pos(str(gr05c.half) = "12")
+select (gr05c)gr05c$ from y.compcode$ + "GR05" where gr05c.league$ = gr05.league$ and gr05c.id$ = gr04.id$ and gr05c.score
 repeat
   read record(gr05c, end=*break)gr05c$
   if l.srnd < 20 then gosub latest
