@@ -8,7 +8,11 @@ dim html$[1:8]
 
 call "CDS095", gr03, "XXGR03", "YNY", gr03$
 jdate = playdate
-read record(gr03, knum=0, key=league$ + bin(jdate - 7, 3), dom=eoj)gr03$; rem "Need to know what half the last round this year was played in
+repeat
+  read record(gr03, knum=0, key=league$ + bin(jdate - 7, 3), dom=eoj)gr03$; rem "Need to know what half the last round this year was played in
+  if gr03.half = 1 or gr03.half = 2 then break
+  jdate = jdate - 7
+until 0
 half  = gr03.half
 jdate = gr03.date
 if half then

@@ -66,7 +66,8 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("id", 1, "js01"); rem  Jim Sterley
     gr10!.setFieldValue("id", 2, "mf01"); rem  Mike Fee
     gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regain
-    gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
+REM     gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
+    gr10!.setFieldValue("id", 4, "lk01"); rem  Len Krause
     gr10File!.addUniqueRecord(gr10!)
     for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
