@@ -1,6 +1,7 @@
 rem "GW054.bbj - 05/15/21 Weekly Golf Point Ranking, Prize Winners, Skins Game - cron version
 
 use ::yearLongSkins.bbj::yearLongSkins
+use ::DTHtmlTable.bbj::DTHtmlTable
 
 setesc DT_ERR; seterr DT_ERR
 enter y$, league$, playdate, flts$, html$[all]
@@ -133,15 +134,16 @@ html$[len(flts$)] = html$
 return
 
 prizes:
-html$ = ""
+declare DTHtmlTable table!
+table! = new DTHtmlTable(BBjAPI.TRUE)
 pz$ = ssort(pz$, 7)
-call "CDW000", row$, "hs4c", "Prize Winners - " + date(playdate - 7:"%Ds %Ms %D")
-call "CDW000", tab$, "r class='title'", row$
-call "CDW000", row$, "hc", "Flt"
-call "CDW000", row$, "hc", "Skill"
-call "CDW000", row$, "hc", "Score"
-call "CDW000", row$, "hc", "Winners"
-call "CDW000", tab$, "r class='title'", row$
+table!.addHeaderCell("Prize Winners - " + date(playdate - 7:"%Ds %Ms %D"), "cs4")
+table!.addRow() 
+table!.addHeaderCell("Flt", "c")
+table!.addHeaderCell("Skill", "c")
+table!.addHeaderCell("Score", "c")
+table!.addHeaderCell("Winners", "c")
+table!.addRow()
 flt$ = "", skill$ = "", names$ = ""
 for i = 1 to len(pz$) step 7
   if pz$(i,2) <> flt$ + skill$ then
@@ -159,8 +161,8 @@ for i = 1 to len(pz$) step 7
   fi
 next i
 if len(names$) then gosub add_prize_row
-call "CDW000", html$, "t", tab$
-html$[5] = html$
+table!.addTable()
+html$[5] = table!.getBody()
 return
 
 addname:
@@ -171,11 +173,11 @@ addname:
 return
 
 add_prize_row:
-  call "CDW000", row$, "dc", flt$
-  call "CDW000", row$, "dc", iff(skill$ = "N", "Low Net", "Low Putts")
-  call "CDW000", row$, "dc", str(score)
-  call "CDW000", row$, "d", names$
-  call "CDW000", tab$, "r", row$
+  table!.addCell(flt$, "c")
+  table!.addCell(iff(skill$ = "N", "Low Net", "Low Putts"), "c")
+  table!.addCell(str(score), "c")
+  table!.addCell(names$)
+  table!.addRow()
   names$ = ""
 return  
 
