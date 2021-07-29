@@ -46,8 +46,8 @@ repeat
   if pos(" " <> gr04.email$) = 0 then continue
   html$ = "", tab$ = "", row$ = ""
   if gr03.half = 1 or gr03.half = 2 or gr03a.half = 1 or gr03a.half = 2 then
-    call "CDW000", row$, "hbcs3", gr01.name$
-    call "CDW000", tab$, "r", row$
+    table!.addHeaderCell(gr01.name$, "cs3")
+    table!.addRow()
   fi
   dim gr05a$:fattr(gr05$)
   gr05a.league$ = gr05.league$
