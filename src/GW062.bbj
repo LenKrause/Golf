@@ -1,4 +1,4 @@
-rem "GW062.bbj - 05/15/21 Golf Weekly Email - cron version
+rem "GW062.bbj - 07/29/21 Golf Weekly Email - cron version
 use ::ttm.bbj::ttm
 setesc DT_ERR; seterr DT_ERR
 enter y$, league$, playdate, pdf$, msg$, err=*next
@@ -67,13 +67,15 @@ repeat
   
   z = pos(gr05.flt$ = flts$)
   if z and len(html$[z]) then html$ = html$ + html$[z] + "<br>"; rem  Flight Point Ranking
+  
+  if len(html$[9]) then html$ = html$ + html$[9] + "<br>"; rem  Year Long Skins Game
    
   html$ = "<div style='font-family:verdana,tahoma,sans-serif'>" + html$ + "</div>"
   html$ = html$ + "<div style='font-size:0;height:5px;'></div>"
   gosub chart
   gosub bestrounds
   s084.toname$ = fnn$(gr04$), s084.toemail$ = gr04.email$
-  if 0 then s084.toemail$ = "len@excellware.com"
+  if 1 then s084.toemail$ = "len@excellware.com"
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
   if 0 then note$ = cgi.note$
@@ -81,7 +83,7 @@ repeat
   if 0 then call "SW002", note$, $e28099$, "'"
   if 0 then cgi.note$ = note$
   if 0 then call "SW002", note$, $0d0a$, "<br>"
-  if jul(0,0,0) <= jul(2021,4,28) then note$ = "<p>We had some additional last minute roster changes, so here is the updated match info.</p>"
+  if jul(0,0,0) <= jul(2021,7,31) then note$ = "<p>Note the Year Long Skins Game status below.</p>"
   if len(note$) then print (y6.ch)note$
   if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
   link$ = ttm.getLink(gr04.EMAIL$)
@@ -101,7 +103,7 @@ repeat
   if len(pdf$) then call "CDS184", y$, y6$, pdf$, "HandicapListing.pdf"
   call "CDS094", y6$, "e"
   sent = sent + 1
-  if 0 then ts = ts + 1; if ts = 2 then goto eoj
+  if 1 then ts = ts + 1; if ts = 2 then goto eoj
 until 0
 
 week:

@@ -1,0 +1,236 @@
+REM /**
+REM  * yearLongSkins.bbj
+REM  * @author len
+REM  *
+REM  */
+
+use java.util.HashMap
+use ::DTJsonObject.bbj::DTJsonObject
+use ::DTHtmlTable.bbj::DTHtmlTable
+use ::DT.bbj::DT
+
+class public yearLongSkins
+  field private BBjVector skins!
+  field private BBjNumber roundlen = 9
+  field private BBjNumber year
+  field private BBjString league$
+  field private BBjString rounds$
+  field private BBjVector par!
+  
+  method public yearLongSkins(BBjString league$) 
+    #league$ = league$
+    #year = num(date(0:"%Yl"))
+    repeat
+      #getRounds()
+      if len(#rounds$) = 0 then #year = #year - 1
+    until len(#rounds$)
+    #computeSkins()
+  methodend
+
+  method private void getRounds()
+    call "CDS095", gr03, "LKGR03", "YNY", gr03$; rem  Weeks
+    call "CDS095", gr04, "LKGR04", "YNY", gr04$; rem  Players
+    call "CDS095", gr05, "LKGR05", "YNY", gr05$; rem  Scores
+
+    rem  Need to add course to gr03 file, hard code to PH for now
+    call "SW001", "LKGR08", 0, "PH ", gr08$
+    #par! = new BBjVector()
+    for hole = 1 to 18
+      #par!.add(gr08.par[hole])
+    next hole
+    
+    declare HashMap wks!
+    wks! = new HashMap()
+    gr03s = unt
+    league$ = #league$
+    year    = #year
+    select (gr03s)gr03$ from "LK/LKGR03" where gr03.league$ = league$ and gr03.date >= jul(year, 1, 1) and gr03.date <= jul(year, 12, 31) and pos(gr03.nine$ = "FB") and pos(str(gr03.half) = "12")
+    repeat
+      read record (gr03s, end=*break)gr03$
+      wks!.put(gr03.date, gr03.nine$)
+    until 0
+    
+    gr05s = unt
+    select (gr05s)gr05$ from "LK/LKGR05" where gr05.league$ = league$ and gr05.date >= jul(year, 1, 1) and gr05.date <= jul(year, 12, 31) and gr05.score
+    repeat
+      read record (gr05s, end=*break)gr05$
+      nine$ = DT.toString(wks!.get(gr05.date))
+      if len(nine$) = 0 then continue
+      for i = 1 to 9
+        if gr05.hscore[i] then
+          hole = 9 * (nine$ = "B") + i
+          #rounds$ = #rounds$ + chr(hole) + chr(gr05.hscore[i]) + gr05.date$ + gr05.id$
+        fi
+      next i
+    until 0
+    if len(#rounds$) then #rounds$ = ssort(#rounds$, #roundlen)
+    close (gr03)
+    close (gr04)
+    close (gr05)
+    close (gr03s)
+    close (gr05s)
+  methodend
+
+  method private void computeSkins()
+    #skins! = new BBjVector()
+    declare DTJsonObject skin!
+    h = 1
+    repeat
+      holeScore$ = #rounds$(h, 2)
+      rounds  = 0
+      players$ = ""
+      slots$   = ""
+      rem  process all slots with best score on this hole
+      while #rounds$(h, 2) = holeScore$
+        slot$  = #rounds$(h, #roundlen)
+        rem  slot$(1, 1) = hole 
+        rem  slot$(2, 1) = score
+        rem  slot$(3, 3) = date
+        rem  slot$(6, 4) = player id
+        rounds = rounds + 1
+        slots$ = slots$ + slot$
+        if pos(slot$(6, 4) = players$, 4) = 0 then players$ = players$ + slot$(6, 4)
+        h = h + #roundlen
+      wend
+      skin! = new DTJsonObject()
+      skin!.put("score", asc(holeScore$(2)))
+      if len(players$) = 4 then
+        skin!.put("player", players$)
+        dates$ = ""
+        for i = 1 to len(slots$) step #roundlen
+          if len(dates$) then dates$ = dates$ + " and "
+          slot$ = slots$(i, #roundlen)
+          dates$ = dates$ + date(dec(slot$(3, 3)), "%Ms %D")
+        next i
+        skin!.put("dates", dates$)
+      else
+        names$ = ""
+        for i = 1 to len(slots$) step #roundlen
+          slot$ = slots$(i, #roundlen)
+          if len(names$) then names$ = names$ + "|"
+          names$ = names$ + date(dec(slot$(3, 3)), "%Ms %D - ") + #getPlayerName(slot$(6, 4)) 
+        next i
+        skin!.put("rounds", rounds)
+        skin!.put("names", names$)
+      fi
+      #skins!.add(skin!)
+      rem  Skip remaining rounds for this hole
+      while h < len(#rounds$) and #rounds$(h, 1) = holeScore$(1, 1)
+        h = h + #roundlen
+      wend
+    until h > len(#rounds$)
+  methodend
+  
+  method public BBjVector getSkins()
+    methodret #skins!
+  methodend
+  
+  method public void printSkins()
+    declare DTJsonObject skin!
+    print ""
+    for i = 0 to 17
+      skin! = cast(DTJsonObject, #skins!.get(i))
+      hole  = i + 1
+      score = skin!.getNumber("score")
+      out$ = str(hole:"#0B") + #getScoreTextForHole(hole, score) + " " + str(score) + " "
+      rounds = skin!.getNumber("rounds")
+      if rounds then
+        out$ = out$ + str(rounds) + " times " + skin!.getString("names")
+      else
+        out$ = out$ + "by " + skin!.getString("player") + " on " + skin!.getString("dates")
+      fi
+      print out$
+    next i
+  methodend
+
+  method public DTHtmlTable getHtmlTable()
+    declare DTHtmlTable  table!
+    declare DTJsonObject skin!
+    table! = new DTHtmlTable(BBjAPI.TRUE); rem  for delivery by email
+    table!.addHeaderCell(str(#year) + " Year Long Skins Game", "cs4")
+    table!.addRow()
+    
+    table!.addHeaderCell("Hole", "c")
+    table!.addHeaderCell("Score", "c")
+    table!.addHeaderCell("Skin", "c")
+    table!.addHeaderCell("Note")
+    table!.addRow()
+    
+    for i = 0 to 17
+      skin! = cast(DTJsonObject, #skins!.get(i))
+      hole  = i + 1
+      table!.addCell(str(hole), "c")
+      score = skin!.getNumber("score")
+      score$ = #getScoreTextForHole(hole, score)
+      table!.addCell(score$ + " " + str(score), "c")
+      rounds = skin!.getNumber("rounds")
+      if rounds then
+        table!.addCell("")
+        if score$ = "Par" or pos("Bogie" = score$) then
+          table!.addCell(str(rounds) + " times")
+        else
+          declare BBjString rounds!
+          rounds! = skin!.getString("names")
+          table!.addCell(rounds!.replace("|", "<br>"), "&")
+        fi
+      else
+        table!.addCell(#getPlayerName(skin!.getString("player")) + " on " + skin!.getString("dates"))
+        table!.addCell("")
+      fi
+      table!.addRow()
+    next i
+    table!.addTable()
+    methodret table!
+  methodend
+  
+  method public BBjString getHtmlTableBody()
+    methodret #getHtmlTable().getBody()
+  methodend
+  
+  method public BBjString getHtml()
+    methodret #getHtmlTable().getHtml()
+  methodend
+  
+  method private BBjString getScoreTextForHole(BBjNumber hole, BBjNumber score)
+    methodret #getScoreText(score, num(#par!.get(hole - 1)))
+  methodend
+
+  method public static BBjString getScoreText(BBjNumber score, BBjNumber par)
+    net = score - par
+    switch net
+      case -3; out$ = "Double Eagle"; break
+      case -2; out$ = "Eagle"; break
+      case -1; out$ = "Birdie"; break
+      case  0; out$ = "Par"; break
+      case  1; out$ = "Bogie"; break
+      case  2; out$ = "Double Bogie"; break
+      case  3; out$ = "Triple Bogie"; break
+      case defaut; out$ = str(net) + " " + iff(net < 0, "Under ", "Over") + " Par"; break
+    swend
+    methodret out$
+  methodend
+  
+  method public BBjString getPlayerName(BBjString id$)
+    call "SW001", "LKGR04", 0, #league$ + id$, gr04$
+    methodret cvs(gr04.firstname$, 3) + " " + cvs(gr04.lastname$, 3)
+  methodend
+
+classend
+
+begin
+call "CDS011", "LK"
+
+declare yearLongSkins yearLongSkins!
+yearLongSkins! = new yearLongSkins("SAW")
+yearLongSkins!.printSkins()
+
+call "CDS041", "CDS084", s084$, "YP"
+s084.name$ = "MAIL"
+s084.mode$ = "N"
+s084.subject$ = "Test Year Long Skins Game"
+s084.toemail$ = "len@excellware.com"
+s084.emailtype$ = "H"
+call "CDS084", y$, y5$, u0, s084$, y6, y6$
+html$ = yearLongSkins!.getHtml()
+print (y6.ch)html$
+call "CDS094", y6$, "E"

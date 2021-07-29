@@ -1,10 +1,14 @@
-rem "GW054.bbj - 05/15/21 Weekly Golf Point Ranking & Prize Winners - cron version
+rem "GW054.bbj - 05/15/21 Weekly Golf Point Ranking, Prize Winners, Skins Game - cron version
+
+use ::yearLongSkinsGame.bbj::yearLongSkinsGame
+
 setesc DT_ERR; seterr DT_ERR
 enter y$, league$, playdate, flts$, html$[all]
 html$ = "", flts$ = ""
 rem  1:4 point ranking flights A, B, C, D
-rem  5 prize winners all flights
-dim html$[1:8]
+rem  5:8 prize winners all flights
+rem  9   year long skins game
+dim html$[1:9]
 
 call "CDS095", gr03, "XXGR03", "YNY", gr03$
 jdate = playdate
@@ -103,6 +107,9 @@ next i
 gosub finishflt
 
 if len(pz$) then gosub prizes
+
+html$[9] = new yearLongSkinsGame("SAW").getHtmlTableBody()
+
 exit
 
 newflt:
