@@ -184,9 +184,7 @@ class public yearLongSkins
   methodend
   
   method public BBjString getHtmlTableBody()
-    declare DTHtmlTable table!
-    table! = #getHtmlTable() 
-    methodret table!.getStyle() + table!.getBody()
+    methodret #getHtmlTable().getBody()
   methodend
   
   method public BBjString getHtml()

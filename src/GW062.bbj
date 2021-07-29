@@ -1,5 +1,8 @@
 rem "GW062.bbj - 07/29/21 Golf Weekly Email - cron version
+
 use ::ttm.bbj::ttm
+use ::DTHtmlTable.bbj::DTHtmlTable
+
 setesc DT_ERR; seterr DT_ERR
 enter y$, league$, playdate, pdf$, msg$, err=*next
 
@@ -78,6 +81,9 @@ repeat
   if 1 then s084.toemail$ = "len@excellware.com"
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
+  declare DTHtmlTable table!
+  table! = new DTHtmlTable()
+  print (y6.ch)"<head>" + table!.getStyle() + "</head>" + $0a$
   if 0 then note$ = cgi.note$
   if 0 then call "SW002", note$, $e2809d$, """"
   if 0 then call "SW002", note$, $e28099$, "'"
