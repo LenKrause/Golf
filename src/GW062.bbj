@@ -82,7 +82,7 @@ repeat
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
   declare DTHtmlTable table!
-  table! = new DTHtmlTable()
+  table! = new DTHtmlTable(BBjAPI.TRUE)
   print (y6.ch)"<head>" + table!.getStyle() + "</head>" + $0a$
   if 0 then note$ = cgi.note$
   if 0 then call "SW002", note$, $e2809d$, """"
