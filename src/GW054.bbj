@@ -3,6 +3,8 @@ rem "GW054.bbj - 05/15/21 Weekly Golf Point Ranking, Prize Winners, Skins Game -
 use ::yearLongSkins.bbj::yearLongSkins
 use ::DTHtmlTable.bbj::DTHtmlTable
 
+declare DTHtmlTable table!
+
 setesc DT_ERR; seterr DT_ERR
 enter y$, league$, playdate, flts$, html$[all]
 html$ = "", flts$ = ""
@@ -93,17 +95,17 @@ for i = 1 to len(g$) step len(g0$)
     if len(lastflt$) then gosub finishflt
     gosub newflt
   fi
-  call "CDW000", row$, "dc", cvs(g0.rank$, 3) + cvs(g0.tie$, 1)
+  table!.addCell(cvs(g0.rank$, 3) + cvs(g0.tie$, 1), "c")
   dim gr04$:fattr(gr04$)
   read record(gr04, knum=0, key=league$ + g0.id$, dom=*next)gr04$
-  call "CDW000", row$, "d", cvs(gr04.firstname$, 3) + " " + cvs(gr04.lastname$, 3)
+  table!.addCell(cvs(gr04.firstname$, 3) + " " + cvs(gr04.lastname$, 3))
   if half then
-    call "CDW000", row$, "dc", g0.points$
-    call "CDW000", row$, "dc", str(g0.rounds)
+    table!.addCell(g0.points$, "c")
+    table!.addCell(str(g0.rounds), "c")
   else
     gosub tourney_html
   fi
-  call "CDW000", tab$, "r", row$
+  table!.addRow()
 next i
 gosub finishflt
 
@@ -119,22 +121,28 @@ if half then h$ = "Point", span$ = "s4" else h$ = "Tournament"; if len(dates$) =
 txt$ = h$ + " Ranking"
 if len(flts$) > 1 then txt$ = txt$ + " - " + g0.flt$ + " Flight"
 if y.passparm$ = "E" then type$ = "h" else type$ = "d"; rem "Use th for email for style
-call "CDW000", row$, type$ + "c" + span$, txt$
-call "CDW000", tab$, "r class='title'", row$
+
+table! = new DTHtmlTable(BBjAPI.TRUE)
+table!.addHeaderCell(txt$, "c" + span$) 
+table!.addRow()
 if half = 0 then rs$ = " rowspan=2"
-call "CDW000", row$, type$ + "c" + rs$, "Rank"
-call "CDW000", row$, type$ + rs$, "Name"
-if half then call "CDW000", row$, type$ + "c", "Points"; call "CDW000", row$, type$ + "c", "Rounds Played" else gosub tourney_head
-call "CDW000", tab$, "r class='head'", row$
+table!.addHeaderCell("Rank", "c" + rs$) 
+table!.addHeaderCell("Name", rs$)
+if half then
+  table!.addHeaderCell("Points", "c")
+  table!.addHeaderCell("Rounds Played", "c")
+else
+  gosub tourney_head
+fi
+table!.addRow()
 return
 
 finishflt:
-call "CDW000", html$, "t", tab$
-html$[len(flts$)] = html$
+table!.addTable()
+html$[len(flts$)] = table!.getBody()
 return
 
 prizes:
-declare DTHtmlTable table!
 table! = new DTHtmlTable(BBjAPI.TRUE)
 pz$ = ssort(pz$, 7)
 table!.addHeaderCell("Prize Winners - " + date(playdate - 7:"%Ds %Ms %D"), "cs4")
@@ -206,20 +214,23 @@ return
 tourney_html:
 for ind=1 to 1 + 2 * (len(dates$) > 3)
   if g0.gross[ind] then gr$ = str(g0.gross[ind]), hc$ = str(g0.hc[ind]), nt$ = str(g0.net[ind]) else gr$ = "", hc$ = "", nt$ = ""
-  call "CDW000", row$, "dc", gr$
-  call "CDW000", row$, "dc", hc$
-  call "CDW000", row$, "dc", nt$
+  table!.addCell(gr$, "c")
+  table!.addCell(hc$, "c")
+  table!.addCell(nt$, "c")
 next ind
 return
 
 tourney_head:
-call "CDW000", row$, "dcs3", "Week 1"
-if len(dates$) > 3 then call "CDW000", row$, "dcs3", "Week 2"; call "CDW000", row$, "dcs3", "Total"
-call "CDW000", tab$, "r class='head'", row$
+table!.addHeaderCell("Week 1", "cs3") 
+if len(dates$) > 3 then
+  table!.addHeaderCell("Week 2", "cs3") 
+  table!.addHeaderCell("Total", "cs3")
+fi
+table!.addRow()
 for ind=1 to 1 + 2 * (len(dates$) > 3)
-  call "CDW000", row$, "dc", "Gross"
-  call "CDW000", row$, "dc", "HC"
-  call "CDW000", row$, "dc", "Net"
+  table!.addHeaderCell("Gross", "c")
+  table!.addHeaderCell("HC", "c")
+  table!.addHeaderCell("Net", "c")
 next ind
 return
 
