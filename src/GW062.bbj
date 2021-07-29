@@ -33,6 +33,10 @@ call "SW001", "XXGR03", 0, league$ + bin(playdate - 7, 3), gr03a$, sw001$
 call "SW001", "XXGR08", 0, gr01.id$, gr08$, sw001$
 s084.subject$ = gr01.name$
 
+declare DTHtmlTable table!
+declare BBjString   style!
+table! = new DTHtmlTable(BBjAPI.TRUE)
+
 gr05s = unt
 select (gr05s)gr05$ from y.compcode$ + "GR05" where gr05.league$ = league$ and gr05.date = playdate
 
@@ -82,9 +86,6 @@ repeat
   if 1 then s084.toemail$ = "len@excellware.com"
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
-  declare DTHtmlTable table!
-  declare BBjString   style!
-  table! = new DTHtmlTable(BBjAPI.TRUE)
   style! = table!.getStyle()
   style! = style!.replace("font-size: 15px;", "font-size:10pt;")
   print (y6.ch)"<head>" + style! + "</head>" + $0a$
