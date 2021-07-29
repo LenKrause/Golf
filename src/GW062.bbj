@@ -64,7 +64,8 @@ repeat
     tit$ = "Next Round - " + iff(gr03.NINE$ = "F", "FRONT", "BACK") +  " NINE"
     gosub week
   fi
-  call "CDW000", html$, "t", tab$
+  table!.addTable()
+  html$ = table!.getHtml()
   
   if len(html$[5]) then html$ = html$ + "<br>" + html$[5] + "<br>"; rem  Weekly Prizes
   
@@ -120,19 +121,52 @@ week:
   read record(gr04, knum=0, key=gr05.league$ + gr05a.opp$, dom=*next)gr04a$
   dim gr05b$:fattr(gr05$)
   read record(gr05, knum=0, key=gr05.league$ + gr05a.opp$ + gr05a.date$, dom=*next)gr05b$
-  call "CDW000", row$, "hcs3", tit$
-  call "CDW000", tab$, "r", row$
-  call "CDW000", row$, "dr", date(gr05a.date:"%Ds %Mz/%Dz/%Yz")
-  call "CDW000", row$, "dc", fnn$(gr04$)
-  call "CDW000", row$, "dc", fnn$(gr04a$)
-  call "CDW000", tab$, "r", row$
-  if wk = 1 then call "CDW000", row$, "dr", "Gross"; call "CDW000", row$, "dc", fns$(gr05a.score); call "CDW000", row$, "dc", fns$(gr05b.score); call "CDW000", tab$, "r", row$
-  call "CDW000", row$, "dr", "Handicap"; call "CDW000", row$, "dc", fns$(gr05a.hc); call "CDW000", row$, "dc", fns$(gr05b.hc); call "CDW000", tab$, "r", row$
-  if wk = 1 then call "CDW000", row$, "dr", "Net"; call "CDW000", row$, "dc", fns$(gr05a.net); call "CDW000", row$, "dc", fns$(gr05b.net); call "CDW000", tab$, "r", row$
-  if wk = 1 then call "CDW000", row$, "dr", "Putts"; call "CDW000", row$, "dc", fns$(gr05a.putts); call "CDW000", row$, "dc", fns$(gr05b.putts); call "CDW000", tab$, "r", row$
-  if wk = 1 then call "CDW000", row$, "dr", "Points"; call "CDW000", row$, "dc", fns$(gr05a.points); call "CDW000", row$, "dc", fns$(gr05b.points); call "CDW000", tab$, "r", row$
-  if wk = 2 then call "CDW000", row$, "dr", "Email"; call "CDW000", row$, "dc", gr04.email$; call "CDW000", row$, "dc", "<a href='mailto:" + cvs(gr04a.email$, 3) + "?subject=Golf'>" + gr04a.email$ + "</a>"; call "CDW000", tab$, "r", row$
-  if wk = 2 then call "CDW000", row$, "dr", "Phone#"; call "CDW000", row$, "dc", gr04.phone$; call "CDW000", row$, "dc", gr04a.phone$; call "CDW000", tab$, "r", row$
+  table!.addHeaderCell(tit$, "cs3")
+  table!.addRow()
+  table!.addCell(date(gr05a.date:"%Ds %Mz/%Dz/%Yz"), "r")
+  table!.addCell(fnn$(gr04$), "c")
+  table!.addCell(fnn$(gr04a$), "c")
+  table!.addRow()
+  if wk = 1 then
+    table!.addCell("Gross", "r")
+    table!.addCell(fns$(gr05a.score), "c")
+    table!.addCell(fns$(gr05b.score), "c")
+    table!.addRow()
+  fi
+  table!.addCell("Handicap", "r")
+  table!.addCell(fns$(gr05a.hc), "c")
+  table!.addCell(fns$(gr05b.hc), "c")
+  table!.addRow()
+  if wk = 1 then
+    table!.addCell("Net", "r")
+    table!.addCell(fns$(gr05a.net), "c")
+    table!.addCell(fns$(gr05b.net), "c")
+    table!.addRow()
+  fi
+  if wk = 1 then
+    table!.addCell("Putts", "r")
+    table!.addCell(fns$(gr05a.putts), "c")
+    table!.addCell(fns$(gr05b.putts), "c")
+    table!.addRow()
+  fi
+  if wk = 1 then
+    table!.addCell("Points", "r")
+    table!.addCell(fns$(gr05a.points), "c")
+    table!.addCell(fns$(gr05b.points), "c")
+    table!.addRow()
+  fi
+  if wk = 2 then
+    table!.addCell("Email", "r")
+    table!.addCell(gr04.email$, "c")
+    table!.addCell("<a href='mailto:" + cvs(gr04a.email$, 3) + "?subject=Golf'>" + gr04a.email$ + "</a>", "c&")
+    table!.addRow()
+  fi
+  if wk = 2 then
+    table!.addCell("Phone#", "r")
+    table!.addCell(gr04.phone$, "c")
+    table!.addCell(gr04a.phone$, "c")
+    table!.addRow()
+  fi
 return
 
 functions:
