@@ -35,7 +35,6 @@ s084.subject$ = gr01.name$
 
 declare DTHtmlTable table!
 declare BBjString   style!
-table! = new DTHtmlTable(BBjAPI.TRUE)
 
 gr05s = unt
 select (gr05s)gr05$ from y.compcode$ + "GR05" where gr05.league$ = league$ and gr05.date = playdate
@@ -44,6 +43,7 @@ repeat
   read record(gr05s, end=eoj)gr05$
   read record(gr04, knum=0, key=gr05.league$ + gr05.id$)gr04$
   if pos(" " <> gr04.email$) = 0 then continue
+  table! = new DTHtmlTable(BBjAPI.TRUE)  
   html$ = "", tab$ = "", row$ = ""
   if gr03.half = 1 or gr03.half = 2 or gr03a.half = 1 or gr03a.half = 2 then
     table!.addHeaderCell(gr01.name$, "cs3")
@@ -209,16 +209,70 @@ repeat
 until 0
 close (gr05c)
 gosub newyr
-r$ = l$; gosub adj; l$ = r$
+r$ = l$;  gosub adj;  l$ = r$
 r$ = yy$; gosub adj; yy$ = r$
-if l.srnd then avgv = round(l.stot / l.srnd, 1), tit$ = "Scores", minv = l.smin, maxv = l.smax, delta = 5, val$ = l.s$, clr$ = "3072F3"; gosub dochl
-if yy.srnd then avgv = round(yy.stot / yy.srnd, 1), tit$ = "Scores", minv = yy.smin, maxv = yy.smax, delta = 1, val$ = yy.s$, clr$ = "3072F3"; gosub dochy
+if l.srnd then
+  avgv = round(l.stot / l.srnd, 1)
+  tit$ = "Scores"
+  minv = l.smin
+  maxv = l.smax
+  delta = 5
+  val$ = l.s$
+  clr$ = "3072F3"
+  gosub dochl
+fi
+if yy.srnd then
+  avgv = round(yy.stot / yy.srnd, 1)
+  tit$ = "Scores"
+  minv = yy.smin
+  maxv = yy.smax
+  delta = 1
+  val$ = yy.s$
+  clr$ = "3072F3"
+  gosub dochy
+fi
 if l.srnd or yy.srnd then call "CDW000", tab$, "r style='padding:0px'", row$
-if l.prnd then avgv = round(l.ptot / l.prnd, 1), tit$ = "Putts", minv = l.pmin - 1, maxv = l.pmax + 1, delta = 1, val$ = l.p$, clr$ = "33cc33"; gosub dochl
-if yy.prnd then avgv = round(yy.ptot / yy.prnd, 1), tit$ = "Putts", minv = yy.pmin - 1, maxv = yy.pmax + 1, delta = 1, val$ = yy.p$, clr$ = "33cc33"; gosub dochy
+if l.prnd then
+  avgv = round(l.ptot / l.prnd, 1)
+  tit$ = "Putts"
+  minv = l.pmin - 1
+  maxv = l.pmax + 1
+  delta = 1
+  val$ = l.p$
+  clr$ = "33cc33"
+  gosub dochl
+fi
+if yy.prnd then
+  avgv = round(yy.ptot / yy.prnd, 1)
+  tit$ = "Putts"
+  minv = yy.pmin - 1
+  maxv = yy.pmax + 1
+  delta = 1
+  val$ = yy.p$
+  clr$ = "33cc33"
+  gosub dochy
+fi
 if l.prnd or yy.prnd then call "CDW000", tab$, "r style='padding:0px'", row$
-if l.hrnd then avgv = round(l.htot / l.hrnd, 1), tit$ = "Handicap", minv = l.hmin - 1, maxv = l.hmax + 1, delta = 1, val$ = l.h$, clr$ = "ff9900"; gosub dochl
-if yy.hrnd then avgv = round(yy.htot / yy.hrnd, 1), tit$ = "Handicap", minv = yy.hmin - 1, maxv = yy.hmax + 1, delta = 1, val$ = yy.h$, clr$ = "ff9900"; gosub dochy
+if l.hrnd then
+  avgv = round(l.htot / l.hrnd, 1)
+  tit$ = "Handicap"
+  minv = l.hmin - 1
+  maxv = l.hmax + 1
+  delta = 1
+  val$ = l.h$
+  clr$ = "ff9900"
+  gosub dochl
+fi
+if yy.hrnd then
+  avgv = round(yy.htot / yy.hrnd, 1)
+  tit$ = "Handicap"
+  minv = yy.hmin - 1
+  maxv = yy.hmax + 1
+  delta = 1
+  val$ = yy.h$
+  clr$ = "ff9900"
+  gosub dochy
+fi
 if l.hrnd or yy.hrnd then call "CDW000", tab$, "r style='padding:0px'", row$
 call "CDW000", html$, "t style='border:0px'", tab$
 return
