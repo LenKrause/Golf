@@ -83,7 +83,7 @@ repeat
   gosub chart
   gosub bestrounds
   s084.toname$ = fnn$(gr04$), s084.toemail$ = gr04.email$
-  if 1 then s084.toemail$ = "len@excellware.com"
+  if 0 then s084.toemail$ = "len@excellware.com"
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
   style! = table!.getStyle()
@@ -114,7 +114,7 @@ repeat
   if len(pdf$) then call "CDS184", y$, y6$, pdf$, "HandicapListing.pdf"
   call "CDS094", y6$, "e"
   sent = sent + 1
-  if 1 then ts = ts + 1; if ts = 2 then goto eoj
+  if 0 then ts = ts + 1; if ts = 2 then goto eoj
 until 0
 
 week:
@@ -314,7 +314,7 @@ bestrounds:
   call "CDS041", "CDW038", w038$, "YY"
   w038.useclass$ = "N"
   y.compname$ = ""
-  call "CDW038", y$, "Best 10 Scores", y5a$, htmlbest$, w038$, "XXGR05", 0, "", "", "GR05.DATE|SCORE|HC|NET|PUTTS", "GR05.LEAGUE$=""" + league$ + """ AND GR05.ID$=""" + gr04.id$ + """ and GR05.NET", "REC.SCORE$+NOT(REC.DATE$)", "", 10
+  call "CDW038", y$, "Best Rounds", y5a$, htmlbest$, w038$, "XXGR05", 0, "", "", "GR05.DATE|SCORE|HC|NET|PUTTS", "GR05.LEAGUE$=""" + league$ + """ AND GR05.ID$=""" + gr04.id$ + """ and GR05.NET", "REC.SCORE$+NOT(REC.DATE$)", "", 10
   html$ = html$ + "<br>" + htmlbest$
 return
 
