@@ -14,6 +14,10 @@ class public weeklyLeagueProcessing
   field private BBjString  msg! = ""
   field private BBjString  aid$ = "lk01"
   
+  field private BBjNumber  hour   = 14; rem  12
+  field private BBjNumber  minute = 10; rem  24
+  field private BBjNumber  delta  = 10; rem  12
+  
   method public weeklyLeagueProcessing(BBjString league$)
     call "SW001", "XXGR01", 0, league$, gr01$, sw001$
     if ! sw001.onfile then
@@ -62,68 +66,59 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("gr08id", gr01.id$); rem  Course
     gr10!.setFieldValue("date", gr03.date)
 
-    gr10!.setFieldValue("time", #fixTime(12, 24))
+    rem  Early 18 hole rounds
+    gr10!.setFieldValue("time", #fixTime())
     gr10!.setFieldValue("id", 1, "js01"); rem  Jim Sterley
     gr10!.setFieldValue("id", 2, "mf01"); rem  Mike Fee
-    gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regain
+    gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regan
 REM     gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
     gr10!.setFieldValue("id", 4, "lk01"); rem  Len Krause
     gr10File!.addUniqueRecord(gr10!)
     for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
     next i
+
+    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+
+    rem  Late 9 hole rounds
+    #hour = 16, #minute = 20, #delta = 10
+    #hour = 16, #minute = 50, #delta = 10; rem  Late start 8/11
     
-    gr10!.setFieldValue("time", #fixTime(12, 36)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(12, 48)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(01, 00)); gr10File!.addUniqueRecord(gr10!)
-REM     gr10!.setFieldValue("time", #fixTime(01, 30)); gr10File!.addUniqueRecord(gr10!)
-REM     gr10!.setFieldValue("time", #fixTime(04, 00)); gr10File!.addUniqueRecord(gr10!)
-
-REM if gr03.date = jul(2021, 4, 14) then
-REM     gr10!.setFieldValue("time", #fixTime(04, 24))
-REM     gr10!.setFieldValue("id", 1, "sh01"); rem  Steve Halcisak
-REM     gr10!.setFieldValue("id", 2, "pc01"); rem  Paul Consiglio
-REM     gr10!.setFieldValue("id", 3, "ds01"); rem  Dave Schweiterman
-REM     gr10File!.addUniqueRecord(gr10!)
-REM     for i = 1 to 4
-REM       gr10!.setFieldValue("id", i, "")
-REM     next i
-REM fi
-
-if gr03.date >= jul(2021, 4, 21) then
-    gr10!.setFieldValue("time", #fixTime(04, 20))
+    gr10!.setFieldValue("time", #fixTime())
     
     gr10!.setFieldValue("id", 1, "jm01"); rem  Jim Mindek
-    gr10!.setFieldValue("id", 2, "jm01"); rem  Jim Mindek Guest
-    gr10!.setFieldValue("id", 3, "bp01"); rem  Bernie
-    gr10!.setFieldValue("id", 4, "mt01"); rem  Mel Tarbuck
-
+    gr10!.setFieldValue("id", 2, "pb01"); rem  Bernie
+    gr10!.setFieldValue("id", 3, "mt01"); rem  Mel
     gr10File!.addUniqueRecord(gr10!)
     for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
     next i
     
-    gr10!.setFieldValue("time", #fixTime(04, 30)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(04, 40)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(04, 50)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(05, 00)); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime(05, 10)); gr10File!.addUniqueRecord(gr10!)
-REM     gr10!.setFieldValue("time", #fixTime(05, 20)); gr10File!.addUniqueRecord(gr10!)
-fi
+    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
 
   methodend
   
-  method public BBjNumber fixTime(BBjNumber hour, BBjNumber minute)
+  method public BBjNumber fixTime()
     precision 6
-    time$ = str(hour:"00") + str(minute:"00")
-    time = hour + minute / 60
+    time$ = str(#hour:"00") + str(#minute:"00")
+    time = #hour + #minute / 60
     timeout$ = date(0, time:"%hz%mz")
     while timeout$ <> time$
       time = time + .000001
       timeout$ = date(0, time:"%hz%mz")
     wend
     precision 2
-    if int(time) < 7 then time = time + 12
+REM     if int(time) < 7 then time = time + 12
+    #minute = #minute + #delta
+    if #minute >= 60 then
+      #hour   = #hour + 1
+      #minute = #minute - 60
+    fi
     methodret time
   methodend
 classend
