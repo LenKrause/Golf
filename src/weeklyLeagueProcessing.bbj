@@ -89,7 +89,7 @@ REM     gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
     gr10!.setFieldValue("time", #fixTime())
     
     gr10!.setFieldValue("id", 1, "jm01"); rem  Jim Mindek
-    gr10!.setFieldValue("id", 2, "pb01"); rem  Bernie
+    gr10!.setFieldValue("id", 2, "bp01"); rem  Bernie
     gr10!.setFieldValue("id", 3, "mt01"); rem  Mel
     gr10File!.addUniqueRecord(gr10!)
     for i = 1 to 4
