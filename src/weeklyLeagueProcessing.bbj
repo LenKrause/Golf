@@ -107,10 +107,10 @@ REM     gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
     precision 6
     time$ = str(#hour:"00") + str(#minute:"00")
     time = #hour + #minute / 60
-    timeout$ = date(0, time:"%hz%mz")
+    timeout$ = date(0, time:"%Hz%mz")
     while timeout$ <> time$
       time = time + .000001
-      timeout$ = date(0, time:"%hz%mz")
+      timeout$ = date(0, time:"%Hz%mz")
     wend
     precision 2
 REM     if int(time) < 7 then time = time + 12
