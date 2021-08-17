@@ -9,6 +9,3 @@ git pull
 
 # copy css
 cp css/*.css /u/CDI/LK/web/dynaweb/
-
-# copy updater script
-cp bin/gitgolf.sh /u/CDI/bin/
