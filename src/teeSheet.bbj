@@ -109,11 +109,11 @@ class public teeSheet
     fi
     
     call "CDS084", y$, y5$, u0, s084$, y6, y6$    
-    if jul(0,0,0) = jul(2020,9,10) then
-      print (y6.ch)"<p>Cost for round and cart at Grey Hawk on Sunday is $50.<br><br>After golf we will meet at Paninis Bar & Grill<br>3520 Center Rd, Brunswick, OH  44212</p>"
+    if jul(0,0,0) = jul(2021,8,17) then
+      print (y6.ch)"<p>Note: Tee times have been revised.</p><p>Cookout after golf tonight!</p>"
     fi
     print (y6.ch)#html$
-    if #courseId$ = "PH " then print (y6.ch)"<br><center>Please phone the course at " + #coursePhone$ + " to prepay by credit card.</center><br>"
+    rem if #courseId$ = "PH " then print (y6.ch)"<br><center>Please phone the course at " + #coursePhone$ + " to prepay by credit card.</center><br>"
     call "CDS094", y6$, "e"
   methodend
   
