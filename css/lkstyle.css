@@ -10,7 +10,7 @@ media screen and (min-width: 60em) {
 body	{
 	font-family: Verdana,Tahoma,Arial;
 	background-color:#c0c0c0;
-	margin:0
+	margin:0;
 	padding:0
 	}
 
@@ -23,7 +23,7 @@ body	{
 	}
 
 .note {
-	color:#a90000;
+	color:#ffb3b3;
 	}
 
 .players, .players tr td {
