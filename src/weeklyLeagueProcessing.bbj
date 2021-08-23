@@ -72,8 +72,8 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("id", 2, "mf01"); rem  Mike Fee
     gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regan
 REM     gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
-REM     gr10!.setFieldValue("id", 4, "lk01"); rem  Len Krause
-    gr10!.setFieldValue("id", 4, "ks01"); rem  Keith Smith
+    gr10!.setFieldValue("id", 4, "lk01"); rem  Len Krause
+REM     gr10!.setFieldValue("id", 4, "ks01"); rem  Keith Smith
     gr10File!.addUniqueRecord(gr10!)
     for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
@@ -85,7 +85,7 @@ REM     gr10!.setFieldValue("id", 4, "lk01"); rem  Len Krause
 
     rem  Late 9 hole rounds
     #hour = 16, #minute = 20, #delta = 10
-REM     #hour = 16, #minute = 50, #delta = 10; rem  Late start 8/11
+REM     #hour = 16, #minute = 50, #delta = 10; rem  Late start 8/11/21
     
     gr10!.setFieldValue("time", #fixTime())
     
