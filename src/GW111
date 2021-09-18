@@ -271,6 +271,7 @@ repeat
   declare BBjString ems!
   declare BBjVector emsV!
   ems! = field(cgi$,"em", err=*break)
+  note$ = field(cgi$, "note", err=*break)
   emsV! = DT.split(ems!, $01$)
   if emsV!.size() then
     call "CDS041", "CDS084", s084$, "YP"
@@ -291,11 +292,8 @@ repeat
       print (y6.ch)"<style>body{color:green;}</style>"
       print (y6.ch)"<body>"
       print (y6.ch)cvs(gr09a.firstname$, 2) + "-<br><br>"
-      if jul(0,0,0) = jul(2020,11,1) then
-        print (y6.ch)"Although we are back to Standard Time, the weather looks promising for Wednesday,"
-        print (y6.ch)"  and several expresed an interest in playing, so<br>"
-      fi
-      print (y6.ch)"Tee Times have been made.<br><br>"
+      call "SW002", note$, $0a$, "<br>"
+      print (y6.ch)note$, "<br><br>"
       link$ = "http://www.scoresandcharts.com/LK/cgi-bin/ttm.cgi?code=" + hta(gr09a.aid$ + gr09a.id$ + hsh(gr09a.aid$ + gr09a.id$))
       print (y6.ch)"Click <a href='" + link$ + "'>here</a> to sign up<br><br>"
       print (y6.ch)"-" + cvs(gr09.firstname$, 2)
@@ -553,6 +551,8 @@ repeat
   call "CDW000", row$, "dc", "<input type='checkbox' name='em' value='" + gr09a.id$ + "'" + checked$ + ">"
   call "CDW000", tab$, "r", row$
 until 0
+call "CDW000", row$, "ds2", "<textarea name='note' rows='4' cols='50'>Tee Times have been made.</textarea>"
+call "CDW000", tab$, "r", row$
 btn1$ = "<button type='submit' onclick='submit();'>Send Emails</button>"
 btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
 call "CDW000", row$, "dcs2", btn1$ + " " + btn2$
