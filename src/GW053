@@ -94,7 +94,7 @@
 0760 declare yearLongSkins sg!
 0770 sg! = new yearLongSkins()
 0780 print (y6.ch)sg!.getHtmlTableBody()
-0750 goto eoj
+0990 goto eoj
 
 1000 newflt:
 1020 flt$ = seq$(seqp, 1)
