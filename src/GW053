@@ -92,7 +92,7 @@
 0744 print (y6.ch)html$
 0750 use ::yearLongSkins.bbj::yearLongSkins
 0760 declare yearLongSkins sg!
-0770 sg! = new yearLongSkins()
+0770 sg! = new yearLongSkins("SAW")
 0780 print (y6.ch)sg!.getHtmlTableBody()
 0990 goto eoj
 
