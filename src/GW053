@@ -72,7 +72,7 @@
 0660   call "CDW000", row$, "d", cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2)
 0670   call "CDW000", row$, "dc", str(pts[id, wks + 5])
 0675   if pos(" " <> gr04.email$) then
-:        if pos("len@excellware.com" = gr04.email4$) then toemail$ = toemail$ + "," + cvs(gr04.email$, 2), sent = sent + 1
+:        toemail$ = toemail$ + "," + cvs(gr04.email$, 2), sent = sent + 1
 :      fi
 0680   for wk = 1 to wks
 0685     if wk = pts[id, wks + 4] then bkg$ = "gff9999" else bkg$ = ""
@@ -87,7 +87,7 @@
 0737 html$ = html$ + "<br>Week with red shading was excluded from point totals for those who played every week."
 0740 call "CDS041", "CDS084", s084$, "YY"
 0741 s084.name$ = "MAIL", s084.subject$ = wases.leaguename$, s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "webmaster@scoresandcharts.com", s084.toname$ = "Golfers", s084.emailbcc$ = toemail$, s084.emailtype$ = "H", s084.mode$ = "E"
-0742 if 0 then s084.emailbcc$ = "len@excellware.com"
+0742 if 1 then s084.emailbcc$ = "len@excellware.com", sent = 1
 0743 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 0744 print (y6.ch)html$
 0750 use ::yearLongSkins.bbj::yearLongSkins
