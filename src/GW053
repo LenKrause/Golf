@@ -1,4 +1,4 @@
-0100 rem "GW053 - 07/10/17 Golf Point Ranking - html
+0100 rem "GW053 - 09/19/21 Golf Point Ranking - html
 0110 setesc 8000; seterr 8000
 0130 html$ = "", toemail$ = "", half = num(cgi.period$)
 0140 tmp$ = stbl("WMS_CDW000", "D")
@@ -72,7 +72,7 @@
 0660   call "CDW000", row$, "d", cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2)
 0670   call "CDW000", row$, "dc", str(pts[id, wks + 5])
 0675   if pos(" " <> gr04.email$) then
-:        toemail$ = toemail$ + "," + cvs(gr04.email$, 2), sent = sent + 1
+:        if pos("len@excellware.com" = gr04.email4$) then toemail$ = toemail$ + "," + cvs(gr04.email$, 2), sent = sent + 1
 :      fi
 0680   for wk = 1 to wks
 0685     if wk = pts[id, wks + 4] then bkg$ = "gff9999" else bkg$ = ""
@@ -90,6 +90,10 @@
 0742 if 0 then s084.emailbcc$ = "len@excellware.com"
 0743 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 0744 print (y6.ch)html$
+0750 use ::yearLongSkins.bbj::yearLongSkins
+0760 declare yearLongSkins sg!
+0770 sg! = new yearLongSkins()
+0780 print (y6.ch)sg!.getHtmlTableBody()
 0750 goto eoj
 
 1000 newflt:
@@ -107,6 +111,7 @@
 1130 call "CDW000", row$, "hbr", "Points"
 1135 call "CDW000", tab$, "r", row$
 1140 return
+
 7010 def fnh$(half)
 7020 switch half
 7030   case 1; out$ = "1st half "; break
