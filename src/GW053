@@ -89,7 +89,7 @@
 0741 s084.name$ = "MAIL", s084.subject$ = wases.leaguename$, s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "webmaster@scoresandcharts.com", s084.toname$ = "Golfers", s084.emailbcc$ = toemail$, s084.emailtype$ = "H", s084.mode$ = "E"
 0742 if 1 then s084.emailbcc$ = "len@excellware.com", sent = 1
 0743 call "CDS084", y$, y5$, u0, s084$, y6, y6$
-0744 print (y6.ch)html$
+0744 if 0 print (y6.ch)html$
 0750 use ::yearLongSkins.bbj::yearLongSkins
 0760 declare yearLongSkins sg!
 0770 sg! = new yearLongSkins("SAW")
