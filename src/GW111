@@ -449,7 +449,7 @@ repeat
       if pos(gr09.id$ = gr10a.id$[1] + gr10a.id$[2] + gr10a.id$[3] + gr10a.id$[4], 4) then
         playing = playing + 1
         mytime = gr10.time
-        break
+REM         break
       fi
       read record (gr10a, end=*break)gr10a$
       if gr10a.aid$ <> gr10.aid$ or gr10a.date <> gr10.date then break
