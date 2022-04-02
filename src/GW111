@@ -485,13 +485,13 @@ REM         break
       rem  Claim my first time - not playing, first available spot in this foursome
       case gr10.id$[i] = "    " and playing = 0 and time_box = 0 
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
-        col2$ = "Check this box to play 1"
+        col2$ = "Check this box to play"
         time_box = 1
         break
       rem  Claim my second time - playing earlier, first available spot in this foursome
-      case gr10.id$[i] = "    " and playing = 1 and time_box = 0 and gr10.time >= mytime + 2 
+      case gr10.id$[i] = "    " and playing = 1 and time_box = 0 and (gr10.time >= mytime + 2 or gr10.time <= mytime - 2)
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
-        col2$ = "Check this box to play 2"
+        col2$ = "Check this box to play"
         time_box = 1
         break
       rem  Claim time for my guest - I'm in this foursome, first available spot in this foursome
