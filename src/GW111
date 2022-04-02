@@ -422,8 +422,10 @@ if gr09.aid$ = "lk01" then
   fi
 fi
   
-gids$ = ""
-ldate = 0
+gids$   = ""
+ldate   = 0
+playing = 0
+mytime  = 0
 gr10.aid$ = gr09.aid$
 gr10.date = y.jdate
 gr10.time = tim
@@ -445,7 +447,8 @@ repeat
     read record (gr10a, knum=1, key=kgen(gr10$, gr10k$, 1))gr10a$
     repeat
       if pos(gr09.id$ = gr10a.id$[1] + gr10a.id$[2] + gr10a.id$[3] + gr10a.id$[4], 4) then
-        playing = 1
+        playing = playin + 1
+        mytime = gr10.time
         break
       fi
       read record (gr10a, end=*break)gr10a$
@@ -479,8 +482,14 @@ repeat
         if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         col2$ = col2$ + "</span>"
         break
-      rem  Claim my time - not playing, first available spot in this foursome
+      rem  Claim my first time - not playing, first available spot in this foursome
       case gr10.id$[i] = "    " and playing = 0 and time_box = 0 
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col2$ = "Check this box to play"
+        time_box = 1
+        break
+      rem  Claim my second time - playing earlier, first available spot in this foursome
+      case gr10.id$[i] = "    " and playing = 1 and time_box = 0 and gr10.time >= mytime + 2 
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
         col2$ = "Check this box to play"
         time_box = 1
