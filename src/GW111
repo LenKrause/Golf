@@ -448,7 +448,7 @@ repeat
     repeat
       if pos(gr09.id$ = gr10a.id$[1] + gr10a.id$[2] + gr10a.id$[3] + gr10a.id$[4], 4) then
         playing = playing + 1
-        mytime = gr10.time
+        mytime = gr10a.time
 REM         break
       fi
       read record (gr10a, end=*break)gr10a$
