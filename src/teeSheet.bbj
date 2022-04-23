@@ -57,6 +57,7 @@ class public teeSheet
     
     for i = 0 to gr10Recs!.size() - 1
       gr10$ = gr10Recs!.get(i).toString()
+      if last_time and last_time < 4 and gr10.time >= 4 then ids$ = ""; rem  players now make 2 tee times per day
       table!.addCell(date(gr10.date, gr10.time:"%h:%mz %p"), "cR4")
       for player = 1 to 4
         name$ = "&nbsp;"
@@ -73,6 +74,7 @@ class public teeSheet
         table!.addCell("")
         table!.addRow()
       next player
+      last_time = gr10.time
     next i
     
     table!.addPageStyle("th a {text-decoration:none;background-color:#346904;color:#fefefe !important;border-radius:4px;padding:1px 5px 1px 5px;white-space:nowrap;display:block;} th a:hover {color:#ffffcc !important;}")
@@ -148,7 +150,7 @@ y$ = "LK"
 y5$ = "Tee Sheet"
 call "CDS011", y$, y5$
 
-sheet! = new teeSheet("lk01", jul(2021,9,12))
+sheet! = new teeSheet("lk01", jul(2022,5,4))
 if ! sheet!.getErrMsg().isEmpty() then
   print sheet!.getErrMsg()
 else
