@@ -150,7 +150,7 @@ y$ = "LK"
 y5$ = "Tee Sheet"
 call "CDS011", y$, y5$
 
-sheet! = new teeSheet("lk01", jul(2022,5,4))
+sheet! = new teeSheet("lk01", jul(2022,4,27))
 if ! sheet!.getErrMsg().isEmpty() then
   print sheet!.getErrMsg()
 else
