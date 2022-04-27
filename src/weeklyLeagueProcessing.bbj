@@ -66,30 +66,35 @@ class public weeklyLeagueProcessing
     gr10!.setFieldValue("gr08id", gr01.id$); rem  Course
     gr10!.setFieldValue("date", gr03.date)
 
+    day_of_week$ = date(0:"%Ds")
+
     rem  Early 18 hole rounds
-    gr10!.setFieldValue("time", #fixTime())
-    #preset(gr10File!, gr10!)
+    if day_of_week$ = "Wed" then
+      gr10!.setFieldValue("time", #fixTime())
+      #preset(gr10File!, gr10!)
 
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+    fi
+    
     rem  Late 9 hole rounds
-    #hour = 16, #minute = 08, #delta = 8; rem  4:08 pm every 8 minutes
-REM     #hour = 16, #minute = 50, #delta = 10; rem  Late start 8/11/21
+    if day_of_week$ = "Sat" then
+      #hour = 16, #minute = 08, #delta = 8; rem  4:08 pm every 8 minutes
 
-    gr10!.setFieldValue("time", #fixTime())
-    #preset(gr10File!, gr10!)
+      gr10!.setFieldValue("time", #fixTime())
+      #preset(gr10File!, gr10!)
 
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-    gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+    fi
+    
   methodend
   
   method public BBjNumber fixTime()
@@ -138,6 +143,9 @@ if ! wlp!.getErrMsg().isEmpty() then
   print wlp!.getErrMsg()
   run "CDS001"
 fi
+
+rem  On Wed just schedule 18 hole tee times
+if date(0:"%Ds") = "Wed" run "CDS001"
 
 declare BBjTemplatedString gr03!
 gr03! = wlp!.getPlayDateRecord()
