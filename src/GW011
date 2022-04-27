@@ -29,7 +29,7 @@
 1140 IF POS(" "<>CGI.PHONE$) THEN GOSUB PHONE
 1150 IF POS(" "<>CGI.PASSWORD$) AND FND("PASSWORD") THEN LET GR04.PASSWORD$=CGI.PASSWORD$,MSG$="Password Changed"; GOSUB ACTIVITY
 1160 IF POS(FIELD(CGI$,"AUTOSCHEDULE",ERR=1161)="YN") AND FND("AUTOSCHEDULE") THEN LET GR04.AUTOSCHEDULE$=CGI.AUTOSCHEDULE$,MSG$="Auto Schedule set to "+ GR04.AUTOSCHEDULE$; GOSUB ACTIVITY
-1162 IF POS(FIELD(CGI$,"TIMEPREFERENCE",ERR=1163)="ELN") AND FND("TIMEPREFERENCE") THEN LET GR04.TIMEPREFERENCE$=CGI.TIMEPREFERENCE$,MSG$="Time Preference set to "+GR04.TIMEPREFERENCE$; GOSUB ACTIVITY
+1162 IF POS(FIELD(CGI$,"TIMEPREFERENCE",ERR=1163)="ELN") AND FND("TIMEPREFERENCE") THEN LET GR04.TIMEPREFERENCE$=CGI.TIMEPREFERENCE$,MSG$="Time Preference set to "+fnv$(0); GOSUB ACTIVITY
 1164 IF POS(FIELD(CGI$,"PLAYTHISYEAR",ERR=1170)="YN") AND FND("PLAYTHISYEAR") THEN LET GR04.PLAYTHISYEAR$=CGI.PLAYTHISYEAR$,MSG$="Play this year set to "+FNYN$(GR04.PLAYTHISYEAR$); GOSUB ACTIVITY
 1170 WRITE RECORD(GR04)GR04$
 1180 LET MSG$=ALLMSG$,ALLMSG$=""
@@ -59,9 +59,10 @@
 
 1337 CALL "CDW000",ROW$,"dr class='head'","Time Preference"
 1338 def fno$(val$, text$)="<input type='radio' name='" + fld$ + "' value='" + val$ + "'" + iff(field(gr04$,fld$)=val$, " Checked", "") + ">" + text$
-1339 FLD$="TIMEPREFERENCE"
-1340 call "CDW000",row$,"d",iff(gr04.timepreference$ = "E", "Early", iff(gr04.timepreference$ = "L", "Late", "No Preference"))
-1341 options$ = fno$("E", "Early")
+1339 def fnv$(x)=iff(gr04.timepreference$ = "E", "Early", iff(gr04.timepreference$ = "L", "Late", "No Preference"))
+1340 FLD$="TIMEPREFERENCE"
+1341 call "CDW000",row$,"d",fnv$(0)
+1342 options$ = fno$("E", "Early")
 1343 options$ = options$ + "<br>" + fno$("L", "Late")
 1344 options$ = options$ + "<br>" + fno$("N", "No Preference")
 1345 CALL "CDW000",ROW$,"d",options$
