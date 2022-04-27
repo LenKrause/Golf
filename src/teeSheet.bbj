@@ -57,7 +57,7 @@ class public teeSheet
     
     for i = 0 to gr10Recs!.size() - 1
       gr10$ = gr10Recs!.get(i).toString()
-      if last_time and last_time < 4 and gr10.time >= 4 then ids$ = ""; rem  players now make 2 tee times per day
+      if last_time and last_time < 16 and gr10.time >= 16 then ids$ = ""; rem  players now make 2 tee times per day
       table!.addCell(date(gr10.date, gr10.time:"%h:%mz %p"), "cR4")
       for player = 1 to 4
         name$ = "&nbsp;"
