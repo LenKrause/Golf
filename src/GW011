@@ -54,19 +54,22 @@
 1332 IF GR04.AUTOSCHEDULE$="Y" THEN LET VAL$="Yes",YES$=" Checked",NO$="" ELSE LET VAL$="No",YES$="",NO$=" Checked"
 1333 LET FLD$="AUTOSCHEDULE"
 1334 CALL "CDW000",ROW$,"d",VAL$
+1335 CALL "CDW000",ROW$,"d","<input type='radio' name='"+FLD$+"' value='Y'"+YES$+">Yes<br><input type='radio' name='"+FLD$+"' value='N'"+NO$+">No"
+1336 CALL "CDW000",TAB$,"r",ROW$
 
-1335 def fno$(val$, text$)="<input type='radio' name='" + fld$ + "' value='" + val$ + "'" + iff(field(gr04$,fld$)=val$, " Checked", "") + ">" + text$
-1336 FLD$="TIMEPREFERENCE"
-1337 options$ = fno$("E", "Early")
-1338 options$ = options$ + "<br>" + fno$("L", "Late")
-1339 options$ = options$ + "<br>" + fno$("N", "No Preference")
-1340 CALL "CDW000",ROW$,"d",options$
-1341 rem CALL "CDW000",ROW$,"d","<input type='radio' name='"+FLD$+"' value='E'"+YES$+">Early<br><input type='radio' name='"+FLD$+"' value='L'"+NO$+">Late"
-1342 CALL "CDW000",TAB$,"r",ROW$
+1337 CALL "CDW000",ROW$,"dr class='head'","Time Preference"
+1338 def fno$(val$, text$)="<input type='radio' name='" + fld$ + "' value='" + val$ + "'" + iff(field(gr04$,fld$)=val$, " Checked", "") + ">" + text$
+1339 FLD$="TIMEPREFERENCE"
+1340 call "CDW000",row$,"d",iff(gr04.timepreference$ = "E", "Early", iff(gr04.timepreference$ = "L", "Late", "No Preference"))
+1341 options$ = fno$("E", "Early")
+1343 options$ = options$ + "<br>" + fno$("L", "Late")
+1344 options$ = options$ + "<br>" + fno$("N", "No Preference")
+1345 CALL "CDW000",ROW$,"d",options$
+1346 rem CALL "CDW000",ROW$,"d","<input type='radio' name='"+FLD$+"' value='E'"+YES$+">Early<br><input type='radio' name='"+FLD$+"' value='L'"+NO$+">Late"
+1347 CALL "CDW000",TAB$,"r",ROW$
 
 1356 CALL "CDW000",ROW$,"dr class='head'","Play in "+DATE(0:"%Yl")
 1358 IF GR04.PLAYTHISYEAR$="Y" THEN LET VAL$="Yes",YES$=" Checked",NO$="" ELSE LET VAL$="No",YES$="",NO$=" Checked"
-
 1360 LET FLD$="PLAYTHISYEAR"
 1370 CALL "CDW000",ROW$,"d",VAL$
 1380 CALL "CDW000",ROW$,"d","<input type='radio' name='"+FLD$+"' value='Y'"+YES$+">Yes<br><input type='radio' name='"+FLD$+"' value='N'"+NO$+">No"
