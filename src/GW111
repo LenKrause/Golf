@@ -42,7 +42,7 @@ PLAYER:
 
 if field(cgi$, "p", err=*next) = "scorePosting.bbj" then run "scorePosting.bbj"
 
-if gr09.id$ = gr09.aid$ then
+if gr09.id$ = gr09.aid$ or (gr09.aid$ = "lk01" and gr09.id$ = "js01") then
   func$ = field(cgi$, "f", err=*endif)
 fi
 
