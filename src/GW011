@@ -28,8 +28,8 @@
 1130 IF POS(" "<>CGI.EMAIL$) THEN GOSUB EMAIL
 1140 IF POS(" "<>CGI.PHONE$) THEN GOSUB PHONE
 1150 IF POS(" "<>CGI.PASSWORD$) AND FND("PASSWORD") THEN LET GR04.PASSWORD$=CGI.PASSWORD$,MSG$="Password Changed"; GOSUB ACTIVITY
-1160 IF POS(FIELD(CGI$,"AUTOSCHEDULE",ERR=1161)="YN") AND FND("AUTOSCHEDULE") THEN LET GR04.AUTOSCHEDULE$=CGI.AUTOSCHEDULE$,MSG$="Auto Schedule set to "+ GR04.AUTOSCHEDULE$; GOSUB ACTIVITY
-1162 IF POS(FIELD(CGI$,"TIMEPREFERENCE",ERR=1163)="ELN") AND FND("TIMEPREFERENCE") THEN LET GR04.TIMEPREFERENCE$=CGI.TIMEPREFERENCE$,MSG$="Time Preference set to "+fnv$(0); GOSUB ACTIVITY
+1160 REM IF POS(FIELD(CGI$,"AUTOSCHEDULE",ERR=1161)="YN") AND FND("AUTOSCHEDULE") THEN LET GR04.AUTOSCHEDULE$=CGI.AUTOSCHEDULE$,MSG$="Auto Schedule set to "+ GR04.AUTOSCHEDULE$; GOSUB ACTIVITY
+1162 REM IF POS(FIELD(CGI$,"TIMEPREFERENCE",ERR=1163)="ELN") AND FND("TIMEPREFERENCE") THEN LET GR04.TIMEPREFERENCE$=CGI.TIMEPREFERENCE$,MSG$="Time Preference set to "+fnv$(0); GOSUB ACTIVITY
 1164 IF POS(FIELD(CGI$,"PLAYTHISYEAR",ERR=1170)="YN") AND FND("PLAYTHISYEAR") THEN LET GR04.PLAYTHISYEAR$=CGI.PLAYTHISYEAR$,MSG$="Play this year set to "+FNYN$(GR04.PLAYTHISYEAR$); GOSUB ACTIVITY
 1170 WRITE RECORD(GR04)GR04$
 1180 LET MSG$=ALLMSG$,ALLMSG$=""
@@ -50,24 +50,24 @@
 1320 LET TXT$="Telephone",FLD$="PHONE"; GOSUB ROW
 1330 LET TXT$="Password",FLD$="PASSWORD"; GOSUB ROW
 
-1331 CALL "CDW000",ROW$,"dr class='head'","Auto Schedule"
-1332 IF GR04.AUTOSCHEDULE$="Y" THEN LET VAL$="Yes",YES$=" Checked",NO$="" ELSE LET VAL$="No",YES$="",NO$=" Checked"
-1333 LET FLD$="AUTOSCHEDULE"
-1334 CALL "CDW000",ROW$,"d",VAL$
-1335 CALL "CDW000",ROW$,"d","<input type='radio' name='"+FLD$+"' value='Y'"+YES$+">Yes<br><input type='radio' name='"+FLD$+"' value='N'"+NO$+">No"
-1336 CALL "CDW000",TAB$,"r",ROW$
+1331 REM CALL "CDW000",ROW$,"dr class='head'","Auto Schedule"
+1332 REM IF GR04.AUTOSCHEDULE$="Y" THEN LET VAL$="Yes",YES$=" Checked",NO$="" ELSE LET VAL$="No",YES$="",NO$=" Checked"
+1333 REM LET FLD$="AUTOSCHEDULE"
+1334 REM CALL "CDW000",ROW$,"d",VAL$
+1335 REM CALL "CDW000",ROW$,"d","<input type='radio' name='"+FLD$+"' value='Y'"+YES$+">Yes<br><input type='radio' name='"+FLD$+"' value='N'"+NO$+">No"
+1336 REM CALL "CDW000",TAB$,"r",ROW$
 
-1337 CALL "CDW000",ROW$,"dr class='head'","Time Preference"
-1338 def fno$(val$, text$)="<input type='radio' name='" + fld$ + "' value='" + val$ + "'" + iff(field(gr04$,fld$)=val$, " Checked", "") + ">" + text$
-1339 def fnv$(x)=iff(gr04.timepreference$ = "E", "Early", iff(gr04.timepreference$ = "L", "Late", "No Preference"))
-1340 FLD$="TIMEPREFERENCE"
-1341 call "CDW000",row$,"d",fnv$(0)
-1342 options$ = fno$("E", "Early")
-1343 options$ = options$ + "<br>" + fno$("L", "Late")
-1344 options$ = options$ + "<br>" + fno$("N", "No Preference")
-1345 CALL "CDW000",ROW$,"d",options$
-1346 rem CALL "CDW000",ROW$,"d","<input type='radio' name='"+FLD$+"' value='E'"+YES$+">Early<br><input type='radio' name='"+FLD$+"' value='L'"+NO$+">Late"
-1347 CALL "CDW000",TAB$,"r",ROW$
+1337 REM CALL "CDW000",ROW$,"dr class='head'","Time Preference"
+1338 REM def fno$(val$, text$)="<input type='radio' name='" + fld$ + "' value='" + val$ + "'" + iff(field(gr04$,fld$)=val$, " Checked", "") + ">" + text$
+1339 REM def fnv$(x)=iff(gr04.timepreference$ = "E", "Early", iff(gr04.timepreference$ = "L", "Late", "No Preference"))
+1340 REM FLD$="TIMEPREFERENCE"
+1341 REM call "CDW000",row$,"d",fnv$(0)
+1342 REM options$ = fno$("E", "Early")
+1343 REM options$ = options$ + "<br>" + fno$("L", "Late")
+1344 REM options$ = options$ + "<br>" + fno$("N", "No Preference")
+1345 REM CALL "CDW000",ROW$,"d",options$
+1346 REM rem CALL "CDW000",ROW$,"d","<input type='radio' name='"+FLD$+"' value='E'"+YES$+">Early<br><input type='radio' name='"+FLD$+"' value='L'"+NO$+">Late"
+1347 REM CALL "CDW000",TAB$,"r",ROW$
 
 1356 CALL "CDW000",ROW$,"dr class='head'","Play in "+DATE(0:"%Yl")
 1358 IF GR04.PLAYTHISYEAR$="Y" THEN LET VAL$="Yes",YES$=" Checked",NO$="" ELSE LET VAL$="No",YES$="",NO$=" Checked"
