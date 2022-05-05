@@ -1,6 +1,7 @@
 REM "GW111 - 11/19/20 Tee Time Manager Menu
 
 use ::scorePosting.bbj::scorePosting
+use ::ttm.bbj::ttm
 
 SETESC DT_ERR; SETERR DT_ERR
 
