@@ -93,6 +93,7 @@ class public yearLongSkins
         h = h + #roundlen
       wend
       skin! = new DTJsonObject()
+      skin!.put("hole", asc(holeScore$(1,1)))
       skin!.put("score", asc(holeScore$(2)))
       if len(players$) = 4 then
         skin!.put("player", players$)
@@ -155,10 +156,10 @@ class public yearLongSkins
     table!.addHeaderCell("Skin", "c")
     table!.addHeaderCell("Note")
     table!.addRow()
-    
-    for i = 0 to 17
+
+    for i = 0 to #skins!.size() - 1
       skin! = cast(DTJsonObject, #skins!.get(i))
-      hole  = i + 1
+      hole  = skin!.getNumber("hole")
       table!.addCell(str(hole), "c")
       score = skin!.getNumber("score")
       score$ = #getScoreTextForHole(hole, score)
