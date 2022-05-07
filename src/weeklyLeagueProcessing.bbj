@@ -156,9 +156,9 @@ tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
 
 if pos(str(gr03!.getFieldAsNumber("half")) = "12")
   rem  Build Handicap Listing pdf file for playdate
-  call "GW045", y$, league$, playdate, pdffile$
+  call "GW045", y$, league$, playdate, hcListPdf$, skinPdf$
   rem  Email each player with a match
-  call "GW062.bbj", y$, league$, playdate, pdffile$, msg$
+  call "GW062.bbj", y$, league$, playdate, hcListPdf$, skinPdf$, msg$
 else
   rem  Email each player who has either played recently or is set to play this year
   call "PracticeRoundEmail.bbj", y$, league$, playdate, msg$

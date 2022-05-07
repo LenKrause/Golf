@@ -1,16 +1,17 @@
-rem "GW062.bbj - 07/29/21 Golf Weekly Email - cron version
+rem "GW062.bbj - 05/07/22 Golf Weekly Email - cron version
 
 use ::ttm.bbj::ttm
 use ::DTHtmlTable.bbj::DTHtmlTable
 
 setesc DT_ERR; seterr DT_ERR
-enter y$, league$, playdate, pdf$, msg$, err=*next
+enter y$, league$, playdate, hcListPdf$, skinPdf$, msg$, err=*next
 
 if len(y$) = 0 then
   call "CDS091", y$
   league$ = "SAW"
   playdate = jul(2021,4,7)
-  pdf$ = ""
+  hcListPdf$ = ""
+  skinPdf$   = ""
   msg$ = ""
 fi
 
@@ -111,7 +112,8 @@ repeat
   print (y6.ch)"<li>View latest charts and your best 10 rounds!</li>"
   print (y6.ch)"</ul>"
   print (y6.ch)html$
-  if len(pdf$) then call "CDS184", y$, y6$, pdf$, "HandicapListing.pdf"
+  if len(hcListPdf$) then call "CDS184", y$, y6$, hcListPdf$, "HandicapListing.pdf"
+  if len(skinPdf$) and pos(gr04.id$ = "lk01js01", 4) then call "CDS184", y$, y6$, skinPdf$, "Skins Posting Sheet.pdf"
   call "CDS094", y6$, "e"
   sent = sent + 1
   if 0 then ts = ts + 1; if ts = 2 then goto eoj
