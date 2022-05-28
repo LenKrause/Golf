@@ -1,5 +1,6 @@
-0100 REM "GW011 - 04/18/17 Golfer Menu
+0100 REM "GW011 - 06/28/22 Golfer Menu
 0110 SETESC 8000; SETERR 8000
+0115 USE ::ttm.bbj::ttm
 0120 LET TAB$="",ROW$=""; REM "Can't clear HTML$ because some apps return here
 0130 IF POS(WASES.ADMIN$="WLF") THEN LET Y.VDTSFX$=WASES.ADMIN$; CALL "CDW100",Y$,"SYS",HTML$; LET HTML$=HTML$+"<br>"
 0140 IF POS(" "<>WASES.CID$) THEN GOSUB PLAYER
@@ -11,6 +12,7 @@
 1010 IF GR04=0 THEN CALL "CDS095",GR04,"XXGR04","YUY",GR04$
 1020 READ RECORD(GR04,KNUM=0,KEY=WASES.LEAGUE$+WASES.CID$,ERR=1440)GR04$
 1030 IF LEN(FIELD(CGI$,"FIRSTNAME",ERR=1040))>=0 THEN GOSUB STORE
+1035 GOSUB TTM
 1040 GOSUB INFOFORM
 1050 GOSUB LASTNEXT
 1054 CALL "GW054",Y$,WASES$,POINTSDATE,FLTS$,HTML$[ALL]
@@ -200,6 +202,11 @@
 2890 IF LEN(ALLMSG$) THEN LET ALLMSG$=ALLMSG$+"<br>"
 2900 LET ALLMSG$=ALLMSG$+MSG$
 2910 RETURN
+
+2920 TTM:
+2930 link$ = ttm.getLink(gr04.EMAIL$)
+2940 IF LEN(LINK$) THEN LET HTML$=HTML$+"<style>button{color:white;background-color:#346904;font-size:16px;padding:10px;border-radius:5px;border:1px solid #008000;box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);}button:hover{color:#ccf027;}button:focus{border:1px solid #008000;}</style><button type='button' onclick='window.open("""+LINK$+""")'>Tee Time Manager</button><br><br>"
+2990 RETURN
 
 3000 FUNCTIONS:
 3010 DEF FNYN$(VAL$)
