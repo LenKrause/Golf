@@ -227,9 +227,9 @@ class public scorePosting
     methodret table!.getBody() + s$
   methodend
   
-  method public BBjString getGr04(BBjString gr09$)
+  method public static BBjString getGr04(BBjString gr09$)
     if len(gr09$) = 8 then call "SW001", "XXGR09", 0, gr09$ + "", gr09$, sw001$
-    if sw001.onfile then
+    if pos(" "<>gr09.email$) then
       call "CDS095", gr04, "LKGR04", "YUY", gr04$ 
       read (gr04, knum=2, key=gr09.email$ + "SAW", dom=*next)
       readrecord (gr04, end=*next)gr04$

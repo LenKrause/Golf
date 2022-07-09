@@ -1,0 +1,56 @@
+setopts 0800C824000021200000000000000000
+
+alias X0 SYSGUI
+alias T0 SYSWINDOW "" INVISIBLE,MAXIMIZED,COLS=80,ROWS=25,LOCKMODE=VARYFONTS,XPOS=0,YPOS=0
+
+alias LPEX1 $CDS084 "Required Printer Entry"
+alias LPEX2 $CDS084 "Required Printer Entry"
+alias LPEX3 $CDS084 "Required Printer Entry"
+alias LPEX4 $CDS084 "Required Printer Entry"
+alias LPEX5 $CDS084 "Required Printer Entry"
+
+alias N0 tcp "" NODELAY
+alias NDT SSL "Required Dynamo Tools Error Socket" NODELAY
+
+use ::DT.bbj::DT
+use ::DTError.bbj::DTError
+use ::DTJsonArray.bbj::DTJsonArray
+use ::DTJsonObject.bbj::DTJsonObject
+use ::DTSession.bbj::DTSession
+use ::DTServlet.bbj::DTServlet
+use ::DTServletOut.bbj::DTServletOut
+use ::DTServletRequestParameters.bbj::DTServletRequestParameters
+
+use java.util.HashMap
+
+set SMSDIR=C:/u/CDI/
+set SMS_ERROR_EMAIL=false
+
+PREFIX      /Users/len/ews/DynamoTools/SMS/src6/ /Users/len/ews/DynamoTools/SMS/servlets/ /Users/len/ews/DynamoTools/SMS/src5/ /Users/len/ews/DynamoTools/FMS/src5/ /Users/len/ews/DynamoTools/WMS/src5/ /Users/len/ews/Dynamo/src6/
+set SMS_PFX=/Users/len/ews/DynamoTools/SMS/src6/ /Users/len/ews/DynamoTools/SMS/servlets/ /Users/len/ews/DynamoTools/SMS/src5/ /Users/len/ews/DynamoTools/FMS/src5/ /Users/len/ews/DynamoTools/WMS/src5/
+
+DSKSYN A:
+DSKSYN B:
+DSKSYN D:
+DSKSYN E:
+DSKSYN F:
+DSKSYN G:
+DSKSYN H:
+DSKSYN I:
+DSKSYN J:
+DSKSYN K:
+DSKSYN L:
+DSKSYN M:
+DSKSYN N:
+DSKSYN O:
+DSKSYN P:
+DSKSYN Q:
+DSKSYN R:
+DSKSYN S:
+DSKSYN T:
+DSKSYN U:
+DSKSYN V:
+DSKSYN W:
+DSKSYN X:
+DSKSYN Y:
+DSKSYN Z:

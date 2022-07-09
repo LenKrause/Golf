@@ -6,6 +6,7 @@ REM  */
 
 use ::DTFileRecords.bbj::DTFileRecords
 use ::DTHtmlTable.bbj::DTHtmlTable
+use ::scorePosting.bbj::scorePosting
 
 class public teeSheet
   field private BBjString msg! = ""
@@ -26,6 +27,7 @@ class public teeSheet
       #msg! = "No tee times found for admin id ' " + adminId$ + "' on " + date(date%:"%Ds %Ms %D")
       methodret
     fi
+    
     dim gr10$:gr10File!.getTemplate()
     gr10$ = gr10Recs!.get(0).toString()
     
@@ -46,13 +48,15 @@ class public teeSheet
     #coursePhone$ = gr08.phone$
     courseName$ = cvs(gr08.name$, 2)
     tags$ = "target=_blank "
+    outing = (gr03.half = 0)
     if #courseId$ = "RT " then courseName$ = "<a " + tags$ + "href='https://www.google.com/maps/dir//ridge+top+golf+course/@41.2017946,-81.9148965,11z/data=!4m8!4m7!1m0!1m5!1m1!1s0x8830c97d136e17d9:0xdb9f1bf6beae8f60!2m2!1d-81.8160934!2d41.0708847'>" + courseName$ + "</a>"
-    table!.addHeaderCell(courseName$ + nine$, "cs3&")
+    
+    table!.addHeaderCell(courseName$ + nine$, "cs" + str(2 + outing) + "&")
     table!.addRow()
     
     table!.addHeaderCell("Time", "c")
     table!.addHeaderCell("Player")
-    table!.addHeaderCell("Paid", "c")
+    if outing then table!.addHeaderCell("Handicap", "c")
     table!.addRow()
     
     for i = 0 to gr10Recs!.size() - 1
@@ -71,7 +75,11 @@ class public teeSheet
           fi
         fi
         table!.addCell(name$, "l&")
-        table!.addCell("")
+        if outing then
+          gr04$ = scorePosting.getGr04(gr09$)
+          call "CW009", y$, gr04$, gw009$
+          table!.addCell(str(gw009.hc), "c")
+        fi
         table!.addRow()
       next player
       last_time = gr10.time
@@ -150,7 +158,7 @@ y$ = "LK"
 y5$ = "Tee Sheet"
 call "CDS011", y$, y5$
 
-sheet! = new teeSheet("lk01", jul(2022,4,27))
+sheet! = new teeSheet("lk01", jul(2022,7,10))
 if ! sheet!.getErrMsg().isEmpty() then
   print sheet!.getErrMsg()
 else

@@ -1,2 +1,2 @@
-#Sun May 17 08:21:42 EDT 2020
-projectConfiguration={"environmentId"\:"02d2465b-3276-48ae-aad2-de3fe24c6dda","projectPrefix"\:"","tokenized"\:false,"outputFolderName"\:"bin","projectVersion"\:"20.1.0","deploymentDescriptor"\:"","properties"\:{},"compilerErrorLogging"\:false,"projectBuildLogging"\:true,"staticTypeChecking"\:true,"staticTypeWarnings"\:true,"defaultSourceOption"\:false,"maxParseSize"\:1048576}
+#Fri Jul 08 18:30:47 EDT 2022
+projectConfiguration={"environmentId"\:"BRE_CONTAINER","projectPrefix"\:"","tokenized"\:false,"outputFolderName"\:"bin","projectVersion"\:"21.14.0","deploymentDescriptor"\:"","properties"\:{},"compilerErrorLogging"\:false,"projectBuildLogging"\:true,"staticTypeChecking"\:true,"staticTypeWarnings"\:true,"defaultSourceOption"\:true,"maxParseSize"\:1048576}
