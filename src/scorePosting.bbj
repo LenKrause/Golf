@@ -234,7 +234,7 @@ class public scorePosting
     s$ = s$ + $0a$ + "  var myLength = target.value.length;"
     s$ = s$ + $0a$ + "  if (myLength >= maxLength) {"
     s$ = s$ + $0a$ + "    var next = target;"
-    s$ = s$ + $0a$ + "    alert('before ' + next.id);"
+    s$ = s$ + $0a$ + "    alert('before ' + next.id + ' ' + next.nextElementSibling.id);"
     s$ = s$ + $0a$ + "    while (next = next.nextElementSibling) {"
     s$ = s$ + $0a$ + "      alert('after ' + next.id);"
     s$ = s$ + $0a$ + "      if (next == null)"
