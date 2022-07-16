@@ -152,7 +152,8 @@ class public scorePosting
     table!.setStripe(BBjAPI.FALSE)
     
     table!.addBody("<form method='post' action='" + #getUrl("postScorecard") + "'>")
-    
+    table!.addBody("<div class='container'>")
+
     table!.addCell("Scorecard", "cs12")
     table!.addRow(" class='top'")
     
@@ -208,11 +209,13 @@ class public scorePosting
       tabindex = tabindex + 18
     next i
     table!.addTable()
+    table!.addBody("</div>")
     table!.addBody("<center><input type='submit' value='Submit'> <button type='button' onclick='window.location=""" + #getDsn() + """'>Cancel</button>" + "</center>")
     table!.addBody("<input type='hidden' name='formid' value='" + str(gr10.date) + players$ + "'>")
     table!.addBody("</form>")
     
     s$ = $0a$ + "<script>"
+
     s$ = s$ + $0a$ + "function compute(id) {"
     s$ = s$ + $0a$ + "var total = 0;"
     s$ = s$ + $0a$ + "var i;"
@@ -222,6 +225,37 @@ class public scorePosting
     s$ = s$ + $0a$ + "  }"
     s$ = s$ + $0a$ + "document.getElementById(id + '_total').innerHTML = total;"
     s$ = s$ + $0a$ + "}"
+
+    s$ = s$ + $0a$ + "var container = document.getElementsByClassName('container')[0];"
+    s$ = s$ + $0a$ + "container.onkeyup = function(e) {"
+    s$ = s$ + $0a$ + "  var target = e.srcElement || e.target;"
+    s$ = s$ + $0a$ + "  var maxLength = 1;"
+    s$ = s$ + $0a$ + "  var myLength = target.value.length;"
+    s$ = s$ + $0a$ + "  if (myLength >= maxLength) {"
+    s$ = s$ + $0a$ + "    1var next = target;"
+    s$ = s$ + $0a$ + "    while (next = next.nextElementSibling) {"
+    s$ = s$ + $0a$ + "      if (next == null)"
+    s$ = s$ + $0a$ + "        break;"
+    s$ = s$ + $0a$ + "      if (next.tagName.toLowerCase() === 'input') {"
+    s$ = s$ + $0a$ + "        next.focus();"
+    s$ = s$ + $0a$ + "        break;"
+    s$ = s$ + $0a$ + "      }"
+    s$ = s$ + $0a$ + "    }"
+    s$ = s$ + $0a$ + "  }"
+rem Move to previous field if empty (user pressed backspace)
+    s$ = s$ + $0a$ + "  else if (myLength === 0) {"
+    s$ = s$ + $0a$ + "    var previous = target;"
+    s$ = s$ + $0a$ + "    while (previous = previous.previousElementSibling) {"
+    s$ = s$ + $0a$ + "      if (previous == null)"
+    s$ = s$ + $0a$ + "        break;"
+    s$ = s$ + $0a$ + "      if (previous.tagName.toLowerCase() === 'input') {"
+    s$ = s$ + $0a$ + "        previous.focus();"
+    s$ = s$ + $0a$ + "        break;"
+    s$ = s$ + $0a$ + "      }"
+    s$ = s$ + $0a$ + "    }"
+    s$ = s$ + $0a$ + "  }"
+    s$ = s$ + $0a$ + "}"
+
     s$ = s$ + $0a$ + "</script>"
 
     methodret table!.getBody() + s$
