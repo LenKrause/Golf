@@ -151,7 +151,7 @@ class public scorePosting
     table! = new DTHtmlTable()
     table!.setStripe(BBjAPI.FALSE)
     
-    table!.addBody("<form method='post' action='" + #getUrl("postScorecard") + "'>")
+    table!.addBody("<form id='form1' name='form1' method='post' action='" + #getUrl("postScorecard") + "'>")
     table!.addBody("<div class='container'>")
 
     table!.addCell("Scorecard", "cs12")
@@ -171,7 +171,7 @@ class public scorePosting
     
     call "CDS041", "LKGR04", gr04$, "YY"
     
-    tabindex = 0
+    tabindex = 1
     j = 0
     for i = 1 to 4
       ids$ = ids$ + gr10.id$[i]
@@ -189,7 +189,7 @@ class public scorePosting
 
       table!.addCell("Score:", bc$ + "r")
       for hole = 1 to 9
-        cell$ = "<input tabindex='" + str(tabindex + hole * 2) + "'" + #getCell(gr04.id$, hole) + " min='0' max='9' style='text-align:center;width:3em'" + #getValue(gr05.hscore[hole]) + ">"
+        cell$ = "<input tabindex='" + str(tabindex + (hole - 1) * 2) + "'" + #getCell(gr04.id$, hole) + " min='0' max='9' style='text-align:center;width:3em'" + #getValue(gr05.hscore[hole]) + ">"
         table!.addCell(cell$, bc$ + "&")
       next hole
       value$ = iff(gr05.score, str(gr05.score), "")
@@ -199,7 +199,8 @@ class public scorePosting
       
       table!.addCell("Putts:", bc$ + "r")
       for hole = 1 to 9
-        cell$ = "<input tabindex='" + str(tabindex + hole * 2 + 1) + "'" + #getCell(gr04.id$ + "P", hole) + " min='0' max='9' style='text-align:center;width:3em'" + #getValue(gr05.hputts[hole]) + ">"
+        putts$ = iff(gr05.hscore[hole], str(gr05.hputts[hole]), "")
+        cell$ = "<input tabindex='" + str(tabindex + (hole - 1) * 2 + 1) + "'" + #getCell(gr04.id$ + "P", hole) + " min='0' max='9' style='text-align:center;width:3em' value='" + putts$ + "'>"
         table!.addCell(cell$, bc$ + "&")
       next hole
       value$ = iff(gr05.putts, str(gr05.putts), "")
@@ -226,36 +227,22 @@ class public scorePosting
     s$ = s$ + $0a$ + "document.getElementById(id + '_total').innerHTML = total;"
     s$ = s$ + $0a$ + "}"
 
-rem  trying to advance to next input 7/16/22
-rem  but next.nextElementSibling always is null
     s$ = s$ + $0a$ + "var container = document.getElementsByClassName('container')[0];"
     s$ = s$ + $0a$ + "container.onkeyup = function(e) {"
     s$ = s$ + $0a$ + "  var target = e.srcElement || e.target;"
-    s$ = s$ + $0a$ + "  var maxLength = 1;"
-    s$ = s$ + $0a$ + "  var myLength = target.value.length;"
-    s$ = s$ + $0a$ + "  if (myLength >= maxLength) {"
+    s$ = s$ + $0a$ + "  var key = e.key;"
+    s$ = s$ + $0a$ + "  if (target.value.length = 1 && key >= '0' && key <= '9') {"
     s$ = s$ + $0a$ + "    var next = target;"
-REM     s$ = s$ + $0a$ + "    alert('next.id=' + next.id);"
-REM     s$ = s$ + $0a$ + "    alert('next.nextElementSibling.id=' + next.nextElementSibling.id);"
-    s$ = s$ + $0a$ + "    while (next = next.nextElementSibling) {"
-    s$ = s$ + $0a$ + "      if (next == null)"
-    s$ = s$ + $0a$ + "        break;"
-    s$ = s$ + $0a$ + "      if (next.tagName.toLowerCase() === 'input') {"
-    s$ = s$ + $0a$ + "        next.focus();"
-    s$ = s$ + $0a$ + "        break;"
-    s$ = s$ + $0a$ + "      }"
-    s$ = s$ + $0a$ + "    }"
-    s$ = s$ + $0a$ + "  }"
-rem Move to previous field if empty (user pressed backspace)
-    s$ = s$ + $0a$ + "  else if (myLength === 0) {"
-    s$ = s$ + $0a$ + "    var previous = target;"
-    s$ = s$ + $0a$ + "    while (previous = previous.previousElementSibling) {"
-    s$ = s$ + $0a$ + "      if (previous == null)"
-    s$ = s$ + $0a$ + "        break;"
-    s$ = s$ + $0a$ + "      if (previous.tagName.toLowerCase() === 'input') {"
-    s$ = s$ + $0a$ + "        previous.focus();"
-    s$ = s$ + $0a$ + "        break;"
-    s$ = s$ + $0a$ + "      }"
+    s$ = s$ + $0a$ + "    var thisTabIndex = parseInt(next.tabIndex);"
+    s$ = s$ + $0a$ + "    if (thisTabIndex < " + str(tabindex - 1) + ")"
+    s$ = s$ + $0a$ + "       {var nextTabIndex = thisTabIndex + 1 } else "
+    s$ = s$ + $0a$ + "       {var nextTabIndex = 1};"
+    s$ = s$ + $0a$ + "    var elements = document.getElementById('form1').elements;"
+    s$ = s$ + $0a$ + "    for (var i = 0, element; element = elements[i++];) {"
+    s$ = s$ + $0a$ + "      if (element.tabIndex === nextTabIndex)"
+    s$ = s$ + $0a$ + "        {element.focus();"
+    s$ = s$ + $0a$ + "        element.select();"
+    s$ = s$ + $0a$ + "        break}"
     s$ = s$ + $0a$ + "    }"
     s$ = s$ + $0a$ + "  }"
     s$ = s$ + $0a$ + "}"
