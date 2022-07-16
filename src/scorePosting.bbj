@@ -229,7 +229,7 @@ class public scorePosting
     s$ = s$ + $0a$ + "var container = document.getElementsByClassName('container')[0];"
     s$ = s$ + $0a$ + "container.onkeyup = function(e) {"
     s$ = s$ + $0a$ + "  var target = e.srcElement || e.target;"
-    s$ = s$ + $0a$ + "  alert('target ' + target.innerText');"
+    s$ = s$ + $0a$ + "  alert('target ' + target.innerText);"
     s$ = s$ + $0a$ + "  var maxLength = 1;"
     s$ = s$ + $0a$ + "  var myLength = target.value.length;"
     s$ = s$ + $0a$ + "  if (myLength >= maxLength) {"
