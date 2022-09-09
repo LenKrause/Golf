@@ -69,20 +69,30 @@ class public teeSheet
           call "SW001", "XXGR09", 0, gr10.aid$ + gr10.id$[player], gr09$, sw001$
           if sw001.onfile then
             name$ = cvs(gr09.firstname$, 2) + " " + cvs(gr09.lastname$, 2)
-            if pos(gr09.id$ = ids$, 4) then name$ = name$ + " - Guest"
+            if pos(gr09.id$ = ids$, 4) then
+              name$ = name$ + " - Guest"
+              guest = 1
+            else
+              guest = 0
+            fi
+            
             #players!.add(cvs(gr09.email$, 2))
             if pos(gr09.id$ = ids$, 4) = 0 then ids$ = ids$ + gr09.id$
           fi
+          emptyRow = 0
+        else 
+          emptyRow = 1
         fi
         table!.addCell(name$, "l&")
         if outing then
           if len(gr04$) = 0 then
             call "CDS041","LKGR04",  gr04$, "YP"
             call "CDS041","LKGW009", gw009$, "YP"
+            call "CDS091", y$
           fi
           gr04$ = scorePosting.getGr04(gr09$)
           call "GW009", y$, gr04$, gw009$
-          hc$ = iff(gw009.hc, str(int(gw009.hc) + (fpt(gw009.hc) > 0)), "")
+          hc$ = iff(! emptyRow and ! guest and gw009.hc, str(int(gw009.hc) + (fpt(gw009.hc) > 0)), "")
           table!.addCell(hc$, "c")
         fi
         table!.addRow()
