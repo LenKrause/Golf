@@ -76,8 +76,9 @@ class public teeSheet
         fi
         table!.addCell(name$, "l&")
         if outing then
+          if len(gr04$) = 0 then call "CDS041","LKGR04",gr04$,"YP"
           gr04$ = scorePosting.getGr04(gr09$)
-          call "CW009", y$, gr04$, gw009$
+          call "GW009", y$, gr04$, gw009$
           table!.addCell(str(gw009.hc), "c")
         fi
         table!.addRow()
@@ -158,7 +159,7 @@ y$ = "LK"
 y5$ = "Tee Sheet"
 call "CDS011", y$, y5$
 
-sheet! = new teeSheet("lk01", jul(2022,7,10))
+sheet! = new teeSheet("lk01", jul(2022,9,11))
 if ! sheet!.getErrMsg().isEmpty() then
   print sheet!.getErrMsg()
 else
