@@ -76,7 +76,10 @@ class public teeSheet
         fi
         table!.addCell(name$, "l&")
         if outing then
-          if len(gr04$) = 0 then call "CDS041","LKGR04",gr04$,"YP"
+          if len(gr04$) = 0 then
+            call "CDS041","LKGR04",  gr04$, "YP"
+            call "CDS041","LKGW009", gw09$, "YP"
+          fi
           gr04$ = scorePosting.getGr04(gr09$)
           call "GW009", y$, gr04$, gw009$
           table!.addCell(str(gw009.hc), "c")
