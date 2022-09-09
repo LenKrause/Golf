@@ -82,7 +82,8 @@ class public teeSheet
           fi
           gr04$ = scorePosting.getGr04(gr09$)
           call "GW009", y$, gr04$, gw009$
-          table!.addCell(str(gw009.hc), "c")
+          hc$ = iff(gw009.hc, str(int(gw009.hc) + (fpt(gw009.hc) > 0)), "")
+          table!.addCell(hc$, "c")
         fi
         table!.addRow()
       next player
