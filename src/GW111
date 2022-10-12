@@ -284,11 +284,14 @@ repeat
     s084.fromemail$ = cvs(gr09.email$, 2)
     s084.emailtype$ = "H"
     emc = 0
-    for em = 0 to emsV!.size() - 1
+    for em = 0 to 0; rem  testing     emsV!.size() - 1
       em$ = cast(BBjString, emsV!.get(em))
       readrecord (gr09, knum=0, key=gr09.aid$ + pad(em$, 4), dom=*continue)gr09a$
       s084.toname$ = fnn$(gr09a$)
       s084.toemail$ = cvs(gr09a.email$, 2)
+      
+      s084.toemail$ = "lenkrause76@gmail.com"; rem  testing
+      
       call "CDS084", y$, y5$, u0, s084$, y6, y6$
       print (y6.ch)"<style>body{color:green;}</style>"
       print (y6.ch)"<body>"
