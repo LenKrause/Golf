@@ -195,6 +195,7 @@ call "CDS091", y$
 for jdate = jul(2022,9,21) to jul(2022,9,21) step 7
   call pgm(-1), y$, "SAW", jdate, flts$, html$[all]
   if len(html$[5]) then html$ = html$ + html$[5] + "<br>"
+  if len(html$[9]) then html$ = html$ + html$[9] + "<br>"
 next jdate
 if len(html$) then
   call "CDW000", out$, "t", html$
