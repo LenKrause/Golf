@@ -192,7 +192,7 @@ return
 test:
 begin
 call "CDS091", y$
-for jdate = jul(2021,5,5) to jul(2021,5,19) step 7
+for jdate = jul(2022,9,21) to jul(2022,9,21) step 7
   call pgm(-1), y$, "SAW", jdate, flts$, html$[all]
   if len(html$[5]) then html$ = html$ + html$[5] + "<br>"
 next jdate
