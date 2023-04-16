@@ -8,7 +8,7 @@ if len(y$) = 0 then
   call "CDS091", y$
   league$ = "SAW"
   playdate = jul(2023,4,19)
-  testmode = 1
+  testmode = 0
 fi
 use ::ttm.bbj::ttm
 call "CDS041", "CDS084", s084$, "YP"
