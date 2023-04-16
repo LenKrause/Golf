@@ -15,7 +15,7 @@ class public weeklyLeagueProcessing
   field private BBjString  aid$ = "lk01"
   
   field private BBjNumber  hour   = 13
-  field private BBjNumber  minute = 50
+  field private BBjNumber  minute = 30
   field private BBjNumber  delta  = 10
   
   method public weeklyLeagueProcessing(BBjString league$)
@@ -71,21 +71,25 @@ class public weeklyLeagueProcessing
     rem  Early 18 hole rounds
     if day_of_week$ = "Wed" then
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!)
+      #preset(gr10File!, gr10!, "js01mf01lk01dr01"); rem  Jim, Mike, Len, Dave
 
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime())
+      #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
+      
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
     fi
     
     rem  Late 9 hole rounds
     if day_of_week$ = "Sat" then
-      #hour = 16, #minute = 08, #delta = 8; rem  4:08 pm every 8 minutes
+      #hour = 16, #minute = 10, #delta = 10; rem  4:10 pm every 10 minutes
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!)
+      #preset(gr10File!, gr10!, "js01mf01lk01dr01"); rem  Jim, Mike, Len, Dave)
 
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime())
+      #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel)
+      
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
@@ -94,7 +98,6 @@ class public weeklyLeagueProcessing
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
     fi
-    
   methodend
   
   method public BBjNumber fixTime()
@@ -116,13 +119,11 @@ REM     if int(time) < 7 then time = time + 12
     methodret time
   methodend
 
-  method private void preset(DTFileRecords gr10File!, BBjTemplatedString gr10!)
-    gr10!.setFieldValue("id", 1, "js01"); rem  Jim Sterley
-    gr10!.setFieldValue("id", 2, "mf01"); rem  Mike Fee
-    gr10!.setFieldValue("id", 3, "dr01"); rem  Dave Regan
-    gr10!.setFieldValue("id", 4, "lk01"); rem  Len Krause
-REM     gr10!.setFieldValue("id", 4, "ks02"); rem  Keith Sterley
-REM     gr10!.setFieldValue("id", 4, "ks01"); rem  Keith Smith
+  method private void preset(DTFileRecords gr10File!, BBjTemplatedString gr10!, BBjString Players$)
+    gr10!.setFieldValue("id", 1, players$(1,4))
+    gr10!.setFieldValue("id", 2, players$(5,4))
+    gr10!.setFieldValue("id", 3, players$(9,4))
+    gr10!.setFieldValue("id", 4, players$(13,4))
     gr10File!.addUniqueRecord(gr10!)
     for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
