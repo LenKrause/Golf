@@ -45,7 +45,7 @@ s084.TOEMAIL$ = gr04.EMAIL$
 if testmode THEN s084.TOEMAIL$ = "len@excellware.com"
 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 print (y6.ch)"<p>", cvs(gr04.firstname$, 2), "-</p>"
-print (y6.ch)"<p>Click <a href='" + link$ + "'>here</a> to select your practice round tee time.</p>"
+print (y6.ch)"<p>Click <a href='" + link$ + "'>here</a> to select your practice round tee time in the<br>" + gr01.name$ +"</p>"
 REM print (y6.ch)"<p>If no tee times are available,<br>Call the course to schedule a tee time, <br>and reply to this email with the time, so it can be added to the site.</p>"
 call "CDS094", y6$, "e"
 sent = sent + 1

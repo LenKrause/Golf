@@ -26,8 +26,8 @@ use java.util.HashMap
 set SMSDIR=C:/u/CDI/
 set SMS_ERROR_EMAIL=false
 
-PREFIX      /Users/len/ews/DynamoTools/SMS/src6/ /Users/len/ews/DynamoTools/SMS/servlets/ /Users/len/ews/DynamoTools/SMS/src5/ /Users/len/ews/DynamoTools/FMS/src5/ /Users/len/ews/DynamoTools/WMS/src5/ /Users/len/ews/Dynamo/src6/
-set SMS_PFX=/Users/len/ews/DynamoTools/SMS/src6/ /Users/len/ews/DynamoTools/SMS/servlets/ /Users/len/ews/DynamoTools/SMS/src5/ /Users/len/ews/DynamoTools/FMS/src5/ /Users/len/ews/DynamoTools/WMS/src5/
+PREFIX      /Users/len/ews/Golf/src/ /Users/len/ews/DynamoTools/SMS/src6/ /Users/len/ews/DynamoTools/SMS/servlets/ /Users/len/ews/DynamoTools/SMS/src5/ /Users/len/ews/DynamoTools/FMS/src5/ /Users/len/ews/DynamoTools/WMS/src5/ /Users/len/ews/Dynamo/src6/
+set SMS_PFX=/Users/len/ews/Golf/src/ /Users/len/ews/DynamoTools/SMS/src6/ /Users/len/ews/DynamoTools/SMS/servlets/ /Users/len/ews/DynamoTools/SMS/src5/ /Users/len/ews/DynamoTools/FMS/src5/ /Users/len/ews/DynamoTools/WMS/src5/
 
 DSKSYN A:
 DSKSYN B:
