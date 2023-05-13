@@ -15,8 +15,8 @@ class public weeklyLeagueProcessing
   field private BBjString  aid$ = "lk01"
   
   field private BBjNumber  hour   = 13
-  field private BBjNumber  minute = 30
-  field private BBjNumber  delta  = 10
+  field private BBjNumber  minute = 36
+  field private BBjNumber  delta  = 12
   
   method public weeklyLeagueProcessing(BBjString league$)
     call "SW001", "XXGR01", 0, league$, gr01$, sw001$
@@ -71,7 +71,7 @@ class public weeklyLeagueProcessing
     rem  Early 18 hole rounds
     if day_of_week$ = "Wed" then
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01lk01dr01"); rem  Jim, Mike, Len, Dave
+      #preset(gr10File!, gr10!, "js01mf01lk01mm02"); rem  Jim, Mike, Len, Mike M, Dave (dr01)
 
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
@@ -82,13 +82,13 @@ class public weeklyLeagueProcessing
     
     rem  Late 9 hole rounds
     if day_of_week$ = "Sat" then
-      #hour = 16, #minute = 10, #delta = 10; rem  4:10 pm every 10 minutes
+      #hour = 16, #minute = 12, #delta = 12; rem  4:12 pm every 12 minutes
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01lk01dr01"); rem  Jim, Mike, Len, Dave)
+      #preset(gr10File!, gr10!, "js01mf01lk01"); rem  Jim, Mike, Len, Dave (dr01)
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel)
+      #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
       
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
@@ -119,11 +119,11 @@ REM     if int(time) < 7 then time = time + 12
     methodret time
   methodend
 
-  method private void preset(DTFileRecords gr10File!, BBjTemplatedString gr10!, BBjString Players$)
+  method private void preset(DTFileRecords gr10File!, BBjTemplatedString gr10!, BBjString players$)
     gr10!.setFieldValue("id", 1, players$(1,4))
     gr10!.setFieldValue("id", 2, players$(5,4))
     gr10!.setFieldValue("id", 3, players$(9,4))
-    gr10!.setFieldValue("id", 4, players$(13,4))
+    if len(players$) >= 16 then gr10!.setFieldValue("id", 4, players$(13,4))
     gr10File!.addUniqueRecord(gr10!)
     for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
