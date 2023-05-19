@@ -39,7 +39,7 @@ class public weeklyLeagueProcessing
     #gr03$ = gr03$
     
     call "SW004", "XXGR10", 1, #aid$ + gr03.date$, recs
-    if recs < 6 #addTeeTimes(gr01$, gr03$); rem  add more tee times if not yet added 
+    if recs < 6 #addTeeTimes(gr01$, gr03$); rem  add more tee times if not yet added
   methodend
     
   method public BBjString getErrMsg()

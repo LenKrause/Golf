@@ -1,7 +1,10 @@
-rem "GW062.bbj - 10/21/22 Golf Weekly Email - cron version
+rem "GW062.bbj - 05/19/23 Golf Weekly Email - cron version
 
 use ::ttm.bbj::ttm
 use ::DTHtmlTable.bbj::DTHtmlTable
+use java.util.HashMap
+
+declare HashMap emails!
 
 setesc DT_ERR; seterr DT_ERR
 enter y$, league$, playdate, hcListPdf$, skinPdf$, msg$, err=*next
@@ -15,6 +18,17 @@ if len(y$) = 0 then
   msg$ = ""
 fi
 
+if leagues$ = "SAW" then aid$ = "lk01"
+
+emails! = new HashMap()
+rem  Include all in group
+call "SW010", "XXGR09", 0, "", "email", emails$, "", "", "rec.aid$ = """ + aid$ + """ and rec.active$ = ""Y"""
+if len(emails$) then
+  for i = 1 to len(emails$) step 50
+    emails!.put(cvs(emails$(i, 50), 2), "")
+  next i
+fi
+  
 tmp$ = stbl("WMS_CDW000", "D")
 y.passparm$ = "E"
 
@@ -23,8 +37,11 @@ call "GW054.bbj", y$, league$, playdate + 0, flts$, html$[all]
 
 call "CDS041", "CDS084", s084$, "YY"
 sent = 0
-s084.mode$ = "E", s084.name$ = "MAIL", s084.emailtype$ = "H"
-s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "webmaster@scoresandcharts.com"
+s084.mode$      = "E"
+s084.name$      = "MAIL"
+s084.emailtype$ = "H"
+s084.fromname$  = "ScoresAndCharts.com"
+s084.fromemail$ = "webmaster@scoresandcharts.com"
 call "CDS095", gr03, "XXGR03", "YNY", gr03$
 call "CDS095", gr04, "XXGR04", "YNY", gr04$
 call "CDS095", gr05, "XXGR05", "YNY", gr05$, gr05k$
@@ -41,7 +58,7 @@ gr05s = unt
 select (gr05s)gr05$ from y.compcode$ + "GR05" where gr05.league$ = league$ and gr05.date = playdate
 
 repeat
-  read record(gr05s, end=eoj)gr05$
+  read record(gr05s, end=*break)gr05$
   read record(gr04, knum=0, key=gr05.league$ + gr05.id$)gr04$
   if pos(" " <> gr04.email$) = 0 then continue
   table! = new DTHtmlTable(BBjAPI.TRUE)  
@@ -83,7 +100,9 @@ repeat
   html$ = html$ + "<div style='font-size:0;height:5px;'></div>"
   gosub chart
   gosub bestrounds
-  s084.toname$ = fnn$(gr04$), s084.toemail$ = gr04.email$
+  s084.toname$  = fnn$(gr04$)
+  s084.toemail$ = cvs(gr04.email$, 2)
+  emails!.remove(s084.toemail$, err=*next); rem  Remove anyone with a match
   if 0 then s084.toemail$ = "len@excellware.com"
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
@@ -113,11 +132,31 @@ repeat
   print (y6.ch)"</ul>"
   print (y6.ch)html$
   if len(hcListPdf$) then call "CDS184", y$, y6$, hcListPdf$, "HandicapListing.pdf"
-  if len(skinPdf$) and pos(gr04.id$ = "lk01js01", 4) then call "CDS184", y$, y6$, skinPdf$, "Skins Posting Sheet.pdf"
+  if len(skinPdf$) and pos(gr04.id$ = "KRALSTEJ", 4) then call "CDS184", y$, y6$, skinPdf$, "Skins Posting Sheet.pdf"
   call "CDS094", y6$, "e"
   sent = sent + 1
   if 0 then ts = ts + 1; if ts = 2 then goto eoj
 until 0
+
+rem  Send any guest emails
+if emails!.size() then
+  for i = 0 to emails!.size() - 1
+    email$ = emails!.get(i).toString()
+    link$ = ttm.getLink(email$)
+    if len(link$) then
+      s084.toemail$  = email$
+      s084.emailbcc$ = "len@excellware.com"
+      call "CDS084", y$, y5$, u0, s084$, y6, y6$
+      print (y6.ch)"<p>Although you do not have a match scheduled for this week"
+      print (y6.ch)"<br>You can join us as a guest by clicking this <a href='" + link$ + "'>link</a> to select a tee time"
+      print (y6.ch)"<br>If you plan to play 18 holes, then select both an early and a late tee time."
+      call "CDS094", y6$, "e"
+      guests = guests + 1
+    fi
+  next i
+fi
+
+goto eoj
 
 week:
   dim gr04a$:fattr(gr04$)
@@ -382,5 +421,10 @@ retry
 eoj:
 tmp$ = stbl("!CLEAR", "WMS_CDW000")
 html$ = ""
-if sent then msg$ = "Job Completed, " + str(sent) + " emails sent." else msg$ = "Select 'Golf Score Posting Sheets' before 'Weekly Email'"
+if sent then
+  msg$ = "Job Completed, Sent emails to " + str(sent) + " players with a match"
+  if guests then msg$ = msg$ + " and " + str(guests) + "guests"
+else
+  msg$ = "Select 'Golf Score Posting Sheets' before 'Weekly Email'"
+fi
 exit
