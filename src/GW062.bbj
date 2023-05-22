@@ -12,7 +12,7 @@ enter y$, league$, playdate, hcListPdf$, skinPdf$, msg$, err=*next
 if len(y$) = 0 then
   call "CDS091", y$
   league$ = "SAW"
-  playdate = jul(2022,9,21) 
+  playdate = jul(2023,5,24) 
   hcListPdf$ = ""
   skinPdf$   = ""
   msg$ = ""
@@ -103,7 +103,7 @@ repeat
   s084.toname$  = fnn$(gr04$)
   s084.toemail$ = cvs(gr04.email$, 2)
   emails!.remove(s084.toemail$, err=*next); rem  Remove anyone with a match
-  if 0 then s084.toemail$ = "len@excellware.com"
+  if 1 then s084.toemail$ = "len@excellware.com"
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
   style! = table!.getStyle()
