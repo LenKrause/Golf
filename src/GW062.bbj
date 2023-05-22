@@ -140,8 +140,10 @@ until 0
 
 rem  Send any guest emails
 if emails!.size() then
-  for i = 0 to emails!.size() - 1
-    email$ = emails!.get(i).toString()
+  declare BBjVector emv!
+  emv! = DT.getMapKeys(emails!)
+  for i = 0 to emv!.size() - 1
+    email$ = emv!.get(i).toString()
     link$ = ttm.getLink(email$)
     if len(link$) then
       s084.toemail$  = email$
