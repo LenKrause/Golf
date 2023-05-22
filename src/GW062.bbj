@@ -18,7 +18,7 @@ if len(y$) = 0 then
   msg$ = ""
 fi
 
-if leagues$ = "SAW" then aid$ = "lk01"
+if league$ = "SAW" then aid$ = "lk01"
 
 emails! = new HashMap()
 rem  Include all in group
