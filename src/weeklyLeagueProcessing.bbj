@@ -71,7 +71,7 @@ class public weeklyLeagueProcessing
     rem  Early 18 hole rounds
     if day_of_week$ = "Wed" then
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01lk01mm02"); rem  Jim, Mike, Len, Mike M, Dave (dr01)
+      #preset(gr10File!, gr10!, "js01mf01lk01mm02"); rem  Jim, Mike, Len, Mike M or Dave (dr01)
 
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
@@ -85,7 +85,7 @@ class public weeklyLeagueProcessing
       #hour = 16, #minute = 12, #delta = 12; rem  4:12 pm every 12 minutes
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01lk01"); rem  Jim, Mike, Len, Dave (dr01)
+      #preset(gr10File!, gr10!, "js01mf01lk01jm01"); rem  Jim, Mike, Len, Jim Mindek (jm01) or Dave (dr01)
 
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
