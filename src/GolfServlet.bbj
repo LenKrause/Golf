@@ -1,0 +1,57 @@
+REM /**
+REM  * GolfServlet.bbj
+REM  */ 
+
+use ::DTNotepad.bbj::DTNotepad
+use ::DTButton.bbj::DTButton
+
+REM use ::DTGrid.bbj::DTGrid
+REM use ::DTView.bbj::DTView
+REM use ::DTViewField.bbj::DTViewField
+REM use ::DTPopup.bbj::DTPopup
+REM use ::DTProgress.bbj::DTProgress
+REM use ::DTFormUpdate.bbj::DTFormUpdate
+REM use ::DTDialog.bbj::DTDialog
+REM use ::DTFileMaintenance.bbj::DTFileMaintenance
+REM use ::DTCols.bbj::DTCols
+REM use ::DTCol.bbj::DTCol
+REM use ::DTDisplayView.bbj::DTDisplayView
+REM use java.util.LinkedHashMap
+
+class public GolfServlet
+  field private DTServlet servlet!
+  field private BBjInt    httpStatus! = 0
+  field private BBjString msg!        = ""
+  field private BBjString alert!      = ""
+  
+  method public void service(BBjspServletContext context!)
+    declare HashMap methodsMap!
+    methodsMap! = new HashMap()
+    methodsMap!.put("weeklyNotepadSetup",  "GET")
+    methodsMap!.put("weeklyNotepad",       "GET")
+    #servlet! = new DTServlet(context!, methodsMap!)
+    method$ = #servlet!.getMethod()
+    if len(method$) then eval("#" + method$ + "()")
+    if #httpStatus! <> 999 then #servlet!.respond(#httpStatus!, #msg!, #alert!)
+  methodend
+  
+  method private void weeklyNotepadSetup()
+    #msg! = "Under Construction"
+  methodend
+  
+  method private void weeklyNotepad()
+    declare DTNotepad notepad!
+    league$ = #servlet!.getParameter("league")
+    playdate$ = #servlet!.getParameter("playdate")
+    call "CDS055", playdate$, dat[all]
+    notepadKey$ = league$ + str(dat$[2])
+    notepad! = new DTNotepad("LKGR14", notepadkey$, "Weekly Email Notepad")
+    if notepad!.getErrMsg().isEmpty() then
+      notepad!.deliver()
+    else  
+      #msg! = notepad!.getErrMsg()
+    fi
+    DTServletOut.addButton(DTButton.cancel("Close"))
+  methodend
+  
+classend
