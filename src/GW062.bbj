@@ -114,7 +114,7 @@ repeat
   if 0 then call "SW002", note$, $e28099$, "'"
   if 0 then cgi.note$ = note$
   if 0 then call "SW002", note$, $0d0a$, "<br>"
-  if jul(0,0,0) = jul(2021,8,7) then note$ = "<p>Notes:</p><p>Late start for all rounds this week due to girls tournament</p><p>Cookout this week after golf</p><p>Year Long Skins Game status below</p>"
+  if jul(0,0,0) < jul(2023,6,21) then note$ = "<p>Cookout Wednesday June 21</p>"
   if len(note$) then print (y6.ch)note$
   if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
   link$ = ttm.getLink(gr04.EMAIL$)
