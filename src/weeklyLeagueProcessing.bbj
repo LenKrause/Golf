@@ -88,7 +88,7 @@ class public weeklyLeagueProcessing
       #preset(gr10File!, gr10!, "js01mf01lk01jm01"); rem  Jim, Mike, Len, Jim Mindek (jm01) or Dave (dr01)
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
+      #preset(gr10File!, gr10!, "rr01dn01bb01jg01"); rem  Ray, Dan, Bruce, Mel (mt01), Gardini (jg01)
       
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
