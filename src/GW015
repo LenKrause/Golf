@@ -1,4 +1,4 @@
-0100 rem "GW015 - 05/01/17 Golf Assign Flight & Sequence
+0100 rem "GW015 - 07/01/23 Golf Assign Flight & Sequence
 0110 setesc 8000; seterr 8000
 0120 if 0 then
 :      open (1234, mode = "O_CREATE,O_TRUNC")"tmp/gw015.txt";
