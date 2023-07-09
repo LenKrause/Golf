@@ -71,12 +71,14 @@ class public weeklyLeagueProcessing
     rem  Early 18 hole rounds
     if day_of_week$ = "Wed" then
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01dr01lk01"); rem  Jim, Mike, Len, Mike M (mm02) or Dave (dr01)
+      #preset(gr10File!, gr10!, "js01mf01dr01mm02"); rem  Jim, Mike, Len, Mike M (mm02) or Dave (dr01)
 
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
       
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime())
+      #preset(gr10File!, gr10!, "lk01")
+
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
     fi
     
@@ -93,6 +95,7 @@ class public weeklyLeagueProcessing
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "jg01jm01bp01mm01"); rem  Gardini (jg01), Mindek (jm01), Bernie (bp01), Marco (mm01)
 
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
@@ -122,10 +125,11 @@ REM     if int(time) < 7 then time = time + 12
   methodend
 
   method private void preset(DTFileRecords gr10File!, BBjTemplatedString gr10!, BBjString players$)
-    gr10!.setFieldValue("id", 1, players$(1,4))
-    gr10!.setFieldValue("id", 2, players$(5,4))
-    gr10!.setFieldValue("id", 3, players$(9,4))
-    if len(players$) >= 16 then gr10!.setFieldValue("id", 4, players$(13,4))
+    ind = 1
+    for i = 1 to 4
+      if len(players$) >= ind + 3 then gr10!.setFieldValue("id", i, players$(ind, 4))
+      ind = ind + 4
+    next i
     gr10File!.addUniqueRecord(gr10!)
     for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
