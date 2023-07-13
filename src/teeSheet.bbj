@@ -172,11 +172,14 @@ begin
 y$ = "LK"
 y5$ = "Tee Sheet"
 call "CDS011", y$, y5$
-
-sheet! = new teeSheet("lk01", jul(2023,7,16))
+call "CDS069",0,0,0,0,"+date+",jdate,jdate$
+if ctl=4 run "CDS001"
+call "CDS069",1,1,0,0,"Send Emails (Y/N)+", "ANY", 0, email$
+if ctl=4 run "CDS001"
+sheet! = new teeSheet("lk01", int(jdate))
 if ! sheet!.getErrMsg().isEmpty() then
   print sheet!.getErrMsg()
 else
   call "CDW999", sheet!.getHtml()
-  sheet!.email(BBjAPI.FALSE)  
+  sheet!.email(email$ = "Y")  
 fi
