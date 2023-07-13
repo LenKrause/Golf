@@ -172,7 +172,7 @@ begin
 y$ = "LK"
 y5$ = "Tee Sheet"
 call "CDS011", y$, y5$
-call "CDS069",0,0,0,0,"+date+",jdate,jdate$
+call "CDS069",0,0,0,0,"+date+","J",jdate,jdate$
 if ctl=4 run "CDS001"
 call "CDS069",1,1,0,0,"Send Emails (Y/N)+", "ANY", 0, email$
 if ctl=4 run "CDS001"
