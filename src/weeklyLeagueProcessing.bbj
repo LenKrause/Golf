@@ -71,14 +71,15 @@ class public weeklyLeagueProcessing
     rem  Early 18 hole rounds
     if day_of_week$ = "Wed" then
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01dr01mm02"); rem  Jim, Mike, Len, Mike M (mm02) or Dave (dr01)
+      #preset(gr10File!, gr10!, "js01mf01dr01lk01"); rem  Jim, Mike, Dave (dr01), Mike M (mm02) or Len (lk01)
 
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
       
-      gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "lk01")
+REM       gr10!.setFieldValue("time", #fixTime())
+REM       #preset(gr10File!, gr10!, "")
 
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
     fi
     
@@ -87,13 +88,13 @@ class public weeklyLeagueProcessing
       #hour = 16, #minute = 0, #delta = 8; rem  4:00 pm every 8 minutes, per Jim 6/21/23
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01dr01ks01"); rem  Jim (js01), Mike (mf01), Dave (dr01), Len (lk01)
+      #preset(gr10File!, gr10!, "js01mf01dr01lk01"); rem  Jim (js01), Mike (mf01), Dave (dr01), Len (lk01)
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
+      #preset(gr10File!, gr10!, "rr01bb01mt01mm01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
       
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "jg01mm01jm01lk01"); rem  Gardini (jg01), Marco (mm01), Mindek (jm01) + guest
+      #preset(gr10File!, gr10!, "jg01jm01mm02mm02"); rem  Gardini (jg01), Marco (mm01), Mindek (jm01), Mike Mueller (mm02) + guest
 
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
