@@ -79,7 +79,7 @@ repeat
     if gr05a.score = 0 then continue
     call "SW001", "XXGR03", 0, gr05a.league$ + bin(gr05a.date, 3), gr03a$, sw001$
     if ! sw001.onfile then break
-    if gr03a.half = 1 or gr04a.half = 2 then break
+    if gr03a.half = 1 or gr03a.half = 2 then break
   until 0
   if gr05a.league$ = gr05.league$ and gr05a.id$ = gr05.id$ and (gr03a.half = 1 or gr03a.half = 2) then
     wk = 1
