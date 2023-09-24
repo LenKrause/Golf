@@ -71,6 +71,7 @@ repeat
   fi
   dim gr05a$:fattr(gr05$)
   gr05a = unt
+  open (gr05a)y.compcode$ + "GR05"
   read (gr05a, knum=0, key=gr05.league$ + gr05.id$ + bin(-1, 3), dom=*next)
   repeat
     readrecord (gr05a, end=*next)gr05a$
