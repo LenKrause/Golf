@@ -33,7 +33,17 @@ class public weeklyLeagueProcessing
     select (gr03s)gr03$ from "LKGR03" where gr03.league$ = league$ and gr03.date > jul(0,0,0) and gr03.date <= jul(0,0,0) + 7
     readrecord (gr03s, end=*next)gr03$
     if gr03.date = 0 then
-      #msg! = "Play date within one week of today not found"
+      rem  check if this is just after the last week of the year
+      read (gr03, knum=0, key=league$ + bin(-1, 3), dom=*next)
+      readrecord (gr03)gr03$
+      rem  ToDo change -14 to -7 after 2023 year end processing is completed
+      if gr03.league$ = league$ and gr03.date > jul(0,0,0) - 14 then
+        gr03.date = 0; rem  Year end processing
+        gr03.half = 2
+        #gr03$ = gr03$
+      else
+        #msg! = "Play date within one week of today not found"
+      fi
       methodret
     fi
     #gr03$ = gr03$
@@ -162,14 +172,14 @@ playdate = gr03!.getFieldAsNumber("date")
 rem  Set symbol in subject for emails sent
 tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
 
-if pos(str(gr03!.getFieldAsNumber("half")) = "12")
-  rem  Build Handicap Listing pdf file for playdate
-  call "GW045", y$, league$, playdate, hcListPdf$, skinPdf$
+if pos(str(gr03!.getFieldAsNumber("half")) = "12") then
+  rem  Build Handicap Listing and skin posting sheet pdf for playdate
+  if playdate then call "GW045", y$, league$, playdate, hcListPdf$, skinPdf$
   rem  Email each player with a match
   call "GW062.bbj", y$, league$, playdate, hcListPdf$, skinPdf$, msg$
 else
   rem  Email each player who has either played recently or is set to play this year
-  call "PracticeRoundEmail.bbj", y$, league$, playdate, msg$
+  if playdate then call "PracticeRoundEmail.bbj", y$, league$, playdate, msg$
 fi
 
 if fid(0) = "IO" then

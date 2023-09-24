@@ -14,12 +14,25 @@ rem  9   year long skins game
 dim html$[1:9]
 
 call "CDS095", gr03, "XXGR03", "YNY", gr03$
-jdate = playdate
-repeat
-  read record(gr03, knum=0, key=league$ + bin(jdate - 7, 3), dom=eoj)gr03$; rem "Need to know what half the last round this year was played in
-  if gr03.half = 1 or gr03.half = 2 then break
-  jdate = jdate - 7
-until 0
+if playdate then
+  jdate = playdate
+  repeat
+    read record(gr03, knum=0, key=league$ + bin(jdate - 7, 3), dom=eoj)gr03$; rem "Need to know what half the last round this year was played in
+    if gr03.half = 1 or gr03.half = 2 then break
+    jdate = jdate - 7
+  until 0
+else
+  rem  get last playdate of the current year
+  read (gr03, knum=0, key=league$ + bin(-1, 3), dom=*next)
+  repeat
+    readrecord (gr03, end=*break)gr03$
+    if gr03.league$ <> league$ then break
+    if gr03.half = 1 or gr03.half = 2 then
+      playdate = gr03.date + 7; rem  playdate - 7 is last playdate played
+      break
+    fi
+  until 0
+fi
 half  = gr03.half
 jdate = gr03.date
 if half then
