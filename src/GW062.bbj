@@ -65,7 +65,7 @@ repeat
   if pos(" " <> gr04.email$) = 0 then continue
   table! = new DTHtmlTable(BBjAPI.TRUE)  
   html$ = "", tab$ = "", row$ = ""
-  if gr03.half = 1 or gr03.half = 2 or gr03a.half = 1 or gr03a.half = 2 then
+  if gr03.half = 1 or gr03.half = 2 then
     table!.addHeaderCell(gr01.name$, "cs3")
     table!.addRow()
   fi
