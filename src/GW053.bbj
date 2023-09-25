@@ -1,0 +1,131 @@
+rem "GW053.bbj - 09/25/23 Golf Point Ranking - html
+setesc DT_ERR; seterr DT_ERR
+enter y$, league$, year$, half, drop$, html$
+html$ = ""
+if len(league$) = 0 then league$ = "SAW"
+if len(year$)   = 0 then year$ = date(0:"%Yl")
+if half = 0 then half = 2
+if len(drop$)   = 0 then drop$ = "Y"
+call "CDS095", gr03, "XXGR03", "YNY", gr03$
+call "CDS095", gr04, "XXGR04", "YNY", gr04$
+gr03s = unt
+select (gr03s)gr03$ from y.compcode$ + "GR03" where gr03.league$ = league$ and date(gr03.date:"%Yl") = year$
+repeat
+  read record(gr03s, end=*break)gr03$
+  if half = 3 or gr03.half = half then dates$ = dates$ + gr03.date$
+until 0
+close (gr03s)
+dates = len(dates$) / 3
+if dates = 0 then htaml$ = "No rounds played"; return
+dates$ = ssort(dates$, 3)
+dim dates$[1:dates]
+call "CDS095", gr05, "XXGR05", "YNY", gr05$
+dim gs$[1:100]
+gr05s = unt
+select (gr05s)gr05$ from y.compcode$ + "GR05" where gr05.league$ = league$ and pos(gr05.date$ = dates$, 3) sortby gr05.id$ + gr05.date$
+repeat
+  read record(gr05s, end=*break)gr05$
+  if len(cg$) and cg$(1,4) <> gr05.id$ then
+    if len(cg$) > 4 then
+      ids = ids + 1
+      gs$[ids] = lastflt$ + str(lasthc:"##") + cg$
+    fi
+    cg$ = ""
+    lasthc = 0
+  fi
+  lastflt$ = gr05.flt$
+  lasthc = gr05.hc
+  if gr05.score = 0 then continue; rem "Need lasthc from last week in year even if golfer did not play
+  if len(cg$) = 0 then cg$ = gr05.id$
+  z = pos(str(gr05.date) = datl$, 7)
+  if z = 0 then datl$ = datl$ + str(gr05.date)
+  cg$ = cg$ + str(gr05.date) + str(gr05.points:"##.0")
+until 0
+close (gr05s)
+if len(cg$) > 4 then
+  ids = ids + 1
+  gs$[ids] = lastflt$ + str(lasthc:"##") + cg$
+  cg$ = ""
+fi
+if ids = 0 then html$ = "No rounds played"; return
+datl$ = ssort(datl$, 7)
+wks = len(datl$) / 7
+span$ = "s" + str(wks + 4)
+dim pts[1:ids, 1:wks + 5]; rem "+1 weeks, +2 total pts, +3 min pts, +4 min wk#, +5 HC
+for id = 1 to ids
+  cg$ = gs$[id]
+  times = 0
+  tot = 0
+  minpts = 99
+  pts[id, wks + 5] = num(cg$(2,2))
+  for j = 8 to len(cg$) step 11
+    wk = (pos(cg$(j, 7) = datl$, 7) - 1) / 7 + 1
+    pts[id, wk] = num(cg$(j + 7, 4))
+    times = times + 1
+    tot = tot + pts[id, wk]
+    if pts[id, wk] < minpts then
+      minpts = pts[id, wk]
+      minwkno = wk
+    fi
+  next j
+  pts[id, wks + 1] = times
+  pts[id, wks + 2] = tot
+  if times = wks and drop$ = "Y" then
+    pts[id, wks + 3] = minpts
+    pts[id, wks + 4] = minwkno
+  fi
+  seq$ = seq$ + cg$(1,1) + str(200 - (pts[id, wks + 2] - pts[id, wks + 3]):"###.0") + str(id:"##0")
+next id
+seq$ = ssort(seq$, 9)
+call "SW001", "XXGR01", 0, league$, gr01$
+call "CDW000", row$, "hbc" + span$, gr01.name$
+call "CDW000", tab$, "r", row$
+call "CDW000", row$, "hbc" + span$, "Point Ranking - " + fnh$(half)
+call "CDW000", tab$, "r", row$
+for seqp = 1 to len(seq$) step 9
+  if seqp = 1 or seq$(seqp, 1) <> flt$ then gosub newflt
+  id = num(seq$(seqp + 6, 3))
+  read record(gr04, knum=0, key=league$ + gs$[id](4,4))gr04$
+  call "CDW000", row$, "d", cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2)
+  call "CDW000", row$, "dc", str(pts[id, wks + 5])
+  for wk = 1 to wks
+    if wk = pts[id, wks + 4] then bkg$ = "gff9999" else bkg$ = ""
+    call "CDW000", row$, "dc" + bkg$, str(pts[id, wk]:"###.0"); rem , (wk = pts[id, wks + 4])
+  next wk
+  call "CDW000", row$, "dc", str(pts[id, wks + 1])
+  call "CDW000", row$, "dr", str(pts[id, wks + 2] - pts[id, wks + 3]:"###.0")
+  call "CDW000", tab$, "r", row$
+next seqp
+call "CDW000", html$, "t", tab$
+html$ = html$ + "<br>Week with red shading was excluded from point totals for those who played every week."
+exit
+
+newflt:
+flt$ = seq$(seqp, 1)
+txt$ = flt$ + " Flight"
+call "CDW000", row$, "hbc" + span$, txt$
+call "CDW000", tab$, "r", row$
+call "CDW000", row$, "hb", "Name"
+call "CDW000", row$, "hbc", "Handicap"
+for datp = 1 to len(datl$) step 7
+  txt$ = date(num(datl$(datp, 7)):" %M/%Dz")
+  call "CDW000", row$, "hbc", txt$
+next datp
+call "CDW000", row$, "hbc", "Weeks"
+call "CDW000", row$, "hbr", "Points"
+call "CDW000", tab$, "r", row$
+return
+
+def fnh$(half)
+switch half
+  case 1; out$ = "1st half "; break
+  case 2; out$ = "2nd half "; break
+  case 3; out$ = ""; break
+swend
+return out$ + year$
+fnend
+
+dt_err:
+call "CDS063", str(tcb(5 + 3 * (err=127))), y$, pgm(-2)
+if y.errsts = 0 then seterr 0 else if y.errsts = 2 then return
+retry

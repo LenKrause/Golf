@@ -38,6 +38,8 @@ y.passparm$ = "E"
 rem  Get League Points Ranking by Flight
 call "GW054.bbj", y$, league$, playdate + 0, flts$, html$[all]
 
+if playdate = 0 then call "GW053.bbj", y$, league$, date(0:"%Yl"), 2, "Y", rankhtml$
+
 call "CDS041", "CDS084", s084$, "YP"
 sent = 0
 s084.mode$      = "E"
@@ -100,6 +102,8 @@ repeat
   z = pos(gr05.flt$ = flts$)
   if playdate and z and len(html$[z]) then html$ = html$ + html$[z] + "<br>"; rem  Flight Point Ranking
   
+  if len(rankhtml$) then html$ = html$ + rankhtml$ + "</br>"
+  
   if len(html$[9]) then html$ = html$ + html$[9] + "<br>"; rem  Year Long Skins Game
    
   html$ = "<div style='font-family:verdana,tahoma,sans-serif'>" + html$ + "</div>"
@@ -125,11 +129,11 @@ repeat
   if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
   link$ = ttm.getLink(gr04.EMAIL$)
   if len(link$) then
-    linkmsg$ = "Click <a href='" + link$ + "'>here</a>"
+    linkmsg$ = "<a href='" + link$ + "'>here</a>"
     if playdate then
-      message$ = linkmsg$ + " to select your tee time."
+      message$ = "Click " + linkmsg$ + " to select your tee time."
     else
-      message$ = "<strong>Year End Results</strong><br><br>Although our season has ended, you can " + linkmsg$ + " to select a tee time for post season play."
+      message$ = "<strong>Year End Results</strong><br><br>Although our season has ended, you can click " + linkmsg$ + " to select a tee time for post season play."
     fi
     print (y6.ch)"<p>" + message$ + "</p>"
   fi 
