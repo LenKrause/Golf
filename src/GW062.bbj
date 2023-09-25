@@ -129,7 +129,7 @@ repeat
     if playdate then
       message$ = linkmsg$ + " to select your tee time."
     else
-      message$ = "<strong>Year End Results<br><br>Although our season has ended, you can " + linkmsg$ + " to select a tee time for post season play."
+      message$ = "<strong>Year End Results</strong><br><br>Although our season has ended, you can " + linkmsg$ + " to select a tee time for post season play."
     fi
     print (y6.ch)"<p>" + message$ + "</p>"
   fi 
