@@ -102,7 +102,7 @@ repeat
   z = pos(gr05.flt$ = flts$)
   if playdate and z and len(html$[z]) then html$ = html$ + html$[z] + "<br>"; rem  Flight Point Ranking
   
-  if len(rankhtml$) then html$ = html$ + rankhtml$ + "</br>"
+  if len(rankhtml$) then html$ = html$ + rankhtml$ + "<br>"
   
   if len(html$[9]) then html$ = html$ + html$[9] + "<br>"; rem  Year Long Skins Game
    
