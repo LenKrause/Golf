@@ -113,7 +113,7 @@ repeat
   s084.toname$  = fnn$(gr04$)
   s084.toemail$ = cvs(gr04.email$, 2)
   if playdate then emails!.remove(s084.toemail$, err=*next); rem  Remove anyone with a match
-  if 1 then s084.toemail$ = "len@excellware.com"
+  if 0 then s084.toemail$ = "len@excellware.com"
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
   style! = table!.getStyle()
@@ -155,7 +155,7 @@ repeat
   if playdate and len(skinPdf$) and pos(gr04.id$ = "KRALSTEJ", 4) then call "CDS184", y$, y6$, skinPdf$, "Skins Posting Sheet.pdf"
   call "CDS094", y6$, "e"
   sent = sent + 1
-  if 1 then ts = ts + 1; if ts = 5 then goto eoj
+  if 0 then ts = ts + 1; if ts = 5 then goto eoj
 until 0
 
 rem  Send any guest emails
