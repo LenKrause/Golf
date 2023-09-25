@@ -36,8 +36,7 @@ class public weeklyLeagueProcessing
       rem  check if this is just after the last week of the year
       read (gr03, knum=0, key=league$ + bin(-1, 3), dom=*next)
       readrecord (gr03)gr03$
-      rem  ToDo change -14 to -7 after 2023 year end processing is completed
-      if gr03.league$ = league$ and gr03.date > jul(0,0,0) - 14 then
+      if gr03.league$ = league$ and gr03.date > jul(0,0,0) - 7 then
         gr03.date = 0; rem  Year end processing
         gr03.half = 2
         #gr03$ = gr03$
