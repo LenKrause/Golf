@@ -125,13 +125,13 @@ repeat
   if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
   link$ = ttm.getLink(gr04.EMAIL$)
   if len(link$) then
-    linkmsg$ = "Click <a href='" + link$ + "'>here"
+    linkmsg$ = "Click <a href='" + link$ + "'>here</a>"
     if playdate then
       message$ = linkmsg$ + " to select your tee time."
     else
-      message$ = "Year End Results<br><br>Although our season has ended, you can " + linkmsg$ + " to select a tee time for post season play.</p>"
+      message$ = "<strong>Year End Results<br><br>Although our season has ended, you can " + linkmsg$ + " to select a tee time for post season play."
     fi
-    print (y6.ch)"<p><strong>" + message$ + "</p>"
+    print (y6.ch)"<p>" + message$ + "</p>"
   fi 
   if 0 then print (y6.ch)"<p><strong>Please call or email your opponent if you can't play this week.</strong></p>"
   if 0 then if pos(" " <> gr08.name$) and pos(" " <> gr08.phone$) then print (y6.ch)"<p><strong>Call " + cvs(gr08.name$, 2) + " at " + gr08.phone$ + " if you can't play and did not get in touch with your opponent.</strong></p>"
