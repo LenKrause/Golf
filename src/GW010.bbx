@@ -129,9 +129,9 @@
 1860 next i
 1870 call "CDS041", "CDS084", s084$, "YP"
 1880 s084.name$ = "MAIL", s084.method$ = "N", s084.subject$ = "ScoresAndCharts.com Golfer Password"
-1890 s084.toemail$ = email$, s084.emailbcc$ = "webmaster@scoresandcharts.com"
+1890 s084.toemail$ = email$, s084.emailbcc$ = "scoresandcharts@gmail.com"
 1900 call "SW001", "XXGR01", 0, gr04.league$, gr01$, sw001$
-1910 s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "webmaster@scoresandcharts.com"
+1910 s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "scoresandcharts@gmail.com"
 1920 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 1930 print (y6.ch)cvs(gr01.name$, 2)
 1940 print (y6.ch)type$ + " Password is " + pwd$
@@ -298,9 +298,9 @@
 3700 sendttmlink:
 3770 call "CDS041", "CDS084", s084$, "YP"
 3780 s084.name$ = "MAIL", s084.method$ = "N", s084.subject$ = "Tee Time Manager Access Link"
-3790 s084.toemail$ = email$, s084.emailbcc$ = "webmaster@scoresandcharts.com"
+3790 s084.toemail$ = email$, s084.emailbcc$ = "scoresandcharts@gmail.com"
 3800 call "SW001", "XXGR01", 0, gr04.league$, gr01$, sw001$
-3810 s084.fromname$ = "Tee Time Manager", s084.fromemail$ = "webmaster@scoresandcharts.com"
+3810 s084.fromname$ = "Tee Time Manager", s084.fromemail$ = "scoresandcharts@gmail.com"
 3820 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 3830 print (y6.ch)cvs(gr01.name$, 2)
 3840 print (y6.ch)"Tee Time Manager Access Link: http://www.scoresandcharts.com/cgi-bin/ttm.cgi"
