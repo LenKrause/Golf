@@ -3,7 +3,7 @@
 0120 call "CDS041", "CDS084", s084$, "YY"
 0130 sent = 0
 0140 s084.mode$ = "E", s084.name$ = "MAIL", s084.emailtype$ = "H"
-0150 s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "webmaster@scoresandcharts.com"
+0150 s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "scoresandcharts@gmail.com"
 0160 tmp$ = stbl("WMS_CDW000", "D")
 0170 call "CDS095", gr04, "XXGR04", "YNY", gr04$
 0180 call "CDS095", gr06, "XXGR06", "YNY", gr06$

@@ -46,7 +46,7 @@ s084.mode$      = "E"
 s084.name$      = "MAIL"
 s084.emailtype$ = "H"
 s084.fromname$  = "ScoresAndCharts.com"
-s084.fromemail$ = "webmaster@scoresandcharts.com"
+s084.fromemail$ = "scoresandcharts@gmail.com"
 call "CDS095", gr03, "XXGR03", "YNY", gr03$
 call "CDS095", gr04, "XXGR04", "YNY", gr04$
 call "CDS095", gr05, "XXGR05", "YNY", gr05$, gr05k$

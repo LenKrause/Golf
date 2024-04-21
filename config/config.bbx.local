@@ -19,7 +19,6 @@ use ::DTJsonObject.bbj::DTJsonObject
 use ::DTSession.bbj::DTSession
 use ::DTServlet.bbj::DTServlet
 use ::DTServletOut.bbj::DTServletOut
-use ::DTServletRequestParameters.bbj::DTServletRequestParameters
 
 use java.util.HashMap
 

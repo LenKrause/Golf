@@ -99,7 +99,7 @@
 1880 LET S084.NAME$="MAIL",S084.METHOD$="N",S084.SUBJECT$="ScoresAndCharts.com Golfer Password"
 1890 LET S084.TOEMAIL$=EMAIL$,S084.EMAILBCC$="webmaster@scoresandcharts.com"
 1900 CALL "SW001","XXGR01",0,GR04.LEAGUE$,GR01$,SW001$
-1910 LET S084.FROMNAME$="ScoresAndCharts.com",S084.FROMEMAIL$="webmaster@scoresandcharts.com"
+1910 LET S084.FROMNAME$="ScoresAndCharts.com",S084.FROMEMAIL$="scoresandcharts@gmail.com"
 1920 CALL "CDS084",Y$,Y5$,U0,S084$,Y6,Y6$
 1930 PRINT (Y6.CH)CVS(GR01.NAME$,2)
 1940 PRINT (Y6.CH)TYPE$+" Password is "+PWD$
