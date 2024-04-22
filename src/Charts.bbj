@@ -1,0 +1,337 @@
+REM /**
+REM  * Charts.bbj
+REM  * @author len
+REM  *
+REM  */
+
+use ::DTChart.bbj::DTChart
+use ::DTFileRecords.bbj::DTFileRecords
+use java.util.TreeMap
+
+class public Charts
+  field private BBjString gr04$
+  field private BBjString msg$
+  field private TreeMap   years!  = new TreeMap()
+  field private TreeMap   recent! = new TreeMap()
+  field private BBjString gr05Template$
+
+  method public Charts(BBjString league$, BBjString id$)
+    call "SW001", "XXGR04", 0, league$ + id$, gr04$, sw001$
+    if sw001.onfile then
+      #gr04$ = gr04$
+      #getScores()
+    else
+      #msg$ = "Golfer not on file"
+    fi
+  methodend
+  
+  method public Charts(BBjString gr04$)
+    #gr04$ = gr04$
+    #getScores()
+  methodend
+  
+  method private void getScores()
+    declare DTFileRecords gr05File!
+    declare BBjVector     gr05Recs!
+    declare DTJsonObject  year!
+    declare DTJsonObject  round!
+    gr05File! = new DTFileRecords("XXGR05")
+    gr05File!.setKeyPre(0, #gr04$(1, 7))
+    gr05Recs! = gr05File!.getAllRecords()
+    #gr05Template$ = gr05File!.getTemplate()
+    if gr05Recs!.size() = 0 then methodret
+    dim gr05$:#gr05Template$
+    for i = 0 to gr05Recs!.size() - 1
+      gr05$ = gr05Recs!.get(i).toString()
+      if gr05.score = 0 or gr05.putts = 0 then continue
+      if #recent!.size() < 24 then
+        round! = new DTJsonObject()
+        round!.put("score",    gr05.score)
+        round!.put("putts",    gr05.putts)
+        round!.put("handicap", gr05.hc)
+        #recent!.put(dec(gr05.date$), round!)
+      fi
+      year$ = date(gr05.date:"%Yl")
+      if #years!.containsKey(year$) then
+        year! = cast(DTJsonObject, #years!.get(year$))
+      else
+        if #years!.size() = 24 then break
+        year! = new DTJsonObject()
+      fi
+      rounds      = year!.getInt("rounds")      + 1
+      totScore    = year!.getInt("totScore")    + gr05.score
+      totPutts    = year!.getInt("totPutts")    + gr05.putts
+      totHandicap = year!.getInt("totHandicap") + gr05.hc
+      year!.put("rounds",      rounds)
+      year!.put("totScore",    totScore)
+      year!.put("totPutts",    totPutts)
+      year!.put("totHandicap", totHandicap)
+      year!.put("score",       round(totScore    / rounds, 1))
+      year!.put("putts",       round(totPutts    / rounds, 1))
+      year!.put("handicap",    round(totHandicap / rounds, 1))
+      #years!.put(year$, year!)
+    next i
+  methodend
+  
+  method public BBjVector getCharts()
+    declare DTChart      chart!
+    declare BBjVector    charts!
+    declare DTJsonObject year!
+    declare DTJsonArray  x!
+    declare DTJsonArray  score!
+    declare DTJsonArray  putts!
+    declare DTJsonArray  handicap!
+    declare BBjVector    keys!
+    charts! = new BBjVector()
+    if #recent!.size() = 0 then methodret charts!
+    x! = new DTJsonArray()
+    x!.put("Year")
+    score! = new DTJsonArray()
+    score!.put("Scores")
+    putts! = new DTJsonArray()
+    putts!.put("Putts")
+    handicap! = new DTJsonArray()
+    handicap!.put("HC")
+    keys! = DT.getMapKeys(#years!)
+    for i = 0 to keys!.size() - 1
+      key$ = keys!.get(i).toString()
+      x!.put(key$)
+      year! = cast(DTJsonObject, #years!.get(key$))
+      score!.put(year!.getNumber("score"))
+      putts!.put(year!.getNumber("putts"))
+      handicap!.put(year!.getNumber("handicap"))
+    next i
+    
+    chart! = new DTChart("line")
+    chart!.setLegendPosition("none")
+    chart!.setX(x!)
+    chart!.addY(score!)
+    chart!.setTitle("Scores")
+    charts!.add(chart!)
+    
+    chart! = new DTChart("line")
+    chart!.setLegendPosition("none")
+    chart!.setX(x!)
+    chart!.addY(putts!)
+    chart!.setTitle("Putts")
+    charts!.add(chart!)
+
+    chart! = new DTChart("line")
+    chart!.setLegendPosition("none")
+    chart!.setX(x!)
+    chart!.addY(handicap!)
+    chart!.setTitle("Handicap")
+    charts!.add(chart!)
+
+    methodret charts!
+  methodend
+  
+  method public void getHtml()
+    declare BBjVector charts!
+    charts! = #getCharts()
+    pageHeading$ = ""
+    url$ = DT.htmlToUrl(new DTChart().getHtml(pageHeading$, charts!))
+    call "CDS188", err=*next, y$, cmd$, url$, "B", "Golf Charts"
+  methodend
+
+  method public BBjString getErrMsg()
+    methodret #msg$
+  methodend
+  
+  method public TreeMap getYears()
+    methodret #years!
+  methodend
+  
+  method public TreeMap getRecent()
+    methodret #recent!
+  methodend
+classend
+
+begin
+declare Charts charts!
+charts! = new Charts("SAW", "KRAL")
+charts!.getHtml()
+stop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+chart:
+tmp$ = stbl("WMS_CDW000_RC", ""); rem "Disable odd/even row background
+dim r$:"S:C(2*),STOT:B,SRND:B,SMIN:B,SMAX:B,P:C(2*),PTOT:B,PRND:B,PMIN:B,PMAX:B,H:C(2*),HTOT:B,HRND:B,HMIN:B,HMAX:B"
+r.smin = 99, r.pmin = 99, r.hmin = 99
+dim l$:fattr(r$); l$ = r$
+dim yy$:fattr(r$); yy$ = r$
+chxl0$ = "", chxl1$ = "", chxl2$ = "", chxl0y$ = "", yscores$ = "", yputts$ = "", yhc$ = "", gr05c = unt, tots = 0, totp = 0, toth = 0, rndp = 0, rndh = 0, mins = 99, maxs = 0, minp = 99, maxp = 0, minh = 99, maxh = 0, cy = 0, ytots = 0, ytotp = 0, ytoth = 0, yrnds = 0, yrndp = 0, yrndh = 0, ys$ = "", yp$ = "", yh$ = "", yrs = 0
+dim gr05c$:fattr(gr05$)
+select (gr05c)gr05c$ from y.compcode$ + "GR05" where gr05c.league$ = gr05.league$ and gr05c.id$ = gr04.id$ and gr05c.score
+repeat
+  read record(gr05c, end=*break)gr05c$
+  if l.srnd < 20 then gosub latest
+  ty = num(date(gr05c.date:"%Yl"))
+  if ty <> cy and cy then gosub newyr
+  cy = ty, ytots = ytots + gr05c.score, yrnds = yrnds + 1
+  if gr05c.putts then ytotp = ytotp + gr05c.putts, yrndp = yrndp + 1
+  if gr05c.hc then ytoth = ytoth + gr05c.hc, yrndh = yrndh + 1
+until 0
+close (gr05c)
+gosub newyr
+r$ = l$;  gosub adj;  l$ = r$
+r$ = yy$; gosub adj; yy$ = r$
+if l.srnd then
+  avgv = round(l.stot / l.srnd, 1)
+  tit$ = "Scores"
+  minv = l.smin
+  maxv = l.smax
+  delta = 5
+  val$ = l.s$
+  clr$ = "3072F3"
+  gosub dochl
+fi
+if yy.srnd then
+  avgv = round(yy.stot / yy.srnd, 1)
+  tit$ = "Scores"
+  minv = yy.smin
+  maxv = yy.smax
+  delta = 1
+  val$ = yy.s$
+  clr$ = "3072F3"
+  gosub dochy
+fi
+if l.srnd or yy.srnd then call "CDW000", tab$, "r style='padding:0px'", row$
+if l.prnd then
+  avgv = round(l.ptot / l.prnd, 1)
+  tit$ = "Putts"
+  minv = l.pmin - 1
+  maxv = l.pmax + 1
+  delta = 1
+  val$ = l.p$
+  clr$ = "33cc33"
+  gosub dochl
+fi
+if yy.prnd then
+  avgv = round(yy.ptot / yy.prnd, 1)
+  tit$ = "Putts"
+  minv = yy.pmin - 1
+  maxv = yy.pmax + 1
+  delta = 1
+  val$ = yy.p$
+  clr$ = "33cc33"
+  gosub dochy
+fi
+if l.prnd or yy.prnd then call "CDW000", tab$, "r style='padding:0px'", row$
+if l.hrnd then
+  avgv = round(l.htot / l.hrnd, 1)
+  tit$ = "Handicap"
+  minv = l.hmin - 1
+  maxv = l.hmax + 1
+  delta = 1
+  val$ = l.h$
+  clr$ = "ff9900"
+  gosub dochl
+fi
+if yy.hrnd then
+  avgv = round(yy.htot / yy.hrnd, 1)
+  tit$ = "Handicap"
+  minv = yy.hmin - 1
+  maxv = yy.hmax + 1
+  delta = 1
+  val$ = yy.h$
+  clr$ = "ff9900"
+  gosub dochy
+fi
+if l.hrnd or yy.hrnd then call "CDW000", tab$, "r style='padding:0px'", row$
+call "CDW000", html$, "t style='border:0px'", tab$
+return
+
+adj:
+  if r.srnd then r.s$ = "_" + r.s$ + ",_", r.p$ = "_" + r.p$ + ",_", r.h$ = "_" + r.h$ + ",_"
+  r.smin = r.smin - mod(r.smin, 5)
+  r.smax = r.smax - mod(r.smax, 5) + 5
+  r.pmin = r.pmin - mod(r.pmin, 1) - 0
+  r.pmax = r.pmax - mod(r.pmax, 1) + 0
+  r.hmin = r.hmin - mod(r.hmin, 1) - 0
+  r.hmax = r.hmax - mod(r.hmax, 1) + 0
+return
+
+latest:
+  chxl0$ = "|" + date(gr05c.date:"%Mz") + chxl0$
+  chxl1$ = "|" + date(gr05c.date:"%Dz") + chxl1$
+  chxl2$ = "|" + date(gr05c.date:"%Yz") + chxl2$
+  r$ = l$, s = gr05c.score, p = gr05c.putts, h = gr05c.hc; gosub tots; l$ = r$
+return
+
+tots:
+  r.s$ = "," + str(s) + r.s$
+  r.stot = r.stot + s
+  r.srnd = r.srnd + 1
+  r.smin = min(r.smin, s)
+  r.smax = max(r.smax, s)
+  if p then r.p$ = "," + str(p) + r.p$; r.ptot = r.ptot + p; r.prnd = r.prnd + 1; r.pmin = min(r.pmin, p); r.pmax = max(r.pmax, p) else r.p$ = ",_" + r.p$
+  if h then r.h$ = "," + str(h) + r.h$; r.htot = r.htot + h; r.hrnd = r.hrnd + 1; r.hmin = min(r.hmin, h); r.hmax = max(r.hmax, h) else r.h$ = ",_" + r.h$
+return
+
+newyr:
+  if yrnds = 0 then return
+  chxl0y$ = "|" + str(cy) + chxl0y$
+  r$ = yy$, s = round(ytots / yrnds, 1), p = round(ytotp / max(1, yrndp), 1), h = round(ytoth / max(1, yrndh), 1); gosub tots; yy$ = r$
+  ytots = 0, yrnds = 0, ytotp = 0, yrndp = 0, ytoth = 0, yrndh = 0
+  yrs = yrs + 1
+return
+
+dochl:
+  ch$ = "<img src='http://chart.apis.google.com/chart"
+  ch$ = ch$ + "?chf=bg,s,FFFF99"
+  ch$ = ch$ + "&chxl=0:|" + chxl0$ + "||1:|" + chxl1$ + "||2:|" + chxl2$ + "||4:|Avg+" + str(avgv)
+  ch$ = ch$ + "&chxp=4," + str(avgv)
+  ch$ = ch$ + "&chxr=3," + str(minv) + "," + str(maxv) + "," + str(delta) + "|4," + str(minv) + "," + str(maxv)
+  ch$ = ch$ + "&chxs=3,676767,11.5,0,lt,676767|4,FF0000,11.5,0,lt,FF0000"
+  ch$ = ch$ + "&chxt=x,x,x,y,r"
+  ch$ = ch$ + "&chxtc=3,-600|4,-600"
+  ch$ = ch$ + "&chs=500x250"
+  ch$ = ch$ + "&cht=lxy"
+  ch$ = ch$ + "&chco=" + clr$
+  ch$ = ch$ + "&chds=" + str(minv) + "," + str(maxv) + "," + str(minv) + "," + str(maxv)
+  ch$ = ch$ + "&chd=t:-1|" + val$
+  ch$ = ch$ + "&chls=3"
+  ch$ = ch$ + "&chma=25,60,0,50"
+  ch$ = ch$ + "&chm=s," + clr$ + ",0,-1,5"
+  ch$ = ch$ + "&chtt=" + tit$ + "+-+Latest+Rounds'"
+  gosub rep
+  ch$ = ch$ + " style='border:1px solid #c0c0c0' width=500 height=250>"
+  call "CDW000", row$, "d style='padding:0px'", ch$
+return
+
+dochy:
+  wid = 230 + (max(0, yrs - 3)) * 40
+  ch$ = "<img src='http://chart.apis.google.com/chart"
+  ch$ = ch$ + "?chf=bg,s,FFFF99"
+  ch$ = ch$ + "&chxl=0:|" + chxl0y$ + "||2:|Avg+" + str(avgv)
+  ch$ = ch$ + "&chxp=2," + str(avgv)
+  ch$ = ch$ + "&chxr=1," + str(minv) + "," + str(maxv) + "," + str(delta) + "|2," + str(minv) + "," + str(maxv)
+  ch$ = ch$ + "&chxs=1,676767,11.5,0,lt,676767|2,FF0000,11.5,0,lt,FF0000"
+  ch$ = ch$ + "&chxt=x,y,r"
+  ch$ = ch$ + "&chxtc=1,-600|2,-600"
+  ch$ = ch$ + "&chs=" + str(wid) + "x250"
+  ch$ = ch$ + "&cht=lxy"
+  ch$ = ch$ + "&chco=" + clr$
+  ch$ = ch$ + "&chds=" + str(minv) + "," + str(maxv) + "," + str(minv) + "," + str(maxv)
+  ch$ = ch$ + "&chd=t:-1|" + val$
+  ch$ = ch$ + "&chls=3"
+  ch$ = ch$ + "&chma=25,60,0,50"
+  ch$ = ch$ + "&chm=s," + clr$ + ",0,-1,5"
+  ch$ = ch$ + "&chtt=" + tit$ + "+-+Year+by+Year'"
+  gosub rep
+  ch$ = ch$ + " style='border:1px solid #c0c0c0' width=" + str(wid) + " height=250>"
+  call "CDW000", row$, "d style='padding:0px'", ch$
+return
