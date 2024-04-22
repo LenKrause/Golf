@@ -1,6 +1,7 @@
 rem "GW062.bbj - Golf Weekly Email - cron version
 
 use ::ttm.bbj::ttm
+use ::Charts.bbj::Charts
 use ::DTHtmlTable.bbj::DTHtmlTable
 use java.util.HashMap
 
@@ -17,6 +18,7 @@ if len(y$) = 0 then
   hcListPdf$ = ""
   skinPdf$   = ""
   msg$ = ""
+  debug = 1
 fi
 
 if league$ = "SAW" then aid$ = "lk01"
@@ -108,12 +110,14 @@ repeat
    
   html$ = "<div style='font-family:verdana,tahoma,sans-serif'>" + html$ + "</div>"
   html$ = html$ + "<div style='font-size:0;height:5px;'></div>"
-  gosub chart
+REM   gosub chart
   gosub bestrounds
+  html$ = html$ + new Charts(gr04$).getHtml()
+  
   s084.toname$  = fnn$(gr04$)
   s084.toemail$ = cvs(gr04.email$, 2)
   if playdate then emails!.remove(s084.toemail$, err=*next); rem  Remove anyone with a match
-  if 0 then s084.toemail$ = "len@excellware.com"
+  if debug then s084.toemail$ = "len@excellware.com"
   if 0 then call "CDW999", html$; run "GW011"
   call "CDS084", y$, y5$, u0, s084$, y6, y6$
   style! = table!.getStyle()
@@ -155,11 +159,11 @@ repeat
   if playdate and len(skinPdf$) and pos(gr04.id$ = "KRALSTEJ", 4) then call "CDS184", y$, y6$, skinPdf$, "Skins Posting Sheet.pdf"
   call "CDS094", y6$, "e"
   sent = sent + 1
-  if 0 then ts = ts + 1; if ts = 5 then goto eoj
+  if debug then ts = ts + 1; if ts = 5 then goto eoj
 until 0
 
 rem  Send any guest emails
-if playdate and emails!.size() then
+if playdate and emails!.size() and ! debug then
   declare BBjVector emv!
   emv! = DT.getMapKeys(emails!)
   for i = 0 to emv!.size() - 1
