@@ -4,11 +4,11 @@ REM  * @author len
 REM  *
 REM  */
 
-rem  temporary use
-if pos("TEMP/ " = pfx) = 0 then prefix "TEMP/ " + pfx
-
 use ::DTChart.bbj::DTChart
 use ::DTFileRecords.bbj::DTFileRecords
+use ::DTJsonObject.bbj::DTJsonObject
+use ::DTJsonArray.bbj::DTJsonArray
+
 use java.util.TreeMap
 
 class public Charts
@@ -180,12 +180,20 @@ class public Charts
     methodret chart!
   methodend
   
-  method public void getHtml()
+  method public void showPage(BBjString pageHeading$)
     declare BBjVector charts!
     charts! = #getCharts()
-    pageHeading$ = ""
-    url$ = DT.htmlToUrl(new DTChart().getHtml(pageHeading$, charts!))
-    call "CDS188", err=*next, y$, cmd$, url$, "B", "Golf Charts"
+
+    rem  temporary use
+    if pos("TEMP/ " = pfx) = 0 then prefix "TEMP/ " + pfx
+
+    new DTChart().showPage(pageHeading$, charts!)
+  methodend
+  
+  method public BBjString getHtml()
+    declare BBjVector charts!
+    charts! = #getCharts()
+    methodret new DTChart().getHtml(charts!)
   methodend
 
   method public BBjString getErrMsg()
@@ -205,5 +213,5 @@ begin
 ?'cs',
 declare Charts charts!
 charts! = new Charts("SAW", "KRAL")
-charts!.getHtml()
+charts!.showPage("Example Golf Charts")
 run "CDS001"
