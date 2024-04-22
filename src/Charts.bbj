@@ -77,6 +77,7 @@ class public Charts
     declare DTChart      chart!
     declare BBjVector    charts!
     declare DTJsonObject year!
+    declare DTJsonObject round!
     declare DTJsonArray  x!
     declare DTJsonArray  score!
     declare DTJsonArray  putts!
@@ -115,6 +116,45 @@ class public Charts
     chart!.addY(putts!)
     chart!.setTitle("Putts")
     charts!.add(chart!)
+
+    chart! = new DTChart("line")
+    chart!.setLegendPosition("none")
+    chart!.setX(x!)
+    chart!.addY(handicap!)
+    chart!.setTitle("Handicap")
+    charts!.add(chart!)
+
+    x!.clear()
+    x!.put("Date")
+    score!.clear()
+    score!.put("Scores")
+    putts!.clear()
+    putts!.put("Putts")
+    handicap!.clear()
+    handicap!.put("HC")
+    keys! = DT.getMapKeys(#recent!)
+    for i = 0 to keys!.size() - 1
+      key$ = keys!.get(i).toString()
+      x!.put(date(num(key$):"%M/%D"))
+      round! = cast(DTJsonObject, #recent!.get(num(key$)))
+      score!.put(round!.getNumber("score"))
+      putts!.put(round!.getNumber("putts"))
+      handicap!.put(round!.getNumber("handicap"))
+    next i
+    
+    chart! = new DTChart("line")
+    chart!.setLegendPosition("none")
+    chart!.setX(x!)
+    chart!.addY(score!)
+    chart!.setTitle("Scores")
+    charts!.add(1, chart!)
+    
+    chart! = new DTChart("line")
+    chart!.setLegendPosition("none")
+    chart!.setX(x!)
+    chart!.addY(putts!)
+    chart!.setTitle("Putts")
+    charts!.add(3, chart!)
 
     chart! = new DTChart("line")
     chart!.setLegendPosition("none")
