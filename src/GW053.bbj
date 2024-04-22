@@ -47,7 +47,7 @@ if len(cg$) > 4 then
   gs$[ids] = lastflt$ + str(lasthc:"##") + cg$
   cg$ = ""
 fi
-if ids = 0 then html$ = "No rounds played"; return
+if ids = 0 then html$ = "No rounds played"; exit
 datl$ = ssort(datl$, 7)
 wks = len(datl$) / 7
 span$ = "s" + str(wks + 4)
