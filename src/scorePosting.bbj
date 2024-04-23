@@ -664,7 +664,7 @@ switch cgi.mode$
     call "SW001", "LKGR04", 0, id$, gr04$, sw001$
     if ! sw001.onfile then release
     charts! = new Charts(gr04$)
-    html$ = charts!.getPage(cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2))
+    html$ = charts!.getHtml(cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2))
     break
 swend
 run "CDW999"
