@@ -424,6 +424,13 @@ if gr09.aid$ = "lk01" then
     call "CDW000", row$, "dc", "<a href='" + dsn$ + "&p=scorePosting.bbj&mode=getRecentMatches'>Recent Rounds</a>"
     call "CDW000", tab$, "r", row$
   fi
+  if pos(" " <> gr09.email$) then
+    id$ = ttm.getGr04Key(gr09.email$, "SAW")
+    if len(id$) then
+      call "CDW000", row$, "dc", "<a href='" + dsn$ + "&p=scorePosting.bbj&mode=showCharts&id=" + id$ + "'>Charts</a>"
+      call "CDW000", tab$, "r", row$
+    fi
+  fi
 fi
   
 gids$   = ""

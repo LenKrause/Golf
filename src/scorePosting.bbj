@@ -6,6 +6,7 @@ REM  */
 
 use ::DTFileRecords.bbj::DTFileRecords
 use ::DTHtmlTable.bbj::DTHtmlTable
+use ::Charts.bbj::Charts
 
 class public scorePosting
   field private BBjString code$
@@ -656,6 +657,15 @@ switch cgi.mode$
     score! = new scorePosting(cgi.code$)
     hexkey$ = cgi.hexkey$
     html$ = score!.showMatch(hexkey$)
+    break
+  case "showCharts"
+    declare Charts charts!
+    id$ = cgi.id$
+    call "SW001", "LKGR04", 0, id$, gr04$, sw001$
+    if ! sw001.onfile then release
+    charts! = new Charts(gr04$)
+    charts!.showPage(cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastsname$, 2))
+    release
     break
 swend
 run "CDW999"
