@@ -180,7 +180,7 @@ class public Charts
     methodret chart!
   methodend
   
-  method public void getPage(BBjString pageHeading$)
+  method public BBjString getPage(BBjString pageHeading$)
     declare BBjVector charts!
     charts! = #getCharts()
 
