@@ -180,6 +180,16 @@ class public Charts
     methodret chart!
   methodend
   
+  method public void getPage(BBjString pageHeading$)
+    declare BBjVector charts!
+    charts! = #getCharts()
+
+    rem  temporary use
+    if pos("TEMP/ " = pfx) = 0 then prefix "TEMP/ " + pfx
+
+    methodret new DTChart().getPage(pageHeading$, charts!)
+  methodend
+
   method public void showPage(BBjString pageHeading$)
     declare BBjVector charts!
     charts! = #getCharts()
