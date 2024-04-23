@@ -85,7 +85,7 @@ REM       s084.emailbcc$ = s084.fromemail$
       declare DTFileRecords gr04File!
       declare BBjVector     gr04Recs!
       gr04File! = new DTFileRecords("LKGR04")
-      gr04File!.setKeyPre(3, pad(email$, 50) + pad(league$, 3))
+      gr04File!.setKeyPre(2, pad(email$, 50) + pad(league$, 3))
       gr04Recs! = gr04File!.getAllRecords()
       if gr04Recs!.size() = 1 then
         gr04$ = gr04Recs!.get(0).toString()
