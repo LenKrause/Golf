@@ -80,18 +80,10 @@ class public weeklyLeagueProcessing
     rem  Early 18 hole rounds
     if day_of_week$ = "Sat" then
       gr10!.setFieldValue("time", #fixTime())
-      if practice then
-        gr10File!.addUniqueRecord(gr10!)
-      else
-        #preset(gr10File!, gr10!, "js01mf01dr01lk01"); rem  Jim, Mike, Dave (dr01), Mike M (mm02) or Len (lk01)
-      fi
-      
+      #preset(gr10File!, gr10!, "js01mf01dr01bb01"); rem  Jim, Mike, Dave (dr01), Mike M (mm02) or Len (lk01)
+
       gr10!.setFieldValue("time", #fixTime())
-      if practice then
-        gr10File!.addUniqueRecord(gr10!)
-      else
-        #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
-      fi
+      #preset(gr10File!, gr10!, "rr01dn01lk01mt01"); rem  Ray, Dan, Bruce, Mel
 
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
@@ -105,14 +97,14 @@ class public weeklyLeagueProcessing
       if practice then
         gr10File!.addUniqueRecord(gr10!)
       else
-        #preset(gr10File!, gr10!, "js01mf01dr01lk01"); rem  Jim (js01), Mike (mf01), Dave (dr01), Len (lk01)
+        #preset(gr10File!, gr10!, "js01mf01dr01bb01"); rem  Jim (js01), Mike (mf01), Dave (dr01), Len (lk01)
       fi
       
       gr10!.setFieldValue("time", #fixTime())
       if practice then
         gr10File!.addUniqueRecord(gr10!)
       else
-        #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
+        #preset(gr10File!, gr10!, "rr01dn01lk01mt01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
       fi
       
       gr10!.setFieldValue("time", #fixTime())

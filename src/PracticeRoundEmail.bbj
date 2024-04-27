@@ -7,7 +7,7 @@ enter y$, league$, playdate, msg$, err=*next
 if len(y$) = 0 then
   call "CDS091", y$
   league$ = "SAW"
-  playdate = jul(2024,4,24)
+  playdate = jul(2024,5,1)
   testmode = 1
 fi
 use ::ttm.bbj::ttm
@@ -45,8 +45,9 @@ s084.TOEMAIL$ = gr04.EMAIL$
 if testmode THEN s084.TOEMAIL$ = "len@excellware.com"
 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 print (y6.ch)"<p>", cvs(gr04.firstname$, 2), "-</p>"
+print (y6.ch)"<p>Due to the weather and course conditions last week, we'll play a practice round this week, and start match play next week.</p>"
 print (y6.ch)"<p>If you are planning to play in this week's practice round, then click <a href='" + link$ + "'>here</a> to select your tee time."
-print (y6.ch)"<br>If you are playing 18 holes, then unlike regular season play, only one tee time is required."
+print (y6.ch)"<br>If you are playing 18 holes, then unlike regular season play, only one early tee time is required."
 print (y6.ch)"<br>You do not need to record your score for practice rounds.</p>"
 REM print (y6.ch)"<p>If no tee times are available,<br>Call the course to schedule a tee time, <br>and reply to this email with the time, so it can be added to the site.</p>"
 call "CDS094", y6$, "e"
