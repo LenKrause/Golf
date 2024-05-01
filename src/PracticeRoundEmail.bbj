@@ -16,7 +16,7 @@ sent = 0
 s084.MODE$      = "E"
 s084.NAME$      = "MAIL"
 s084.EMAILTYPE$ = "H"
-s084.FROMNAME$ = "ScoresAndCharts.com"
+s084.FROMNAME$  = "Scores & Charts"
 s084.FROMEMAIL$ = "scoresandcharts@gmail.com"
 call "CDS095", gr04, "XXGR04", "YNY", gr04$
 call "CDS095", gr05, "XXGR05", "YNY", gr05$
