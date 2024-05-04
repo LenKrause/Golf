@@ -46,7 +46,7 @@ sent = 0
 s084.mode$      = "E"
 s084.name$      = "MAIL"
 s084.emailtype$ = "H"
-s084.fromname$  = "ScoresAndCharts.com"
+s084.fromname$  = "Scores & Charts"
 s084.fromemail$ = "scoresandcharts@gmail.com"
 call "CDS095", gr03, "XXGR03", "YNY", gr03$
 call "CDS095", gr04, "XXGR04", "YNY", gr04$
@@ -126,7 +126,7 @@ repeat
   if 0 then call "SW002", note$, $e28099$, "'"
   if 0 then cgi.note$ = note$
   if 0 then call "SW002", note$, $0d0a$, "<br>"
-  if jul(0,0,0) < jul(2023,8,2) then note$ = "<p>Cookout after golf this week, Wednesday August 2</p>"
+  if jul(0,0,0) = jul(2024,5,4) then note$ = "<p>Due to some last minute roster revisions, your opponent this week has changed.</p>"
   if len(note$) then print (y6.ch)note$
   if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
   link$ = ttm.getLink(gr04.EMAIL$)
