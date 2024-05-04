@@ -4,7 +4,7 @@
 0130 test = 0
 0140 sent = 0
 0150 s084.mode$ = "E", s084.name$ = "MAIL", s084.emailtype$ = "H"
-0160 s084.fromname$ = "ScoresAndCharts.com", s084.fromemail$ = "scoresandcharts@gmail.com"
+0160 s084.fromname$ = "Scores & Charts", s084.fromemail$ = "scoresandcharts@gmail.com"
 0170 tmp$ = stbl("WMS_CDW000", "D")
 0180 call "CDS095", gr04, "XXGR04", "YNY", gr04$
 0190 switch pos(cgi.sendto$ = "RYN")
