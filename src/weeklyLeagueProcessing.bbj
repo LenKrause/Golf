@@ -86,6 +86,7 @@ class public weeklyLeagueProcessing
       #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
 
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      #preset(gr10File!, gr10!, "ds01pc01jk01tf02"); rem  Dave, Paul, Jerry, Tom
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
     fi
     
@@ -111,10 +112,16 @@ class public weeklyLeagueProcessing
       if practice then
         gr10File!.addUniqueRecord(gr10!)
       else
-        #preset(gr10File!, gr10!, "jg01jm01"); rem  Gardini (jg01), Marco (mm01), Mindek (jm01), Mike Mueller (mm02)
+        #preset(gr10File!, gr10!, "ds01pc01jk01tf02"); rem  Dave, Paul, Jerry, Tom
       fi
       
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime())
+      if practice then
+        gr10File!.addUniqueRecord(gr10!)
+      else
+        #preset(gr10File!, gr10!, "jg01jm01"); rem  Gardini (jg01), Marco (mm01), Mindek (jm01), Mike Mueller (mm02)
+      fi
+
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
