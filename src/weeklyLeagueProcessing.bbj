@@ -85,9 +85,14 @@ class public weeklyLeagueProcessing
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray, Dan, Bruce, Mel
 
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "ds01pc01jk01tf02"); rem  Dave, Paul, Jerry, Tom
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      
+      gr10!.setFieldValue("time", #fixTime())
+      gr10File!.addUniqueRecord(gr10!)
+
+      gr10!.setFieldValue("time", #fixTime())
+      gr10File!.addUniqueRecord(gr10!)
     fi
     
     rem  Late 9 hole rounds
