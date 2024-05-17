@@ -112,9 +112,9 @@
 1700 gethc:
 1710 dim gw009$:fattr(gw009$)
 1720 call "GW009", y$, gr04$, gw009$
-1730 z = pos(gr04.preflt$ = flts$)
+1730 z = pos(gr04.preflt$ = flts$); rem  if player has preferred flight, just assign flight otherwise store by handicap
 1740 if z then
-:      cnt[z] = cnt[z] + 1;
+:      cnt[z] = cnt[z] + 1;  rem  players with preferred flight
 :      gr04.flt$ = gr04.preflt$;
 :      write record(gr04)gr04$
 :    else
@@ -125,8 +125,8 @@
 1800 newflt:
 1810 flt = flt + 1, flt$ = chr(asc("A") - 1 + flt)
 1820 ptf = players1 / flts1, flts1 = flts1 - 1
-1830 if cnt[flt] > ptf then ptf = cnt[flt]
-1840 if mod(ptf, 2) then ptf = ptf + 1
+1830 if cnt[flt] > ptf then ptf = cnt[flt]; rem  cnt[flt] players with a preferred flight
+1840 if mod(ptf, 2) then ptf = ptf + 1; rem  +1 puts extra in A flt, -1 in B
 1850 players1 = players1 - ptf
 1860 ptf = ptf - cnt[flt]
 1870 if ptf <= 0 then goto newflt
