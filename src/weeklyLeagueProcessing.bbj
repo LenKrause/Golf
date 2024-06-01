@@ -133,6 +133,7 @@ class public weeklyLeagueProcessing
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
       gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
     fi
   methodend
   
