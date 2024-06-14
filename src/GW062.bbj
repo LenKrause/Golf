@@ -127,12 +127,8 @@ repeat
   if 0 then cgi.note$ = note$
   if 0 then call "SW002", note$, $0d0a$, "<br>"
   if jul(0,0,0) = jul(2024,5,18) then note$ = "<p>Due to some roster revisions made this week, the match schedule has changed, which means that it is possible that you may play an opponent that you already played this year.</p>"
-  if jul(0,0,0) = jul(2024,6,1)  then
-    note$ = "<p>This is the final week to pay the league dues to Jim.</p>"
-    note$ = note$ + "<p>Cookout after golf Wednesday June 19.</p>"
-    note$ = note$ + "<p>Longtime golf league player Bernie Pesko's 34 year old son Phil, and my former employee, had a bone marrow transplant yesterday,"
-    note$ = note$ + " as the next step in a months-long treatment for leukemia. "
-    note$ = note$ + "Please keep Phil and the Pesko family in your prayers.</p>"
+  if jul(0,0,0) = jul(2024,6,15)  then
+    note$ = "<p>The Cookout has been rescheduled for Wednesday June 26.</p>"
   fi
   if len(note$) then print (y6.ch)note$
   if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
