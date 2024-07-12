@@ -78,7 +78,7 @@ class public weeklyLeagueProcessing
     day_of_week$ = date(0:"%Ds")
 
     rem  Early 18 hole rounds
-    if day_of_week$ = "Sat" then
+    if day_of_week$ = "Sat" and jul(0,0,0) <> jul(2024, 7, 13) then
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "js01mf01dr01lk01"); rem  Jim, Mike, Dave (dr01), Mike M (mm02) or Len (lk01)
 
