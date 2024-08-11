@@ -263,7 +263,7 @@ bestrounds:
   call "CDS041", "CDW038", w038$, "YY"
   w038.useclass$ = "N"
   y.compname$ = ""
-  call "CDW038", y$, "Best Rounds", y5a$, htmlbest$, w038$, "XXGR05", 0, "", "", "GR05.DATE|SCORE|HC|NET|PUTTS", "GR05.LEAGUE$=""" + league$ + """ AND GR05.ID$=""" + gr04.id$ + """ and GR05.NET", "REC.SCORE$+NOT(REC.DATE$)", "", 10
+  call "CDW038", y$, "10 Best Rounds", y5a$, htmlbest$, w038$, "XXGR05", 0, "", "", "DATE|SCORE|HC|NET|PUTTS|GR03A.NINE", "GR05.LEAGUE$=""" + league$ + """ AND GR05.ID$=""" + gr04.id$ + """ and GR05.NET", "REC.SCORE$+NOT(REC.DATE$)", "", 10
   html$ = html$ + "<br>" + htmlbest$
 return
 
