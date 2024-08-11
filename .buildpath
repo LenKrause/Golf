@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <buildpath>
-    <buildpathentry excluding=".settings/**|.work/**|.project|.buildpath|.classpath|backups/**||.DS_Store|.dwclaunches/**|build.log|.metadata/**|.bdtPath|.builaunches/**|wbp-meta/**|.guilaunches/**" kind="src" path=""/>
+	<buildpathentry excluding=".settings/**|.work/**|.project|.buildpath|.classpath|backups/**|.DS_Store|.dwclaunches/**|build.log|.metadata/**|.builaunches/**|.bdtPath|wbp-meta/**|.guilaunches/**" kind="src" path=""/>
 </buildpath>
