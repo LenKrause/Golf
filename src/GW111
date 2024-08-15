@@ -1,4 +1,4 @@
-REM "GW111 - 11/19/20 Tee Time Manager Menu
+REM "GW111 - 11/19/20 Tee Time Manager Menu"
 
 use ::scorePosting.bbj::scorePosting
 use ::ttm.bbj::ttm
@@ -439,7 +439,7 @@ playing = 0
 mytime  = 0
 gr10.aid$ = gr09.aid$
 gr10.date = y.jdate
-REM gr10.time = tim  -- show all times in the day so that foursomes can be revised to enter league scores
+gr10.time = 0; rem  show all times in the day so that foursomes can be revised to enter league scores
 read (gr10, knum=1, key=kgen(gr10$, gr10k$, 1), dom=*next)
 repeat
   readrecord (gr10, end=*break)gr10$
