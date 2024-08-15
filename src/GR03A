@@ -6,7 +6,7 @@ REM  */
 
 enter y$, rec$, gr03a$
 
-call "SW001", "LKGR03", 0, rec.league$ + bin(rec.date, 3), gr03$
+call "SW001", "LKGR03", 0, rec.league$ + bin(rec.date, 3), gr03$, sw001$
 switch gr03.nine$
   case "F"; gr03a.nine$ = "Front"; break
   case "B"; gr03a.nine$ = "Back";  break
