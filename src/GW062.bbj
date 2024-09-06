@@ -132,6 +132,11 @@ repeat
     note$ = note$ + "<p>Pine Hills is having a Patio Party this Wednesday.</p>"
     note$ = note$ + "<p>Come join us at our bar and patio for food and entertainment from 5-9pm.<br>The Barrio Mexican food truck will be there with their taco menu and more!<br>Modelo and Corona beer specials and Margarita's available starting at 4:00.<br>Entertainment will be local DJ Abbey Studor.<br>Have some light fun this summer!</p>"
   fi
+  if jul(0,0,0) = jul(2024,9,7)  then
+    note$ = "<p>Steak Roast after golf this week.</p>"
+    note$ = note$ + "<p>18 hole rounds start at noon.<br>Just make the turn after playing 9 holes.<br>Do not schedule a late tee time.</p>"
+    note$ = note$ + "<p>9 hole players need to schedule a tee time between 4:00 and 4:30 pm this week.</p>"
+  fi
   if len(note$) then print (y6.ch)note$
   if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
   link$ = ttm.getLink(gr04.EMAIL$)
