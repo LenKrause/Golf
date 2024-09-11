@@ -121,6 +121,7 @@ class public teeSheet
     s084.name$      = "MAIL"
     s084.emailtype$ = "H"
     s084.subject$   = "Tee Sheet"
+    if jul(0,0,0) = jul(2024,9,10) then s084.subject$   = "CORRECTED TEE TIMES"
     s084.emailbcc$  = "len@excellware.com"
     s084.fromemail$ = "scoresandcharts@gmail.com"
 
