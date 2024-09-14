@@ -303,6 +303,7 @@ repeat
       print (y6.ch)"-" + cvs(gr09.firstname$, 2)
       call "CDS094", y6$, "E"
       emc = emc + 1
+      wait 2; rem  Helps prevent gmail service delay (temporary failure)
     next em
     msg$ = str(emc) + " emails sent"
   fi
