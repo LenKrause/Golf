@@ -73,6 +73,7 @@ repeat
         msg$ = msg$ + "The tee time on " + fndatetime$(gr10$) + "<br>has already been claimed<br>"
       else
         gr10.id$[seq] = claim.id$
+        gr10.by$[seq] = gr09.id$
         write record (gr10)gr10$
         if claim.id$ = gr09.id$ then msg$ = msg$ + "You are now scheduled to play<br>on " + fndatetime$(gr10$) + "<br>"
       fi
@@ -101,8 +102,10 @@ repeat
         for i = seq to 4
           if i = 4 then
             gr10.id$[i] = ""
+            gr10.by$[i] = ""
           else
             gr10.id$[i] = gr10.id$[i + 1]
+            gr10.by$[i] = gr10.by$[i + 1]
           fi
         next i
         write record (gr10)gr10$
@@ -491,10 +494,10 @@ REM         break
       readrecord (gr09, knum=0, key=gr09.aid$ + gr10.id$[i], dom=*next)gr09a$
     fi
     switch 1
-      rem  Cancel my time or my guest
-      case gr10.id$[i] = gr09.id$
+      rem  Cancel my time or my buddy or my guest
+      case pos(" " <> gr10.id$[i]) and ((gr10.id$[i] = gr09.id$) or (gr10.by$[i] = gr09.id$) or (gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)))
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='window.location=""" + dsn$ + "&cancel=" + str(gr10.ttid) + "-" + str(i) + """'>"
-        col2$ = "<span class='head'>" + fnn$(gr09$)
+        col2$ = "<span class='head'>" + fnn$(gr09a$)
         if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         col2$ = col2$ + "</span>"
         break
@@ -573,7 +576,6 @@ buddyList:
   col2$ = col2$ + "<option value='' selected)>Sign up Buddy or Guest</option>" + $0a$
   if pos(gr09.id$ = foursome$, 4) then col2$ = fnoptn$(gr09.id$, "Guest")
   call "SW010", "LKGR10", 1, gr09.aid$ + gr10.date$, "id[1]|id[2]|id[3]|id[4]", playing$
-REM   DT.writeLog(str(len(playing$)) + " " + playing$)
   call "SW010", "LKGR09", 0, "", "id|firstname|lastname", golfers$, "", "", "rec.aid$ = """ + gr09.aid$ + """ and rec.active$ = ""Y"""
   for i0 = 1 to len(golfers$) step 34
     if pos(golfers$(i0,4) = playing$, 4) = 0 then col2$ = fnoptn$(golfers$(i0,4), cvs(golfers$(i0+4, 10), 2) + " " + cvs(golfers$(i0+14,20), 2))
