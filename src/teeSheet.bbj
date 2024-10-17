@@ -33,7 +33,7 @@ class public teeSheet
     
     #players! = new BBjVector()
     
-    table! = new DTHtmlTable(BBjAPI.TRUE)
+    table! = new DTHtmlTable(Boolean.TRUE)
     table!.addHeaderCell("Tee Time Manager", "cs3")
     table!.addRow()
     
@@ -106,7 +106,7 @@ class public teeSheet
   methodend
 
   method public void email()
-    #email(BBjAPI.FALSE)
+    #email(Boolean.FALSE)
   methodend
 
   method public void email(Boolean testMode!)

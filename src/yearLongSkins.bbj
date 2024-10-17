@@ -147,7 +147,7 @@ class public yearLongSkins
   method public DTHtmlTable getHtmlTable()
     declare DTHtmlTable  table!
     declare DTJsonObject skin!
-    table! = new DTHtmlTable(BBjAPI.TRUE); rem  for delivery by email
+    table! = new DTHtmlTable(Boolean.TRUE); rem  for delivery by email
     table!.addHeaderCell(str(#year) + " Year Long Skins Game", "cs4")
     table!.addRow()
     

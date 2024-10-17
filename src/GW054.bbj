@@ -135,7 +135,7 @@ txt$ = h$ + " Ranking"
 if len(flts$) > 1 then txt$ = txt$ + " - " + g0.flt$ + " Flight"
 if y.passparm$ = "E" then type$ = "h" else type$ = "d"; rem "Use th for email for style
 
-table! = new DTHtmlTable(BBjAPI.TRUE)
+table! = new DTHtmlTable(Boolean.TRUE)
 table!.addHeaderCell(txt$, "c" + span$) 
 table!.addRow()
 if half = 0 then rs$ = " rowspan=2"
@@ -156,7 +156,7 @@ html$[len(flts$)] = table!.getBody()
 return
 
 prizes:
-table! = new DTHtmlTable(BBjAPI.TRUE)
+table! = new DTHtmlTable(Boolean.TRUE)
 pz$ = ssort(pz$, 7)
 table!.addHeaderCell("Prize Winners - " + date(playdate - 7:"%Ds %Ms %D"), "cs4")
 table!.addRow() 

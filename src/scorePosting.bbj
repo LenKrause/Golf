@@ -50,7 +50,7 @@ class public scorePosting
     if gr05Recs!.size() = 0 methodret ""
     
     table! = new DTHtmlTable()
-    table!.setStripe(BBjAPI.FALSE)
+    table!.setStripe(Boolean.FALSE)
     
     table!.addCell(#getPlayerName(gr04$), "cs9")
     table!.addRow(" class='top'")
@@ -150,7 +150,7 @@ class public scorePosting
     fi
     
     table! = new DTHtmlTable()
-    table!.setStripe(BBjAPI.FALSE)
+    table!.setStripe(Boolean.FALSE)
     
     table!.addBody("<form id='form1' name='form1' method='post' action='" + #getUrl("postScorecard") + "'>")
     table!.addBody("<div class='container'>")
@@ -483,7 +483,7 @@ class public scorePosting
     gr08$ = #gr08$
     
     table! = new DTHtmlTable()
-    table!.setStripe(BBjAPI.FALSE)
+    table!.setStripe(Boolean.FALSE)
     
     table!.addCell("Match Results", "cs13")
     table!.addRow(" class='top'")
