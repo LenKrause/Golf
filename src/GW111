@@ -1,4 +1,4 @@
-REM "GW111 - 11/19/20 Tee Time Manager Menu"
+REM "GW111 - 09/24/24 Tee Time Manager Menu"
 
 use ::scorePosting.bbj::scorePosting
 use ::ttm.bbj::ttm
@@ -49,7 +49,7 @@ fi
 dim gr09a$:fattr(gr09$)
 dim rec09$:fattr(gr09$)
 CALL "CDS095", GR08, "XXGR08", "YNY", GR08$
-CALL "CDS095", GR10, "XXGR10", "YNY", GR10$, gr10k$
+CALL "CDS095", GR10, "XXGR10", "YPY", GR10$, gr10k$
 call "CDS095", gr11, "XXGR11", "YNY", gr11$
 dsn$ = "/LK/cgi-bin/ttm.cgi?code=" + code$
 
@@ -57,23 +57,25 @@ rem  Process claim spot
 repeat
   declare BBjString claims!
   declare BBjVector claimsV!
+  dim claim$:"ttid:n(5*=45),seq:n(1*=45),id:c(4*=45)"
   claims! = field(cgi$,"claim", err=*break)
   claimsV! = DT.split(claims!, $01$)
   if claimsV!.size() then
     for claim = 0 to claimsV!.size() - 1
-      claim$ = cast(BBjString, claimsV!.get(claim))
-      z = pos("-" = claim$)
-      if z = 0 continue
-      gr10.ttid = num(claim$(1, z - 1), err=*continue)
-      seq = num(claim$(z + 1), err=*continue)
+      claim$ = cast(BBjString, claimsV!.get(claim)) + "-" + gr09.id$ + "-"
+      z = pos("-" = claim$, 1, 0)
+      if z < 3 continue
+      gr10.ttid = claim.ttid
+      seq = claim.seq
       if seq < 1 or seq > 4 or fpt(seq) continue
       extract record (gr10, knum=0, key=gr10.ttid$, err=*continue)gr10$
       if pos(" " <> gr10.id$[seq]) then
         msg$ = msg$ + "The tee time on " + fndatetime$(gr10$) + "<br>has already been claimed<br>"
       else
-        gr10.id$[seq] = gr09.id$
+        gr10.id$[seq] = claim.id$
+        gr10.by$[seq] = gr09.id$
         write record (gr10)gr10$
-        msg$ = msg$ + "You are now scheduled to play<br>on " + fndatetime$(gr10$) + "<br>"
+        if claim.id$ = gr09.id$ then msg$ = msg$ + "You are now scheduled to play<br>on " + fndatetime$(gr10$) + "<br>"
       fi
     next claim
   fi
@@ -100,8 +102,10 @@ repeat
         for i = seq to 4
           if i = 4 then
             gr10.id$[i] = ""
+            gr10.by$[i] = ""
           else
             gr10.id$[i] = gr10.id$[i + 1]
+            gr10.by$[i] = gr10.by$[i + 1]
           fi
         next i
         write record (gr10)gr10$
@@ -303,7 +307,7 @@ repeat
       print (y6.ch)"-" + cvs(gr09.firstname$, 2)
       call "CDS094", y6$, "E"
       emc = emc + 1
-      wait 2; rem  Helps prevent gmail service delay (temporary failure)
+      wait .1; rem  Helps prevent gmail service delay (temporary failure)
     next em
     msg$ = str(emc) + " emails sent"
   fi
@@ -451,6 +455,8 @@ repeat
   fi
   if ldate <> gr10.date then
     ldate = gr10.date
+    leagueDate = 0
+    if gr10.aid$ = "lk01" then call "SW001", "LKGR03", 0, "SAW" + gr10.date$, gr03$, sw001$; if sw001.onfile and gr03.half then leagueDate = 1
     playing = 0
     gids$ = ""
     gr10a = unt
@@ -480,6 +486,7 @@ REM         break
   time_box  = 0
   guest_box = 0
   foursome$ = ""
+  signup = 0
   for i = 1 to 4
     redim gr09a$
     if pos(" " <> gr10.id$[i]) then
@@ -487,40 +494,46 @@ REM         break
       readrecord (gr09, knum=0, key=gr09.aid$ + gr10.id$[i], dom=*next)gr09a$
     fi
     switch 1
-      rem  Cancel my time or my guest
-      case gr10.id$[i] = gr09.id$
+      rem  Cancel my time or my buddy or my guest
+      case pos(" " <> gr10.id$[i]) and ((gr10.id$[i] = gr09.id$) or (gr10.by$[i] = gr09.id$) or (gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)))
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='window.location=""" + dsn$ + "&cancel=" + str(gr10.ttid) + "-" + str(i) + """'>"
-        col2$ = "<span class='head'>" + fnn$(gr09$)
+        col2$ = "<span class='head'>" + fnn$(gr09a$)
         if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         col2$ = col2$ + "</span>"
         break
       rem  Claim my first time - not playing, first available spot in this foursome
-      case gr10.id$[i] = "    " and playing = 0 and time_box = 0 
+      case gr10.id$[i] = "    " and playing = 0 and time_box = 0  
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
         col2$ = "Check this box to play"
         time_box = 1
         break
       rem  Claim my second time - playing earlier, first available spot in this foursome
-      case gr10.id$[i] = "    " and playing = 1 and time_box = 0 and (gr10.time >= mytime + 2 or gr10.time <= mytime - 2)
+      case gr10.id$[i] = "    " and playing = 1 and time_box = 0 and leagueDate and (gr10.time >= mytime + 2 or gr10.time <= mytime - 2)
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
         col2$ = "Check this box to play"
         time_box = 1
         break
-      rem  Claim time for my guest - I'm in this foursome, first available spot in this foursome
-      case gr10.id$[i] = "    " and pos(gr09.id$ = foursome$, 4) and guest_box = 0 
-        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
-        col2$ = "Check for your Guest"
-        guest_box = 1
-        break
+REM       rem  Claim time for my guest - I'm in this foursome, first available spot in this foursome
+REM       case gr10.id$[i] = "    " and pos(gr09.id$ = foursome$, 4) and guest_box = 0 
+REM         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+REM         col2$ = "Check for your Guest"
+REM         guest_box = 1
+REM         break
       rem  Show some other player, or their guest
       case gr10.id$[i] <> "    "
         col1$ = ""
         col2$ = fnn$(gr09a$)
         if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         break
+      rem  Slot is open, choose guest or another player, or show as Available
       case default
-        col1$ = ""
-        col2$ = "Available"
+        if signup = 0 and ((gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)) or pos(gr09.id$ = foursome$, 4)) then
+          signup = 1
+          gosub buddyList
+        else
+          col1$ = ""
+          col2$ = "Available"
+        fi
         break
     swend
     call "CDW000", player_row$, "dr class='playercheck'", col1$
@@ -554,6 +567,26 @@ if gr09.aid$ = gr09.id$ then
 fi
 
 call "CDW000", html$, "t", tab$
+html$ = html$ + scr1$
+return
+
+buddyList:
+  col1$ = ""
+  col2$ = "<select id='buddy" + str(gr10.ttid) + "' onChange='buddySelect(" + str(gr10.ttid) + ")'>" 
+  col2$ = col2$ + "<option value='' selected)>Sign up Buddy or Guest</option>" + $0a$
+  if pos(gr09.id$ = foursome$, 4) then col2$ = fnoptn$(gr09.id$, "Guest")
+  call "SW010", "LKGR10", 1, gr09.aid$ + gr10.date$, "id[1]|id[2]|id[3]|id[4]", playing$
+  call "SW010", "LKGR09", 0, "", "id|firstname|lastname", golfers$, "", "", "rec.aid$ = """ + gr09.aid$ + """ and rec.active$ = ""Y"""
+  for i0 = 1 to len(golfers$) step 34
+    if pos(golfers$(i0,4) = playing$, 4) = 0 then col2$ = fnoptn$(golfers$(i0,4), cvs(golfers$(i0+4, 10), 2) + " " + cvs(golfers$(i0+14,20), 2))
+  next i0   
+  col2$ = col2$ + "</select>"
+  scr1$ = $0a$ + "<script>" + $0a$
+  scr1$ = scr1$ + "function buddySelect(ttid) {" + $0a$
+  scr1$ = scr1$ + "var buddy = document.getElementById('buddy' + ttid).value" + $0a$
+  scr1$ = scr1$ + "window.location='" + dsn$ + "&claim=' + buddy;" + $0a$
+  scr1$ = scr1$ + "}" + $0a$
+  scr1$ = scr1$ + "</script>" + $0a$
 return
 
 EMAIL_SETUP:
@@ -747,6 +780,8 @@ def fnttid$(gr10$)
 fnend
 
 def fnopt$(string$, number, value) = string$ + "<option value='" + str(number) + "'" + iff(number = value, " selected", "") + ">" + str(number:"00") + "</option>"+ $0a$
+
+def fnoptn$(xid$, xname$) = col2$ + "<option value='" + str(gr10.ttid)+"-"+str(i)+"-"+xid$ +"')>" + xname$ + "</option>" + $0a$
 
 PLAYERS_SETUP:
 call "CDW000", row$, "dcs6", "Tee Time Manager"
