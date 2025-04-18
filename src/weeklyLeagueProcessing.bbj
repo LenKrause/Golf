@@ -30,7 +30,7 @@ class public weeklyLeagueProcessing
     call "CDS095", gr03, "XXGR03", "NNY", gr03$
     #gr03tpl$ = fattr(gr03$)
     gr03s = unt
-    select (gr03s)gr03$ b "LKGR03" where gr03.league$ = league$ and gr03.date > jul(0,0,0) and gr03.date <= jul(0,0,0) + 7
+    select (gr03s)gr03$ "LKGR03" where gr03.league$ = league$ and gr03.date > jul(0,0,0) and gr03.date <= jul(0,0,0) + 7
     readrecord (gr03s, end=*next)gr03$
     if gr03.date = 0 then
       rem  check if this is just after the last week of the year
