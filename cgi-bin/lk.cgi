@@ -56,7 +56,7 @@ then
 	echo "Please try again later."
 	echo ""
 	echo "Dynaweb Administration has been notified"
-	echo -e "Unable to service Dynaweb user, probably out of bbx user licenses\n$msg" | mail -s "Can't start Dynaweb - $COMPCODE" root,len@excellware.com
+	echo -e "Unable to service Dynaweb user, probably out of bbx user licenses\n$msg" | mail -s "Can't start Dynaweb - $COMPCODE" root,lenkrause76@gmail.com
 else
 	rm -f $PROCERR
 fi

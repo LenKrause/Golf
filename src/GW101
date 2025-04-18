@@ -23,7 +23,7 @@
 0320 if !(test) then
 :      s084.emailbcc$ = eml$
 :    else
-:      s084.toemail$ = "len@excellware.com"
+:      s084.toemail$ = "lenkrause76@gmail.com"
 :    fi
 0330 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 0340 note$ = cgi.note$

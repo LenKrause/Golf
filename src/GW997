@@ -4,7 +4,7 @@
 0130 s084.mode$ = "E"
 0140 s084.name$ = "MAIL"
 0150 s084.toname$ = "Len Krause"
-0160 s084.toemail$ = "len@excellware.com"
+0160 s084.toemail$ = "lenkrause76@gmail.com"
 0165 s084.fromname$ = "Scores & Charts"
 0170 s084.fromemail$ = "scoresandcharts@gmail.com"
 0180 s084.subject$ = "Test Email"

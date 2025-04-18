@@ -85,7 +85,7 @@ class public weeklyScoreReminder
     s084.fromname$  = "Scores & Charts"
     s084.fromemail$ = "scoresandcharts@gmail.com"
     s084.toname$    = #getPlayerName(gr04$)
-    s084.toemail$   = "len@excellware.com"
+    s084.toemail$   = "lenkrause76@gmail.com"
     s084.emailtype$ = "H"
     call "CDS084", y$, s084.subject$, u0, s084$, y6, y6$
     print (y6.ch)cvs(gr04.firstname$, 2) + "-"
@@ -148,7 +148,7 @@ if fid(0) = "IO" then
   s084.fromname$  = "Scores & Charts"
   s084.fromemail$ = "scoresandcharts@gmail.com"
   s084.toname$    = "Len Krause"
-  s084.toemail$   = "len@excellware.com"
+  s084.toemail$   = "lenkrause76@gmail.com"
   call "CDS084", y$, s084.subject$, u0, s084$, y6, y6$
   print (y6.ch)"Sent " + str(noScore!.size()) + " emails reminding players to enter their scores for play date " + date(playdate:"%Dl %Ml %D")
   if noScore!.size() then

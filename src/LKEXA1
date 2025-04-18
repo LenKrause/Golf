@@ -10,7 +10,7 @@
 0190 outfile$ = y6.fileout$
 0200 call "CDS094", y6$, "e"
 0210 dim s084$:fattr(s084$)
-0220 s084.mode$ = "E", s084.name$ = "MAIL", s084.subject$ = "Test Spreadsheet Attachment", s084.toemail$ = "len@excellware.com"
+0220 s084.mode$ = "E", s084.name$ = "MAIL", s084.subject$ = "Test Spreadsheet Attachment", s084.toemail$ = "lenkrause76@gmail.com"
 0230 call "CDS084", err=eoj, y$, y5$, u0, s084$, y6, y6$
 0240 print (y6.ch)"This email should have an attached spreadsheet"
 0250 call "CDS184", y$, y6$, outfile$

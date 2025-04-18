@@ -54,7 +54,7 @@ then
 	echo "The Tee Time Manager server is not available."
 	echo "Please try again later."
 	echo ""
-	echo -e "Unable to service Tee Time Manager user\n$msg" | mail -s "Can't start Tee Time Manager" root,len@excellware.com
+	echo -e "Unable to service Tee Time Manager user\n$msg" | mail -s "Can't start Tee Time Manager" root,lenkrause76@gmail.com
 else
 	rm -f $PROCERR
 fi

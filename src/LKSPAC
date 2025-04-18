@@ -15,7 +15,7 @@
 5011 call "CDS041", "CDS084", s084$, "YY"
 5012 s084.name$ = "MAIL", s084.fromemail$ = "len""krause@excellware.com"
 5013 s084.subject$ = "Apostrophe test"
-5014 s084.emailcc$ = "len@excellware.com"
+5014 s084.emailcc$ = "lenkrause76@gmail.com"
 5020 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 5030 print (y6.ch)"Email test"
 5040 call "CDS094", y6$, "E"

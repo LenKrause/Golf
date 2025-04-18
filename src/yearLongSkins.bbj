@@ -229,7 +229,8 @@ call "CDS041", "CDS084", s084$, "YP"
 s084.name$ = "MAIL"
 s084.mode$ = "N"
 s084.subject$ = "Test Year Long Skins Game"
-s084.toemail$ = "len@excellware.com"
+s084.fromemail$ = "scoresandcharts@gmail.com"
+s084.toemail$   = "scoresandcharts@gmail.com"
 s084.emailtype$ = "H"
 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 html$ = yearLongSkins!.getHtml()

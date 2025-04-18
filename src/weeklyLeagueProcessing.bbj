@@ -15,8 +15,8 @@ class public weeklyLeagueProcessing
   field private BBjString  aid$ = "lk01"
   
   field private BBjNumber  hour   = 13
-  field private BBjNumber  minute = 30
-  field private BBjNumber  delta  = 10
+  field private BBjNumber  minute = 24
+  field private BBjNumber  delta  = 8
   
   method public weeklyLeagueProcessing(BBjString league$)
     call "SW001", "XXGR01", 0, league$, gr01$, sw001$
@@ -30,7 +30,7 @@ class public weeklyLeagueProcessing
     call "CDS095", gr03, "XXGR03", "NNY", gr03$
     #gr03tpl$ = fattr(gr03$)
     gr03s = unt
-    select (gr03s)gr03$ from "LKGR03" where gr03.league$ = league$ and gr03.date > jul(0,0,0) and gr03.date <= jul(0,0,0) + 7
+    select (gr03s)gr03$ b "LKGR03" where gr03.league$ = league$ and gr03.date > jul(0,0,0) and gr03.date <= jul(0,0,0) + 7
     readrecord (gr03s, end=*next)gr03$
     if gr03.date = 0 then
       rem  check if this is just after the last week of the year
@@ -85,10 +85,10 @@ class public weeklyLeagueProcessing
     rem  Change date below when early tee times are not available
     if day_of_week$ = "Sat" and jul(0,0,0) <> jul(2024, 8, 3) then
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01dr01ks02"); rem  Jim, Mike, Dave (dr01), Mike M (mm02) or Len (lk01)
+      #preset(gr10File!, gr10!, "js01mf01dr01ks02"); rem  Jim, Mike, Dave (dr01), Keith (ks02) or Mike M (mm02) or Len (lk01)
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray (rr01), Dan, Bruce, Mel
+      #preset(gr10File!, gr10!, "rr01dn01mt01lk01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
 
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, "ds01pc01jk01tf02"); rem  Dave, Paul, Jerry, Tom
@@ -109,14 +109,14 @@ class public weeklyLeagueProcessing
         if practice then
           gr10File!.addUniqueRecord(gr10!)
         else
-          #preset(gr10File!, gr10!, "js01mf01dr01lk01"); rem  Jim (js01), Mike (mf01), Dave (dr01), Len (lk01)
+          #preset(gr10File!, gr10!, "js01mf01dr01ks02"); rem  Jim (js01), Mike (mf01), Dave (dr01), Len (lk01)
         fi
         gr10!.setFieldValue("time", #fixTime())
 
         if practice then
           gr10File!.addUniqueRecord(gr10!)
         else
-          #preset(gr10File!, gr10!, "rr01dn01bb01mt01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
+          #preset(gr10File!, gr10!, "rr01dn01mt01lk01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
         fi
       
         gr10!.setFieldValue("time", #fixTime())
@@ -215,7 +215,8 @@ if fid(0) = "IO" then
   s084.mode$      = "N"
   s084.subject$   = "Weekly Golf Processing"
   s084.toname$    = "Len Krause"
-  s084.toemail$   = "len@excellware.com"
+  s084.fromemail$ = "scoresandcharts@gmail.com"
+  s084.toemail$   = "scoresandcharts@gmail.com"
   call "CDS084", y$, "Weekly Golf Processing", u0, s084$, y6, y6$
   print (y6.ch)msg$
   call "CDS094", y6$, "E"

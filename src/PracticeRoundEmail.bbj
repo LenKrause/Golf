@@ -42,10 +42,10 @@ exit
 send:
 s084.TONAME$ = fnn$(gr04$)
 s084.TOEMAIL$ = gr04.EMAIL$
-if testmode THEN s084.TOEMAIL$ = "len@excellware.com"
+if testmode THEN s084.TOEMAIL$ = "lenkrause76@gmail.com"
 call "CDS084", y$, y5$, u0, s084$, y6, y6$
 print (y6.ch)"<p>", cvs(gr04.firstname$, 2), "-</p>"
-print (y6.ch)"<p>Due to the weather and course conditions last week, we'll play a practice round this week, and start match play next week.</p>"
+REM print (y6.ch)"<p>Due to the weather and course conditions last week, we'll play a practice round this week, and start match play next week.</p>"
 print (y6.ch)"<p>If you are planning to play in this week's practice round, then click <a href='" + link$ + "'>here</a> to select your tee time."
 print (y6.ch)"<br>If you are playing 18 holes, then unlike regular season play, only one early tee time is required."
 print (y6.ch)"<br>You do not need to record your score for practice rounds.</p>"
