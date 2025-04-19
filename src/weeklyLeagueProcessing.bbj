@@ -77,11 +77,12 @@ class public weeklyLeagueProcessing
     practice = pos(gr03.half$ = "12") = 0
     day_of_week$ = date(0:"%Ds")
 
-    rem  Early 18 hole rounds
+    rem  Change date below when 18 hole rounds are played early
     if jul(0,0,0) = jul(2024, 9, 11) then
       #hour   = 12
       #minute = 0
     fi
+
     rem  Change date below when early tee times are not available
     if day_of_week$ = "Sat" and jul(0,0,0) <> jul(2024, 8, 3) then
       gr10!.setFieldValue("time", #fixTime())
@@ -96,8 +97,8 @@ class public weeklyLeagueProcessing
       gr10!.setFieldValue("time", #fixTime())
       gr10File!.addUniqueRecord(gr10!)
 
-      gr10!.setFieldValue("time", #fixTime())
-      gr10File!.addUniqueRecord(gr10!)
+REM       gr10!.setFieldValue("time", #fixTime())
+REM       gr10File!.addUniqueRecord(gr10!)
     fi
     
     rem  Late 9 hole rounds
