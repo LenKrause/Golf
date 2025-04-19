@@ -97,8 +97,8 @@ class public weeklyLeagueProcessing
       gr10!.setFieldValue("time", #fixTime())
       gr10File!.addUniqueRecord(gr10!)
 
-REM       gr10!.setFieldValue("time", #fixTime())
-REM       gr10File!.addUniqueRecord(gr10!)
+      gr10!.setFieldValue("time", #fixTime())
+      gr10File!.addUniqueRecord(gr10!)
     fi
     
     rem  Late 9 hole rounds
