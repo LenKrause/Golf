@@ -121,6 +121,7 @@ repeat
   style! = style!.replace("font-size: 15px;", "font-size:10pt;")
   print (y6.ch)"<head>" + style! + "</head>" + $0a$
   print (y6.ch)"<p>" + cvs(gr04.firstname$, 2),"-</p>"
+
   if 0 then note$ = cgi.note$
   if 0 then call "SW002", note$, $e2809d$, """"
   if 0 then call "SW002", note$, $e28099$, "'"
@@ -146,6 +147,8 @@ repeat
       message$ = "Click " + linkmsg$ + " to select your tee time."
 REM     else
 REM       message$ = "<strong>Year End Results</strong><br><br>Although our season has ended, you can click " + linkmsg$ + " to select a tee time for post season play."
+      message$ = message$ + "<br>Note: new for 2025, those playing 18 holes should not make a late tee time for league play,"
+      message$ = message$ + "<br>unless you plan to play in a different foursome for the 2nd nine."
     fi
     print (y6.ch)"<p>" + message$ + "</p>"
   fi 
