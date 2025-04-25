@@ -103,10 +103,12 @@ class public weeklyLeagueProcessing
     
     rem  Late 9 hole rounds
     if day_of_week$ = "Sat" then
-      #hour = 16, #minute = 0, #delta = 8; rem  4:00 pm every 8 minutes, per Jim 6/21/23
+      #hour = 16, #minute = 24, #delta = 8; rem  4:24pm every 8 minutes, per Jim 4/23/25
       bypassLate = jul(0,0,0) = jul(2024,9,7)
       gr10!.setFieldValue("time", #fixTime())
-      if ! bypassLate then
+    
+      rem  Per Jim 4/23/25 no longer schedule late tee time for 18 holers
+      if 0 and ! bypassLate then
         if practice then
           gr10File!.addUniqueRecord(gr10!)
         else
@@ -119,16 +121,16 @@ class public weeklyLeagueProcessing
         else
           #preset(gr10File!, gr10!, "rr01dn01mt01lk01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
         fi
-      
         gr10!.setFieldValue("time", #fixTime())
+
         if practice then
           gr10File!.addUniqueRecord(gr10!)
         else
           #preset(gr10File!, gr10!, "ds01pc01jk01tf02"); rem  Dave, Paul, Jerry, Tom
         fi
+        gr10!.setFieldValue("time", #fixTime())
       fi
       
-      gr10!.setFieldValue("time", #fixTime())
       if practice then
         gr10File!.addUniqueRecord(gr10!)
       else
