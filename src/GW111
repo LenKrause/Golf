@@ -318,7 +318,7 @@ REM IF LEN(FIELD(CGI$, "FIRSTNAME", ERR=*next)) >= 0 GOSUB STORE
 gosub TTM
 
 if len(logmsg$) then
-  log = chan
+  log = unt
   open (log, mode="O_CREATE,O_APPEND")"LK/ttmlog.txt"
   write (log)date(0,TIM:"%Mz/%Dz/%Yz %Hz:%mz:%sz") + " " + logmsg$
   close (log)
