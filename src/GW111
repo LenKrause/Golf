@@ -99,6 +99,7 @@ repeat
       if pos(" " <> gr10.id$[seq]) = 0 then
         msg$ = msg$ + "Your tee time on " + fndatetime$(gr10$) + "<br>has already been cancelled<br>"
       else
+        logmsg$ = logmsg$ + "cancel$=" + cancel$ + ", gr10.ttid=" + str(gr10.ttid) + ", seq=" + str(seq) + ", fndatetime$(gr10$)=" + fndatetime$(gr10$) + $0a$
         for i = seq to 4
           if i = 4 then
             gr10.id$[i] = ""
@@ -315,6 +316,13 @@ until 1
 
 REM IF LEN(FIELD(CGI$, "FIRSTNAME", ERR=*next)) >= 0 GOSUB STORE
 gosub TTM
+
+if len(logmsg$) then
+  log = chan
+  open (log, mode="O_CREATE,O_APPEND")"LK/ttmlog.txt"
+  write (log)date(0,TIM:"%Mz/%Dz/%Yz %Hz:%mz:%sz") + " " + logmsg$
+  close (log)
+fi
 return
 
 STORE:
@@ -495,11 +503,12 @@ REM         break
     fi
     switch 1
       rem  Cancel my time or my buddy or my guest
-      case pos(" " <> gr10.id$[i]) and ((gr10.id$[i] = gr09.id$) or (gr10.by$[i] = gr09.id$) or (gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)))
+      case pos(" " <> gr10.id$[i]) and pos(" " <> gr09a.id$) and ((gr10.id$[i] = gr09.id$) or (gr10.by$[i] = gr09.id$) or (gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)))
         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='window.location=""" + dsn$ + "&cancel=" + str(gr10.ttid) + "-" + str(i) + """'>"
         col2$ = "<span class='head'>" + fnn$(gr09a$)
         if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         col2$ = col2$ + "</span>"
+        logmsg$ = logmsg$ + "gr10.id$[i]=" + gr10.id$[i] + ", gr09a.id$=" + gr09a.id$ + ", gr09.id$=" + gr09.id$ + ", gr10.by$[i]=" + gr10.by$[i] + ", gr09.aid$=" + gr09.aid$ + ", col2$=" + col2$ + $0a$
         break
       rem  Claim my first time - not playing, first available spot in this foursome
       case gr10.id$[i] = "    " and playing = 0 and time_box = 0  
