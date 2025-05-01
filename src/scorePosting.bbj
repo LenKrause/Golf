@@ -139,7 +139,7 @@ class public scorePosting
     aid$ = #aid$; rem  select does not support field variables in where clause
     id$  = #id$
     rem  get league tee time (after 4pm)
-    select (gr10s)gr10$ from "LKGR10" where gr10.aid$ = aid$ and gr10.date = gr05.date and pos(id$ = gr10.id$[1] + gr10.id$[2] + gr10.id$[3] + gr10.id$[4], 4)
+    select (gr10s)gr10$ from "LKGR10" where gr10.aid$ = aid$ and gr10.date = gr05.date and pos(id$ = gr10.id$[1] + gr10.id$[2] + gr10.id$[3] + gr10.id$[4], 4) sortby not(gr10.time$) 
     readrecord (gr10s, end=*next)gr10$
     
     rem  No tee time made
