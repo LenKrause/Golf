@@ -86,7 +86,7 @@ class public weeklyScoreReminder
     s084.fromemail$ = "scoresandcharts@gmail.com"
     s084.toname$    = #getPlayerName(gr04$)
     s084.toemail$   = cvs(gr04.email$, 2)
-    s084.bccemail$  = "lenkrause76@gmail.com"
+    s084.emailbcc$  = "lenkrause76@gmail.com"
     s084.emailtype$ = "H"
     call "CDS084", y$, s084.subject$, u0, s084$, y6, y6$
     print (y6.ch)cvs(gr04.firstname$, 2) + "-"
