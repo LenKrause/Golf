@@ -181,7 +181,7 @@ class public scorePosting
       if pos(" " <> gr10.id$[i]) = 0 then continue; rem  No player
       if i > 1 and pos(gr10.id$[i] = ids$, 4) <> 1 + (4 * (i - 1)) then continue; rem  Skip Guests
       gr04$ = #getGr04(gr10.aid$ + gr10.id$[i])
-      traceInfo$ = stbl("DTTrace", err=*next)
+      traceInfo$ = stbl("DTtrace", err=*next)
       if len(traceInfo$) > 4 then print (num(traceInfo$(1,4), err=*next))"len(gr04$)=" + str(len(gr04$)) + " " + gr10.aid$ + " " + gr10.id$[i]
       call "SW001", "LKGR05", 0, "SAW" + gr04.id$ + gr10.date$, gr05$, sw001$
       if ! sw001.onfile then continue
