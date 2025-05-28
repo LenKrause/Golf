@@ -638,7 +638,7 @@ classend
 
 rem  Program is run from GW010
 declare scorePosting score!
-
+DT.traceOn()
 switch cgi.mode$
   case "getRecentMatches"
     score! = new scorePosting(cgi.code$)
