@@ -121,7 +121,7 @@ class public teeSheet
     s084.name$      = "MAIL"
     s084.emailtype$ = "H"
     s084.subject$   = "Tee Sheet"
-    if jul(0,0,0) = jul(2024,9,10) then s084.subject$   = "CORRECTED TEE TIMES"
+    if jul(0,0,0) = jul(2025,7,15) then s084.subject$   = "REVISED TEE TIMES"
     s084.emailbcc$  = "lenkrause76@gmail.com"
     s084.fromemail$ = "scoresandcharts@gmail.com"
 
@@ -174,7 +174,7 @@ begin
 y$ = "LK"
 y5$ = "Tee Sheet"
 call "CDS011", y$, y5$
-call "CDS069",0,0,0,0,"+date+","J",jdate,jdate$
+call "CDS069",0,0,0,0,"+play date+","J",jdate,jdate$
 if ctl=4 run "CDS001"
 call "CDS069",1,1,0,0,"Send Emails (Y/N)+", "ANY", 0, email$
 if ctl=4 run "CDS001"
