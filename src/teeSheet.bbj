@@ -136,8 +136,8 @@ class public teeSheet
     fi
     
     call "CDS084", y$, y5$, u0, s084$, y6, y6$    
-    if jul(0,0,0) = jul(2021,8,17) then
-      print (y6.ch)"<p>Note: Tee times have been revised.</p><p>Cookout after golf tonight!</p>"
+    if jul(0,0,0) = jul(2025,7,15) then
+      print (y6.ch)"<p>Note: No early tee times this week.  Tee times have been revised.</p>"
     fi
     print (y6.ch)#html$
     rem if #courseId$ = "PH " then print (y6.ch)"<br><center>Please phone the course at " + #coursePhone$ + " to prepay by credit card.</center><br>"
