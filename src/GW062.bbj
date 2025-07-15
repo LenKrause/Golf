@@ -138,6 +138,9 @@ repeat
     note$ = note$ + "<p>18 hole rounds start at noon.<br>Just make the turn after playing 9 holes.<br>Do not schedule a late tee time.</p>"
     note$ = note$ + "<p>9 hole players need to schedule a tee time between 4:00 and 4:30 pm this week.</p>"
   fi
+  if jul(0,0,0) = jul(2025,6,21)  then
+    note$ = "<p>Cookout after golf this week!</p>"
+  fi
   if len(note$) then print (y6.ch)note$
   if 0 then call "CDS257", y$, league$ + "e", "", "XXGR02", "W", 0, 0, 0, 0, "", "", "", "", cgi.note$
   link$ = ttm.getLink(gr04.EMAIL$)
