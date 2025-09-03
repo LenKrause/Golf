@@ -122,6 +122,7 @@ repeat
   print (y6.ch)"<head>" + style! + "</head>" + $0a$
   print (y6.ch)"<p>" + cvs(gr04.firstname$, 2),"-</p>"
 
+  note$ = ""
   if 0 then note$ = cgi.note$
   if 0 then call "SW002", note$, $e2809d$, """"
   if 0 then call "SW002", note$, $e28099$, "'"
