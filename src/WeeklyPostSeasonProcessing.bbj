@@ -109,5 +109,5 @@ classend
 
 declare WeeklyPostSeasonProcessing wpsp!
 wpsp! = new WeeklyPostSeasonProcessing("lk01")
-if wpsp!.getErrMsg().isEmpty() then wpsp!.sendEmails()
-call "CDS081", y$, -1
+if wpsp!.getErrMsg().isEmpty() then print wpsp!.sendEmails() + " emails sent"
+if fid(0) = "IO" then call "CDS081", y$, -1
