@@ -205,7 +205,7 @@ tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
 if pos(str(gr03!.getFieldAsNumber("half")) = "12") then
   rem  Build Handicap Listing and skin posting sheet pdf for playdate
   if playdate then call "GW045", y$, league$, playdate, hcListPdf$, skinPdf$
-  rem  Email each player with a match
+  rem  Email each player with a match, or send year-end point ranking
   call "GW062.bbj", y$, league$, playdate, hcListPdf$, skinPdf$, msg$
 else
   rem  Email each player who has either played recently or is set to play this year
