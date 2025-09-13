@@ -109,5 +109,19 @@ classend
 
 declare WeeklyPostSeasonProcessing wpsp!
 wpsp! = new WeeklyPostSeasonProcessing("lk01")
-if wpsp!.getErrMsg().isEmpty() then print wpsp!.sendEmails() + " emails sent"
+call "CDS041", "CDS084", s084$, "YP"
+s084.mode$ = "N"
+s084.name$ = "MAIL"
+s084.subject$ = "Weekly Post Season Processing"
+tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
+s084.fromname$  = "Len Krause"
+s084.fromemail$ = "scoresandcharts@gmail.com"
+s084.toemail$   = "lenkrause76@gmail.com"
+call "CDS084", y$, y5$, u0, s084$, y6, y6$
+if ! wpsp!.getErrMsg().isEmpty() then
+  print (y6.ch)wpsp!.getErrMsg()
+else
+  print (y6.ch)wpsp!.sendEmails(), " emails sent"
+fi
+call "CDS094", y6$, "E"
 if fid(0) = "IO" then call "CDS081", y$, -1
