@@ -37,15 +37,15 @@ class public WeeklyPostSeasonProcessing
     gr10$ = gr10Recs!.get(0).toString()
     #playDate% = gr10.date%
 
-    call "SW001", "LKGR08", 0, #gr10.gr08id$, gr08$, sw001$
+    call "SW001", "LKGR08", 0, gr10.gr08id$, gr08$, sw001$
     if ! sw001.onfile then
-      #errMsg$ = "Course " + #gr10.gr08id$ + " is not on file"
+      #errMsg$ = "Course " + gr10.gr08id$ + " is not on file"
       methodret
     fi
     #gr08$ = gr08$
     #gr08Tpl$ = fattr(gr08$)
     gr09File! = new DTFileRecords("LKGR09")
-    where$ = "rec.aid$ = " + DT.quote(aid$) + and rec.active$ = DT.quote("Y")
+    where$ = "rec.aid$ = " + DT.quote(aid$) + " and rec.active$ = DT.quote("Y")
     gr09File!.setWhere(where$)
     #gr09Recs! = gr09File!.getAllRecords()
     #gr09File!.close()
@@ -88,16 +88,16 @@ class public WeeklyPostSeasonProcessing
       call "CDS084", y$, y5$, u0, s084$, y6, y6$
       print (y6.ch)"<style>body{color:green;}</style>"
       print (y6.ch)"<body>"
-      print (y6.ch)cvs(gr09a.firstname$, 2) + "-<br><br>"
+      print (y6.ch)cvs(gr09.firstname$, 2) + "-<br><br>"
     REM   call "SW002", note$, $0a$, "<br>"
     REM   print (y6.ch)note$, "<br><br>"
-      print (y6.ch)"Tee Times have been made at <a href='" + cvs(gr08.url$, 2) + "'>" + cvs(gr08.name$) + "</a> for " + playDate$ + ".<br>"
+      print (y6.ch)"Tee Times have been made at <a href='" + cvs(gr08.url$, 2) + "'>" + cvs(gr08.name$, 2) + "</a> for " + playDate$ + ".<br>"
       link$ = "http://www.scoresandcharts.com/LK/cgi-bin/ttm.cgi?code=" + hta(gr09.aid$ + gr09.id$ + hsh(gr09.aid$ + gr09.id$))
       print (y6.ch)"Click <a href='" + link$ + "'>here</a> to sign up<br><br>"
       print (y6.ch)"<a href='https://www.google.com/maps/search/?api=1&query=" + DT.urlEncode(cvs(gr08.address$, 2) + " " + cvs(gr08.city$, 2) + " " + gr08.state$ + " " + cvs(gr08.zip$, 2)) + "'>Map</a><br><br>"
       print (y6.ch)"-Len"
       call "CDS094", y6$, "E"
-      emc$ = emc$ + 1
+      emc% = emc% + 1
       wait .1; rem  Helps prevent gmail service delay (temporary failure)
     next i
     methodret emc%
