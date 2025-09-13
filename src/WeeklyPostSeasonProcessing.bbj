@@ -17,7 +17,7 @@ class public WeeklyPostSeasonProcessing
     declare DTFileRecords gr10File!; rem  Tee Times
     declare BBjVector     gr10Recs!
     gr10File! = new DTFileRecords("LKGR10")
-    if ! gr10File!.isEmpty() then
+    if ! gr10File!.getErrMsg().isEmpty() then
       #errMsg$ = gr10File!.getErrMsg()
       methodret
     fi
