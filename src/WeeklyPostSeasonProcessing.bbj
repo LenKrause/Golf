@@ -58,11 +58,11 @@ class public WeeklyPostSeasonProcessing
     #gr09Tpl$ = gr09File!.getTemplate()
   methodend
 
-  method private BBjString getErrMsg()
+  method public BBjString getErrMsg()
     methodret #errMsg$
   methodend
 
-  method private BBjInt sendEmails()
+  method public BBjInt sendEmails()
     repeat
     dim gr08$:#gr08Tpl$
     gr08$ = #gr08$; rem  course
