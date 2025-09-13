@@ -44,11 +44,13 @@ class public WeeklyPostSeasonProcessing
     fi
     #gr08$ = gr08$
     #gr08Tpl$ = fattr(gr08$)
+    
+    rem  Get active players
     gr09File! = new DTFileRecords("LKGR09")
     where$ = "rec.aid$ = " + DT.quote(aid$) + " and rec.active$ = " + DT.quote("Y")
     gr09File!.setWhere(where$)
     #gr09Recs! = gr09File!.getAllRecords()
-    #gr09File!.close()
+    gr09File!.close()
     if #gr09Recs! = 0 then
       #errMsg$ = "No active players meet condition: " + where$
       methodret
