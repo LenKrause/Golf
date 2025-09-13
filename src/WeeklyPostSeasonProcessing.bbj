@@ -51,7 +51,7 @@ class public WeeklyPostSeasonProcessing
     gr09File!.setWhere(where$)
     #gr09Recs! = gr09File!.getAllRecords()
     gr09File!.close()
-    if #gr09Recs! = 0 then
+    if #gr09Recs!.size() = 0 then
       #errMsg$ = "No active players meet condition: " + where$
       methodret
     fi
