@@ -96,7 +96,7 @@ REM       s084.emailbcc$ = s084.fromemail$
 classend
 
 test:
-print ttm.getLink("ls01","ls01")
+print ttm.getLink("lk02","lk02")
 escape
 
 sendall:
