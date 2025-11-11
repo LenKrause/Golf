@@ -320,7 +320,7 @@ gosub TTM
 if len(logmsg$) then
   log = unt
   open (log, mode="O_CREATE,O_APPEND")"LK/ttmlog.txt"
-  write (log)date(0,TIM:"%Mz/%Dz/%Yz %Hz:%mz:%sz") + " " + logmsg$
+  write (log)date(0,TIM:"%Mz/%Dz/%Yz %Hz:%mz:%sz") + " " + msg$ + " by " + ttm.getName(gr09$)
   close (log)
 fi
 return

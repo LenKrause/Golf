@@ -93,6 +93,11 @@ REM       s084.emailbcc$ = s084.fromemail$
       fi
       methodret id$
     methodend
+
+    method public static BBjString getName(BBjString gr09$)
+      methodret cvs(gr09.firstname$, 2) + " " + cvs(gr09.lastname$, 2)
+    methodend
+
 classend
 
 test:
