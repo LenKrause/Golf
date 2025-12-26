@@ -37,6 +37,9 @@ fi
 IF LEN(MSG$) HTML$ = "<p class='msg'>" + MSG$ + "</p>" + HTML$
 HTML$ = "<center>"  + HTML$ + "</center>" + $0a$
 
+goto finish
+
+finish:
 rem  Build script for redirection that includes timestamp to prevent re-execution
 script$ = "<script>" + $0a$
 script$ = script$ + "const BASE_URL = '" + dsn$ + "';" + $0a$
@@ -639,7 +642,7 @@ call "CDW000", row$, "dcs2", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
 html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
-goto EOJ
+goto finish
 
 TT_SETUP:
 REM def fnh$(txt$) = head$ + txt$ + $0a$
@@ -783,7 +786,7 @@ call "CDW000", row$, "dcs5", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
 html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
-goto EOJ
+goto finish
 
 def fndate$(gr10$, af$)
   date$ = ""
@@ -865,7 +868,7 @@ call "CDW000", tab$, "r", row$
 
 call "CDW000", html$, "t", tab$
 html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
-run "CDW999"
+goto finish
 
 COURSES_SETUP:
 call "CDW000", row$, "dcs3", "Tee Time Manager"
@@ -895,7 +898,7 @@ call "CDW000", row$, "dcs3", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
 html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
-goto EOJ
+goto finish
 
 INIT:
 Y.COMPNAME$ = "ScoresAndCharts.com"
@@ -925,7 +928,3 @@ DT_ERR:
 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
 RETRY
-
-EOJ:
-RUN "CDW999"
-
