@@ -44,7 +44,7 @@ rem  Build script for redirection that includes timestamp to prevent re-executio
 script$ = "<script>" + $0a$
 script$ = script$ + "const BASE_URL = '" + dsn$ + "';" + $0a$
 script$ = script$ + "function redirect(extraArg) {" + $0a$
-script$ = script$ + "    if (extraArg.length > 0) { extraArg = "&" + extraArg;" + $0a$
+script$ = script$ + "    if (extraArg.length > 0) { extraArg = ""&"" + extraArg;" + $0a$
 script$ = script$ + "    const url = `${BASE_URL}&ts=${Date.now()}${extraArg}`;" + $0a$
 script$ = script$ + "    window.location = url;" + $0a$
 script$ = script$ + "}" + $0a$
