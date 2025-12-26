@@ -348,6 +348,7 @@ WRITE RECORD(GR04)GR04$
 MSG$ = ALLMSG$, ALLMSG$ = ""
 RETURN
 
+rem  not currently implemented
 INFOFORM:
 HTML$ = HTML$ + "<br><form>"
 GOSUB TOPROW
@@ -370,7 +371,7 @@ if wases.league$ <> "TTM" then
   CALL "CDW000", ROW$, "d", "<input type='radio' name='" + FLD$ + "' value='Y'" + YES$ + ">Yes<br><input type='radio' name='" + FLD$ + "' value='N'" + NO$ + ">No"
   CALL "CDW000", TAB$, "r", ROW$
 fi
-CALL "CDW000", ROW$, "dcs3", "<input type='submit' value='Save Changes' onclick='window.location=""[DSN]?p=GW011""'> <input type='button' value='Cancel & Logout' onclick='window.location=""[DSN]?p=GW999""'>"
+CALL "CDW000", ROW$, "dcs3", "<input type='submit' value='Save Changes' onclick='redirect(""p=GW011"")'> <input type='button' value='Cancel & Logout' onclick='redirect(""p=GW999"")'>"
 CALL "CDW000", TAB$, "r class='foot'", ROW$
 CALL "CDW000", HTML$, "tc", TAB$
 HTML$ = HTML$ + "</form>"
@@ -516,7 +517,7 @@ REM         break
     switch 1
       rem  Cancel my time or my buddy or my guest
       case pos(" " <> gr10.id$[i]) and pos(" " <> gr09a.id$) and ((gr10.id$[i] = gr09.id$) or (gr10.by$[i] = gr09.id$) or (gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)))
-        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='window.location=""" + dsn$ + "&cancel=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='redirect(""cancel=" + str(gr10.ttid) + "-" + str(i) + """)'>"
         col2$ = "<span class='head'>" + fnn$(gr09a$)
         if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         col2$ = col2$ + "</span>"
@@ -524,19 +525,19 @@ REM         break
         break
       rem  Claim my first time - not playing, first available spot in this foursome
       case gr10.id$[i] = "    " and playing = 0 and time_box = 0  
-        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='redirect(""claim=" + str(gr10.ttid) + "-" + str(i) + """)'>"
         col2$ = "Check this box to play"
         time_box = 1
         break
       rem  Claim my second time - playing earlier, first available spot in this foursome
       case gr10.id$[i] = "    " and playing = 1 and time_box = 0 and leagueDate and (gr10.time >= mytime + 2 or gr10.time <= mytime - 2)
-        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='redirect(""claim=" + str(gr10.ttid) + "-" + str(i) + """)'>"
         col2$ = "Check this box to play"
         time_box = 1
         break
 REM       rem  Claim time for my guest - Im in this foursome, first available spot in this foursome
 REM       case gr10.id$[i] = "    " and pos(gr09.id$ = foursome$, 4) and guest_box = 0 
-REM         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+REM         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='redirect(""claim=" + str(gr10.ttid) + "-" + str(i) + """)'>"
 REM         col2$ = "Check for your Guest"
 REM         guest_box = 1
 REM         break
@@ -605,7 +606,7 @@ buddyList:
   scr1$ = $0a$ + "<script>" + $0a$
   scr1$ = scr1$ + "function buddySelect(ttid) {" + $0a$
   scr1$ = scr1$ + "var buddy = document.getElementById('buddy' + ttid).value" + $0a$
-  scr1$ = scr1$ + "window.location='" + dsn$ + "&claim=' + buddy;" + $0a$
+  scr1$ = scr1$ + "redirect(""claim="" + buddy);" + $0a$
   scr1$ = scr1$ + "}" + $0a$
   scr1$ = scr1$ + "</script>" + $0a$
 return
@@ -633,7 +634,7 @@ until 0
 call "CDW000", row$, "ds2", "<textarea name='note' rows='4' cols='50'>Tee Times have been made.</textarea>"
 call "CDW000", tab$, "r", row$
 btn1$ = "<button type='submit' onclick='submit();'>Send Emails</button>"
-btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs2", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
@@ -777,7 +778,7 @@ call "CDW000", row$, "dc", "<input type='checkbox' name='cancel_0' value='y'>"
 call "CDW000", tab$, "r", row$
 
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
-btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs5", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
@@ -858,7 +859,7 @@ for i = 1 to 5
 next i
 
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
-btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs6", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 
@@ -889,7 +890,7 @@ repeat
   call "CDW000", tab$, "r", row$
 until 0
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
-btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs3", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
