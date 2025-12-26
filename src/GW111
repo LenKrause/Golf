@@ -574,16 +574,16 @@ fi
 
 rem  Button to edit and switch users for admin and Jim
 if (gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)) then
-  call "CDW000", row$, "dc", "<a class='dw_link' href='redirect(""&f=players"")'>My Golf Buddies</a>"
+  call "CDW000", row$, "dc", "<a class='dw_link' onclick='redirect(""&f=players"")'>My Golf Buddies</a>"
   call "CDW000", tab$, "r", row$
 fi
 
 if gr09.aid$ = gr09.id$ then
-  call "CDW000", row$, "dc", "<a class='dw_link' href='redirect(""&f=teetime"")'>Setup Tee Times</a>"
+  call "CDW000", row$, "dc", "<a class='dw_link' onclick='redirect(""&f=teetime"")'>Setup Tee Times</a>"
   call "CDW000", tab$, "r", row$
-  call "CDW000", row$, "dc", "<a class='dw_link' href='redirect(""&f=emailSetup"")'>Send Emails</a>"
+  call "CDW000", row$, "dc", "<a class='dw_link' onclick='redirect(""&f=emailSetup"")'>Send Emails</a>"
   call "CDW000", tab$, "r", row$
-  call "CDW000", row$, "dc", "<a class='dw_link' href='redirect(""&f=coursesSetup"")'>My Courses</a>"
+  call "CDW000", row$, "dc", "<a class='dw_link' onclick='redirect(""&f=coursesSetup"")'>My Courses</a>"
   call "CDW000", tab$, "r", row$
 fi
 
