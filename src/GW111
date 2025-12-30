@@ -53,6 +53,17 @@ script$ = script$ + "    if (extraArg.length > 0) { extraArg = ""&"" + extraArg;
 script$ = script$ + "    const url = `${BASE_URL}&ts=${Date.now()}${extraArg}`;" + $0a$
 script$ = script$ + "    window.location = url;" + $0a$
 script$ = script$ + "}" + $0a$
+rem  Build script for form submission that includes timestamp to prevent re-execution
+script$ = script$ + "const myForm = document.getElementById('myForm');" + $0a$
+script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
+script$ = script$ + "  event.preventDefault();" + $0a$
+script$ = script$ + "  const formData = new FormData(myForm);" + $0a$
+script$ = script$ + "  const url = `${BASE_URL}&ts=${Date.now()}`;" + $0a$
+script$ = script$ + "  fetch(url, {" + $0a$
+script$ = script$ + "    method: 'POST'," + $0a$
+script$ = script$ + "    body: formData" + $0a$
+script$ = script$ + "  })" + $0a$
+script$ = script$ + "});" + $0a$
 script$ = script$ + "</script>" + $0a$
 
 html$ = html$ + script$
@@ -647,7 +658,7 @@ btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs2", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
-html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
 goto finish
 
 TT_SETUP:
@@ -791,7 +802,7 @@ btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs5", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
-html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
 goto finish
 
 def fndate$(gr10$, af$)
@@ -873,7 +884,7 @@ call "CDW000", row$, "dcs6", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 
 call "CDW000", html$, "t", tab$
-html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
 goto finish
 
 COURSES_SETUP:
@@ -903,7 +914,8 @@ btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs3", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
-html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+rem html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
+html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
 goto finish
 
 INIT:
