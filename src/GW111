@@ -1,5 +1,5 @@
 REM "GW111 - 09/24/24 Tee Time Manager Menu"
-
+DT.traceOn()
 use ::scorePosting.bbj::scorePosting
 use ::ttm.bbj::ttm
 
