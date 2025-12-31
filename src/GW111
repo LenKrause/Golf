@@ -1,4 +1,4 @@
-REM "GW111 - 09/24/24 Tee Time Manager Menu"
+REM "GW111 - 12/31/25 Tee Time Manager Menu"
 
 use ::scorePosting.bbj::scorePosting
 use ::ttm.bbj::ttm
@@ -53,19 +53,10 @@ script$ = script$ + "    if (extraArg.length > 0) { extraArg = ""&"" + extraArg;
 script$ = script$ + "    const url = `${BASE_URL}&ts=${Date.now()}${extraArg}`;" + $0a$
 script$ = script$ + "    window.location = url;" + $0a$
 script$ = script$ + "}" + $0a$
-rem  Build script for form submission that includes timestamp at the time submitted to prevent re-execution
+rem  Set timestamp in hidden input upon form submission to prevent re-execution
 script$ = script$ + "const myForm = document.getElementById('myForm');" + $0a$
 script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
 script$ = script$ + "document.getElementsByName('ts')[0].value = `${Date.now()}`;" + $0a$
-rem script$ = script$ + "  event.preventDefault();" + $0a$
-rem script$ = script$ + "  const formData = new FormData(myForm);" + $0a$
-rem script$ = script$ + "  const url = `${BASE_URL}&ts=${Date.now()}`;" + $0a$
-rem script$ = script$ + "  alert('url=' + url)" + $0a$
-rem script$ = script$ + "  alert('formData=' + formData)" + $0a$
-rem script$ = script$ + "  fetch(url, {" + $0a$
-rem script$ = script$ + "    method: 'POST'," + $0a$
-rem script$ = script$ + "    body: formData" + $0a$
-rem script$ = script$ + "  })" + $0a$
 script$ = script$ + "});" + $0a$
 script$ = script$ + "</script>" + $0a$
 
@@ -666,22 +657,6 @@ html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
 goto finish
 
 TT_SETUP:
-REM def fnh$(txt$) = head$ + txt$ + $0a$
-REM head$ = "", head$ = stbl("$otherhead", err=*next)
-REM head$ = fnh$("<link rel='stylesheet' href='/LK/css/jquery.timeentry.css'>")
-REM head$ = fnh$("<style>")
-REM head$ = fnh$("body > iframe { display: none;}")
-REM head$ = fnh$("input:focus, select:focus, input[type='checkbox']:focus, button:focus {background-color: #F0E68C;}")
-REM head$ = fnh$("</style>")
-REM head$ = fnh$("<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'></script>")
-REM head$ = fnh$("<script src='/LK/js/jquery.plugin.js'></script>")
-REM head$ = fnh$("<script src='/LK/js/jquery.timeentry.js'></script>")
-REM head$ = fnh$("<script>")
-REM head$ = fnh$("$(function () {")
-REM head$ = fnh$("  $(""[name='timeEntry']"").timeEntry({ampmPrefix: ' ', noSeparatorEntry: true, spinnerImage: ''});")
-REM head$ = fnh$("});")
-REM head$ = fnh$("</script>")
-REM head$ = stbl("$otherhead", head$)
 
 call "CDW000", row$, "dcs5", "Tee Time Manager"
 call "CDW000", tab$, "r class='top'", row$
@@ -755,15 +730,17 @@ redim gr10$
 if ldate then
   gr10.date = ldate
   interval = 0
-  if len(lcourse$) then
-    if gr08.id$ = lcourse$ then
-      interval = gr08.interval
-    else
-      readrecord (gr08, knum=0, key=lcourse$, dom=*endif)gr08$
-      interval = gr08.interval
+  if gr09.aid$ <> "lk02" then
+    if len(lcourse$) then
+      if gr08.id$ = lcourse$ then
+        interval = gr08.interval
+      else
+        readrecord (gr08, knum=0, key=lcourse$, dom=*endif)gr08$
+        interval = gr08.interval
+      fi
     fi
+    if interval = 0 then interval = 10 
   fi
-  if interval = 0 then interval = 10 
   if hour then minute = minute + interval
   if minute >= 60 then hour = hour + 1, minute = minute - 60
 else
@@ -798,7 +775,7 @@ call "CDW069", w069$, course$
 
 call "CDW000", row$, "d", course$
 call "CDW000", row$, "d", ""
-call "CDW000", row$, "dc", "<input type='checkbox' name='cancel_0' value='y'>"
+call "CDW000", row$, "dc", "<input type='checkbox' name='cancel_0' checked value='y'>"
 call "CDW000", tab$, "r", row$
 
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
