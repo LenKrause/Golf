@@ -59,6 +59,8 @@ script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
 script$ = script$ + "  event.preventDefault();" + $0a$
 script$ = script$ + "  const formData = new FormData(myForm);" + $0a$
 script$ = script$ + "  const url = `${BASE_URL}&ts=${Date.now()}`;" + $0a$
+script$ = script$ + "  alert("url=" + url)" + $0a$
+script$ = script$ + "  alert("formData=" + formData)" + $0a$
 script$ = script$ + "  fetch(url, {" + $0a$
 script$ = script$ + "    method: 'POST'," + $0a$
 script$ = script$ + "    body: formData" + $0a$
@@ -467,13 +469,13 @@ if gr09.aid$ = "lk01" then
   declare scorePosting score!
   score! = new scorePosting(code$)
   if len(score!.getRecentMatches()) then
-    call "CDW000", row$, "dc", "<a href='" + dsn$ + "&p=scorePosting.bbj&mode=getRecentMatches'>Recent Rounds</a>"
+    call "CDW000", row$, "dc", "<a onclick='redirect(""&p=scorePosting.bbj&mode=getRecentMatches"")'>Recent Rounds</a>"
     call "CDW000", tab$, "r", row$
   fi
   if pos(" " <> gr09.email$) then
     id$ = ttm.getGr04Key(gr09.email$, "SAW")
     if len(id$) then
-      call "CDW000", row$, "dc", "<a href='" + dsn$ + "&p=scorePosting.bbj&mode=showCharts&id=" + id$ + "'>Charts</a>"
+      call "CDW000", row$, "dc", "<a onclick='redirect(""&p=scorePosting.bbj&mode=showCharts&id=" + id$ + """)'>Charts</a>"
       call "CDW000", tab$, "r", row$
     fi
   fi
@@ -914,7 +916,6 @@ btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs3", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
-rem html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
 html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
 goto finish
 
