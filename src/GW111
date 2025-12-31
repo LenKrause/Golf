@@ -59,8 +59,8 @@ script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
 script$ = script$ + "  event.preventDefault();" + $0a$
 script$ = script$ + "  const formData = new FormData(myForm);" + $0a$
 script$ = script$ + "  const url = `${BASE_URL}&ts=${Date.now()}`;" + $0a$
-script$ = script$ + "  alert("url=" + url)" + $0a$
-script$ = script$ + "  alert("formData=" + formData)" + $0a$
+script$ = script$ + "  alert('url=' + url)" + $0a$
+script$ = script$ + "  alert('formData=' + formData)" + $0a$
 script$ = script$ + "  fetch(url, {" + $0a$
 script$ = script$ + "    method: 'POST'," + $0a$
 script$ = script$ + "    body: formData" + $0a$
