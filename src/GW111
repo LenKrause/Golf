@@ -48,15 +48,15 @@ finish:
 rem  Build script for redirection that includes timestamp to prevent re-execution
 script$ = "<script>" + $0a$
 script$ = script$ + "const BASE_URL = '" + dsn$ + "';" + $0a$
-script$ = script$ + "document.getElementsByName('ts')[0].value = `${Date.now()}`;" + $0a$
 script$ = script$ + "function redirect(extraArg) {" + $0a$
 script$ = script$ + "    if (extraArg.length > 0) { extraArg = ""&"" + extraArg;}" + $0a$
 script$ = script$ + "    const url = `${BASE_URL}&ts=${Date.now()}${extraArg}`;" + $0a$
 script$ = script$ + "    window.location = url;" + $0a$
 script$ = script$ + "}" + $0a$
-rem  Build script for form submission that includes timestamp to prevent re-execution
-rem script$ = script$ + "const myForm = document.getElementById('myForm');" + $0a$
-rem script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
+rem  Build script for form submission that includes timestamp at the time submitted to prevent re-execution
+script$ = script$ + "const myForm = document.getElementById('myForm');" + $0a$
+script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
+script$ = script$ + "document.getElementsByName('ts')[0].value = `${Date.now()}`;" + $0a$
 rem script$ = script$ + "  event.preventDefault();" + $0a$
 rem script$ = script$ + "  const formData = new FormData(myForm);" + $0a$
 rem script$ = script$ + "  const url = `${BASE_URL}&ts=${Date.now()}`;" + $0a$
@@ -66,8 +66,7 @@ rem script$ = script$ + "  fetch(url, {" + $0a$
 rem script$ = script$ + "    method: 'POST'," + $0a$
 rem script$ = script$ + "    body: formData" + $0a$
 rem script$ = script$ + "  })" + $0a$
-rem script$ = script$ + "});" + $0a$
-
+script$ = script$ + "});" + $0a$
 script$ = script$ + "</script>" + $0a$
 
 html$ = html$ + script$
