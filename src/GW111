@@ -1,4 +1,4 @@
-REM "GW111 - 09/24/24 Tee Time Manager Menu"
+REM "GW111 - 12/31/25 Tee Time Manager Menu"
 
 use ::scorePosting.bbj::scorePosting
 use ::ttm.bbj::ttm
@@ -28,6 +28,11 @@ repeat
   code = 0
 until 1
 
+rem  Prevent re-execution of prior submission
+ts$ = field(cgi$, "ts", err=*next)
+if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
+if elapsedSecs > 3 or len(ts$) = 0 then dim cgi$:"empty:c(1*)"
+
 if code then
   msg$ = "Unauthorized, code=" + str(code)
 else
@@ -35,7 +40,28 @@ else
 fi
 
 IF LEN(MSG$) HTML$ = "<p class='msg'>" + MSG$ + "</p>" + HTML$
-HTML$ = "<center>"  + HTML$ + "</center>"
+HTML$ = "<center>"  + HTML$ + "</center>" + $0a$
+
+goto finish
+
+finish:
+rem  Build script for redirection that includes timestamp to prevent re-execution
+script$ = "<script>" + $0a$
+script$ = script$ + "const BASE_URL = '" + dsn$ + "';" + $0a$
+script$ = script$ + "function redirect(extraArg) {" + $0a$
+script$ = script$ + "    if (extraArg.length > 0) { extraArg = ""&"" + extraArg;}" + $0a$
+script$ = script$ + "    const url = `${BASE_URL}&ts=${Date.now()}${extraArg}`;" + $0a$
+script$ = script$ + "    window.location = url;" + $0a$
+script$ = script$ + "}" + $0a$
+rem  Set timestamp in hidden input upon form submission to prevent re-execution
+script$ = script$ + "const myForm = document.getElementById('myForm');" + $0a$
+script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
+script$ = script$ + "document.getElementsByName('ts')[0].value = `${Date.now()}`;" + $0a$
+script$ = script$ + "});" + $0a$
+script$ = script$ + "</script>" + $0a$
+
+html$ = html$ + script$
+
 RUN "CDW999"
 
 PLAYER:
@@ -336,6 +362,7 @@ WRITE RECORD(GR04)GR04$
 MSG$ = ALLMSG$, ALLMSG$ = ""
 RETURN
 
+rem  not currently implemented
 INFOFORM:
 HTML$ = HTML$ + "<br><form>"
 GOSUB TOPROW
@@ -358,7 +385,7 @@ if wases.league$ <> "TTM" then
   CALL "CDW000", ROW$, "d", "<input type='radio' name='" + FLD$ + "' value='Y'" + YES$ + ">Yes<br><input type='radio' name='" + FLD$ + "' value='N'" + NO$ + ">No"
   CALL "CDW000", TAB$, "r", ROW$
 fi
-CALL "CDW000", ROW$, "dcs3", "<input type='submit' value='Save Changes' onclick='window.location=""[DSN]?p=GW011""'> <input type='button' value='Cancel & Logout' onclick='window.location=""[DSN]?p=GW999""'>"
+CALL "CDW000", ROW$, "dcs3", "<input type='submit' value='Save Changes' onclick='redirect(""p=GW011"")'> <input type='button' value='Cancel & Logout' onclick='redirect(""p=GW999"")'>"
 CALL "CDW000", TAB$, "r class='foot'", ROW$
 CALL "CDW000", HTML$, "tc", TAB$
 HTML$ = HTML$ + "</form>"
@@ -434,13 +461,13 @@ if gr09.aid$ = "lk01" then
   declare scorePosting score!
   score! = new scorePosting(code$)
   if len(score!.getRecentMatches()) then
-    call "CDW000", row$, "dc", "<a href='" + dsn$ + "&p=scorePosting.bbj&mode=getRecentMatches'>Recent Rounds</a>"
+    call "CDW000", row$, "dc", "<a onclick='redirect(""&p=scorePosting.bbj&mode=getRecentMatches"")'>Recent Rounds</a>"
     call "CDW000", tab$, "r", row$
   fi
   if pos(" " <> gr09.email$) then
     id$ = ttm.getGr04Key(gr09.email$, "SAW")
     if len(id$) then
-      call "CDW000", row$, "dc", "<a href='" + dsn$ + "&p=scorePosting.bbj&mode=showCharts&id=" + id$ + "'>Charts</a>"
+      call "CDW000", row$, "dc", "<a onclick='redirect(""&p=scorePosting.bbj&mode=showCharts&id=" + id$ + """)'>Charts</a>"
       call "CDW000", tab$, "r", row$
     fi
   fi
@@ -504,7 +531,7 @@ REM         break
     switch 1
       rem  Cancel my time or my buddy or my guest
       case pos(" " <> gr10.id$[i]) and pos(" " <> gr09a.id$) and ((gr10.id$[i] = gr09.id$) or (gr10.by$[i] = gr09.id$) or (gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)))
-        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='window.location=""" + dsn$ + "&cancel=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' checked onclick='redirect(""cancel=" + str(gr10.ttid) + "-" + str(i) + """)'>"
         col2$ = "<span class='head'>" + fnn$(gr09a$)
         if pos(gr10.id$[i] = foursome$, 4) col2$ = col2$ + " - Guest"
         col2$ = col2$ + "</span>"
@@ -512,19 +539,19 @@ REM         break
         break
       rem  Claim my first time - not playing, first available spot in this foursome
       case gr10.id$[i] = "    " and playing = 0 and time_box = 0  
-        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='redirect(""claim=" + str(gr10.ttid) + "-" + str(i) + """)'>"
         col2$ = "Check this box to play"
         time_box = 1
         break
       rem  Claim my second time - playing earlier, first available spot in this foursome
       case gr10.id$[i] = "    " and playing = 1 and time_box = 0 and leagueDate and (gr10.time >= mytime + 2 or gr10.time <= mytime - 2)
-        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+        col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='redirect(""claim=" + str(gr10.ttid) + "-" + str(i) + """)'>"
         col2$ = "Check this box to play"
         time_box = 1
         break
-REM       rem  Claim time for my guest - I'm in this foursome, first available spot in this foursome
+REM       rem  Claim time for my guest - Im in this foursome, first available spot in this foursome
 REM       case gr10.id$[i] = "    " and pos(gr09.id$ = foursome$, 4) and guest_box = 0 
-REM         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='window.location=""" + dsn$ + "&claim=" + str(gr10.ttid) + "-" + str(i) + """'>"
+REM         col1$ = "<input style='transform: scale(1.4)' class='checkbox' type='checkbox' onclick='redirect(""claim=" + str(gr10.ttid) + "-" + str(i) + """)'>"
 REM         col2$ = "Check for your Guest"
 REM         guest_box = 1
 REM         break
@@ -562,16 +589,16 @@ fi
 
 rem  Button to edit and switch users for admin and Jim
 if (gr09.aid$ = gr09.id$) or (gr09.aid$ = "lk01" and pos(gr09.id$ = "js01", 4)) then
-  call "CDW000", row$, "dc", "<a class='dw_link' href='" + dsn$ + "&f=players'>My Golf Buddies</a>"
+  call "CDW000", row$, "dc", "<a class='dw_link' onclick='redirect(""f=players"")'>My Golf Buddies</a>"
   call "CDW000", tab$, "r", row$
 fi
 
 if gr09.aid$ = gr09.id$ then
-  call "CDW000", row$, "dc", "<a class='dw_link' href='" + dsn$ + "&f=teetime'>Setup Tee Times</a>"
+  call "CDW000", row$, "dc", "<a class='dw_link' onclick='redirect(""f=teetime"")'>Setup Tee Times</a>"
   call "CDW000", tab$, "r", row$
-  call "CDW000", row$, "dc", "<a class='dw_link' href='" + dsn$ + "&f=emailSetup'>Send Emails</a>"
+  call "CDW000", row$, "dc", "<a class='dw_link' onclick='redirect(""f=emailSetup"")'>Send Emails</a>"
   call "CDW000", tab$, "r", row$
-  call "CDW000", row$, "dc", "<a class='dw_link' href='" + dsn$ + "&f=coursesSetup'>My Courses</a>"
+  call "CDW000", row$, "dc", "<a class='dw_link' onclick='redirect(""f=coursesSetup"")'>My Courses</a>"
   call "CDW000", tab$, "r", row$
 fi
 
@@ -593,7 +620,7 @@ buddyList:
   scr1$ = $0a$ + "<script>" + $0a$
   scr1$ = scr1$ + "function buddySelect(ttid) {" + $0a$
   scr1$ = scr1$ + "var buddy = document.getElementById('buddy' + ttid).value" + $0a$
-  scr1$ = scr1$ + "window.location='" + dsn$ + "&claim=' + buddy;" + $0a$
+  scr1$ = scr1$ + "redirect(""claim="" + buddy);" + $0a$
   scr1$ = scr1$ + "}" + $0a$
   scr1$ = scr1$ + "</script>" + $0a$
 return
@@ -621,30 +648,15 @@ until 0
 call "CDW000", row$, "ds2", "<textarea name='note' rows='4' cols='50'>Tee Times have been made.</textarea>"
 call "CDW000", tab$, "r", row$
 btn1$ = "<button type='submit' onclick='submit();'>Send Emails</button>"
-btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs2", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
-html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
-goto EOJ
+gosub hidden
+html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
+goto finish
 
 TT_SETUP:
-REM def fnh$(txt$) = head$ + txt$ + $0a$
-REM head$ = "", head$ = stbl("$otherhead", err=*next)
-REM head$ = fnh$("<link rel='stylesheet' href='/LK/css/jquery.timeentry.css'>")
-REM head$ = fnh$("<style>")
-REM head$ = fnh$("body > iframe { display: none;}")
-REM head$ = fnh$("input:focus, select:focus, input[type='checkbox']:focus, button:focus {background-color: #F0E68C;}")
-REM head$ = fnh$("</style>")
-REM head$ = fnh$("<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'></script>")
-REM head$ = fnh$("<script src='/LK/js/jquery.plugin.js'></script>")
-REM head$ = fnh$("<script src='/LK/js/jquery.timeentry.js'></script>")
-REM head$ = fnh$("<script>")
-REM head$ = fnh$("$(function () {")
-REM head$ = fnh$("  $(""[name='timeEntry']"").timeEntry({ampmPrefix: ' ', noSeparatorEntry: true, spinnerImage: ''});")
-REM head$ = fnh$("});")
-REM head$ = fnh$("</script>")
-REM head$ = stbl("$otherhead", head$)
 
 call "CDW000", row$, "dcs5", "Tee Time Manager"
 call "CDW000", tab$, "r class='top'", row$
@@ -718,15 +730,17 @@ redim gr10$
 if ldate then
   gr10.date = ldate
   interval = 0
-  if len(lcourse$) then
-    if gr08.id$ = lcourse$ then
-      interval = gr08.interval
-    else
-      readrecord (gr08, knum=0, key=lcourse$, dom=*endif)gr08$
-      interval = gr08.interval
+  if gr09.aid$ <> "lk02" then
+    if len(lcourse$) then
+      if gr08.id$ = lcourse$ then
+        interval = gr08.interval
+      else
+        readrecord (gr08, knum=0, key=lcourse$, dom=*endif)gr08$
+        interval = gr08.interval
+      fi
     fi
+    if interval = 0 then interval = 10 
   fi
-  if interval = 0 then interval = 10 
   if hour then minute = minute + interval
   if minute >= 60 then hour = hour + 1, minute = minute - 60
 else
@@ -761,16 +775,17 @@ call "CDW069", w069$, course$
 
 call "CDW000", row$, "d", course$
 call "CDW000", row$, "d", ""
-call "CDW000", row$, "dc", "<input type='checkbox' name='cancel_0' value='y'>"
+call "CDW000", row$, "dc", "<input type='checkbox' name='cancel_0' checked value='y'>"
 call "CDW000", tab$, "r", row$
 
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
-btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs5", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
-html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
-goto EOJ
+gosub hidden
+html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
+goto finish
 
 def fndate$(gr10$, af$)
   date$ = ""
@@ -846,13 +861,14 @@ for i = 1 to 5
 next i
 
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
-btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs6", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 
 call "CDW000", html$, "t", tab$
-html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
-run "CDW999"
+gosub hidden
+html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
+goto finish
 
 COURSES_SETUP:
 call "CDW000", row$, "dcs3", "Tee Time Manager"
@@ -877,12 +893,18 @@ repeat
   call "CDW000", tab$, "r", row$
 until 0
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
-btn2$ = "<button type='button' onclick='window.location=""" + dsn$ + """'>Cancel</button>"
+btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
 call "CDW000", row$, "dcs3", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 call "CDW000", html$, "t", tab$
-html$ = "<center><form method='post' action='" + dsn$ + "'>" + html$ + "</form></center>"
-goto EOJ
+gosub hidden
+html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
+goto finish
+
+hidden:
+HTML$ = HTML$ + "<input type='hidden' name='code' value='" + code$ + "'>"
+HTML$ = HTML$ + "<input type='hidden' name='ts'>"
+return
 
 INIT:
 Y.COMPNAME$ = "ScoresAndCharts.com"
@@ -912,7 +934,3 @@ DT_ERR:
 CALL "CDS063",STR(TCB(5+3*(ERR=127))),Y$,PGM(-2)
 IF Y.ERRSTS=0 THEN SETERR 0 ELSE IF Y.ERRSTS=2 THEN RETURN
 RETRY
-
-EOJ:
-RUN "CDW999"
-
