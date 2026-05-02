@@ -202,7 +202,6 @@ fi
 declare BBjTemplatedString gr03!
 gr03! = wlp!.getPlayDateRecord()
 playdate = gr03!.getFieldAsNumber("date")
-escape
 rem  Set symbol in subject for emails sent
 tmp$ = stbl("SMS_CDS084.SYMBOL", "E29BB3")
 
