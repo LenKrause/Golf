@@ -128,6 +128,13 @@ repeat
   if 0 then call "SW002", note$, $e28099$, "'"
   if 0 then cgi.note$ = note$
   if 0 then call "SW002", note$, $0d0a$, "<br>"
+  
+  if jul(0,0,0) = jul(2026,5,2) then
+    note$ = "<p>Welcome to a new golf season!.</p>"
+    note$ = note$ + "<p>Although the weather looks to be wet and cold, we have scheduled our first league match play for this Wednesday, May 6.</p>"
+    note$ = note$ + "<p>We will send out an email should the round be canceled due to weather</p>"
+  fi
+
   if jul(0,0,0) = jul(2024,5,18) then note$ = "<p>Due to some roster revisions made this week, the match schedule has changed, which means that it is possible that you may play an opponent that you already played this year.</p>"
   if jul(0,0,0) = jul(2024,8,3)  then
     note$ = "<p>No early golf this week due to a girls event, just league play.</p>"
