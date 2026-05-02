@@ -196,6 +196,7 @@ if playdate and emails!.size() and ! debug then
     link$ = ttm.getLink(email$)
     if len(link$) then
       s084.toemail$  = email$
+      s084.toname$ = ""
       if 0 s084.emailbcc$ = "lenkrause76@gmail.com"
       call "CDS084", y$, y5$, u0, s084$, y6, y6$
       print (y6.ch)"<p>Although you do not have a match scheduled for this week"
