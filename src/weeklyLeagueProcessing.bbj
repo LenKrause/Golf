@@ -13,9 +13,15 @@ class public weeklyLeagueProcessing
   field private BBjString  gr03tpl$
   field private BBjString  msg! = ""
   field private BBjString  aid$ = "lk01"
+  field private BBjString  g1_18$ = "js01mf01dr01ks02"; rem Jim S, Mike, Dave, Keith
+  field private BBjString  g2_18$ = "rr01dn01mt01bb01"; rem Ray, Dan, Mel, Bruce
+  field private BBjString  g3_18$ = "ds01pc01jk01tf02"; rem Dave, Paul, Jerry, Tom
+  field private BBjString  g4_18$ = ""
+  field private BBjString  g5_18$ = ""
+  field private BBjString  g1_9$  = "jm01jg01"; rem Jim Mindek, Jim Gardini
   
   field private BBjNumber  hour   = 13
-  field private BBjNumber  minute = 30
+  field private BBjNumber  minute = 20
   field private BBjNumber  delta  = 10
   
   method public weeklyLeagueProcessing(BBjString league$)
@@ -86,47 +92,61 @@ class public weeklyLeagueProcessing
     rem  Change date below when early tee times are not available
     if day_of_week$ = "Sat" and jul(0,0,0) <> jul(2024, 8, 3) then
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "js01mf01dr01ks02"); rem  Jim, Mike, Dave (dr01), Keith (ks02) or Mike M (mm02) or Len (lk01)
+      #preset(gr10File!, gr10!, #g1_18$)
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "rr01dn01mt01bb01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
+      #preset(gr10File!, gr10!, #g2_18$)
 
       gr10!.setFieldValue("time", #fixTime())
-      #preset(gr10File!, gr10!, "ds01pc01jk01tf02"); rem  Dave, Paul, Jerry, Tom
+      #preset(gr10File!, gr10!, #g3_18$)
       
       gr10!.setFieldValue("time", #fixTime())
-      gr10File!.addUniqueRecord(gr10!)
+      #preset(gr10File!, gr10!, #g4_18$)
 
       gr10!.setFieldValue("time", #fixTime())
-      gr10File!.addUniqueRecord(gr10!)
+      #preset(gr10File!, gr10!, #g5_18$)
     fi
     
     rem  Late 9 hole rounds
     if day_of_week$ = "Sat" then
-      #hour = 16, #minute = 10, #delta = 10
+      #hour = 16, #minute = 8, #delta = 8
       bypassLate = jul(0,0,0) = jul(2024,9,7)
       gr10!.setFieldValue("time", #fixTime())
     
-      rem  Per Jim 4/23/25 no longer schedule late tee time for 18 holers
-      if 0 and ! bypassLate then
+      rem  As of 5/7/26 schedule late tee time for 18 holers
+      if ! bypassLate then
         if practice then
           gr10File!.addUniqueRecord(gr10!)
         else
-          #preset(gr10File!, gr10!, "js01mf01dr01ks02"); rem  Jim (js01), Mike (mf01), Dave (dr01), Len (lk01)
+          #preset(gr10File!, gr10!, #g1_18$)
         fi
         gr10!.setFieldValue("time", #fixTime())
 
         if practice then
           gr10File!.addUniqueRecord(gr10!)
         else
-          #preset(gr10File!, gr10!, "rr01dn01mt01lk01"); rem  Ray (rr01), Dan (dn01), Bruce (bb01), Mel (mt01)
+          #preset(gr10File!, gr10!, #g2_18$)
         fi
         gr10!.setFieldValue("time", #fixTime())
 
         if practice then
           gr10File!.addUniqueRecord(gr10!)
         else
-          #preset(gr10File!, gr10!, "ds01pc01jk01tf02"); rem  Dave, Paul, Jerry, Tom
+          #preset(gr10File!, gr10!, #g3_18$)
+        fi
+        gr10!.setFieldValue("time", #fixTime())
+
+        if practice then
+          gr10File!.addUniqueRecord(gr10!)
+        else
+          #preset(gr10File!, gr10!, #g4_18$)
+        fi
+        gr10!.setFieldValue("time", #fixTime())
+
+        if practice then
+          gr10File!.addUniqueRecord(gr10!)
+        else
+          #preset(gr10File!, gr10!, #g5_18$)
         fi
         gr10!.setFieldValue("time", #fixTime())
       fi
@@ -134,18 +154,16 @@ class public weeklyLeagueProcessing
       if practice then
         gr10File!.addUniqueRecord(gr10!)
       else
-        #preset(gr10File!, gr10!, "jg01jm01"); rem  Gardini (jg01), Marco (mm01), Mindek (jm01), Mike Mueller (mm02)
+        #preset(gr10File!, gr10!, #g1_9$)
       fi
-
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-      gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-      if ! bypassLate then
-        gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-        gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-        gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-        gr10!.setFieldValue("time", #fixTime()); gr10File!.addUniqueRecord(gr10!)
-      fi
+      gr10!.setFieldValue("time", #fixTime())
+      
+      rem  Total of 5 9-hole only tee times
+      for g9 = 2 to 5
+        gr10File!.addUniqueRecord(gr10!)
+        gr10!.setFieldValue("time", #fixTime())
+      next g9       
+     
     fi
   methodend
   
@@ -175,6 +193,7 @@ REM     if int(time) < 7 then time = time + 12
       ind = ind + 4
     next i
     gr10File!.addUniqueRecord(gr10!)
+    rem  clear player ids for next preset
     for i = 1 to 4
       gr10!.setFieldValue("id", i, "")
     next i

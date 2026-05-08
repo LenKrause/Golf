@@ -29,12 +29,12 @@ repeat
 until 1
 
 rem  Prevent re-execution of prior submission
-ts$ = field(cgi$, "ts", err=*next)
-if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
-if elapsedSecs > 3 or len(ts$) = 0 then dim cgi$:"empty:c(1*)"
+rem ts$ = field(cgi$, "ts", err=*next)
+rem if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
+rem if elapsedSecs > 3 or len(ts$) = 0 then dim cgi$:"empty:c(1*)"
 
 if code then
-  msg$ = "Unauthorized, code=" + str(code)
+  msg$ = "Unauthorized, code=" + str(code) + " " + errmsg$
 else
   gosub PLAYER
 fi
@@ -461,13 +461,13 @@ if gr09.aid$ = "lk01" then
   declare scorePosting score!
   score! = new scorePosting(code$)
   if len(score!.getRecentMatches()) then
-    call "CDW000", row$, "dc", "<a onclick='redirect(""&p=scorePosting.bbj&mode=getRecentMatches"")'>Recent Rounds</a>"
+    call "CDW000", row$, "dc", "<a onclick='redirect(""p=scorePosting.bbj&mode=getRecentMatches"")'>Recent Rounds</a>"
     call "CDW000", tab$, "r", row$
   fi
   if pos(" " <> gr09.email$) then
     id$ = ttm.getGr04Key(gr09.email$, "SAW")
     if len(id$) then
-      call "CDW000", row$, "dc", "<a onclick='redirect(""&p=scorePosting.bbj&mode=showCharts&id=" + id$ + """)'>Charts</a>"
+      call "CDW000", row$, "dc", "<a onclick='redirect(""p=scorePosting.bbj&mode=showCharts&id=" + id$ + """)'>Charts</a>"
       call "CDW000", tab$, "r", row$
     fi
   fi

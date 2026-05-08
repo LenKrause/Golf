@@ -12,6 +12,7 @@ class public scorePosting
   field private BBjString code$
   field private BBjString aid$
   field private BBjString id$
+  field private BBjString dsn$
   field private BBjString gr08tpl$; rem  Course record
   field private BBjString gr08$
   field private BBjString gr04tpl$; rem  Player record
@@ -27,6 +28,7 @@ class public scorePosting
     code1$  = ath(code$)
     #aid$   = code1$(1, 4)
     #id$    = code1$(5, 4)
+    #dsn$ = "/LK/cgi-bin/ttm.cgi?code=" + code$
   methodend
   
   rem  checks for player in league system
@@ -294,19 +296,28 @@ REM       if len(traceInfo$) > 4 then print (num(traceInfo$(1,4), err=*next))"le
       anyzero = 0
       for hole = 1 to 9
         gr05.hscore[hole] = num(field(cgi$, gr05.id$ + "_" + str(hole)))
-        if gr05.hscore[hole] = 0 then anyzero = 1
+        if gr05.hscore[hole] = 0 then anyzero = anyzero + 1
         gr05.score = gr05.score + gr05.hscore[hole]
         gr05.hputts[hole] = num(field(cgi$, gr05.id$ + "P_" + str(hole)))
         putts = putts + gr05.hputts[hole]
       next hole
-      if anyzero then
-        read (gr05)
-      else
-        gr05.net   = gr05.score - gr05.hc
-        if putts then gr05.putts = putts; rem  Older scores do not have putts hole by hole
-        gr05$ = #computePoints(gr05$, gr05)
-        write record (gr05)gr05$
-      fi
+      switch anyzero
+        case 0
+          gr05.net   = gr05.score - gr05.hc
+          if putts then gr05.putts = putts; rem  Older scores do not have putts hole by hole
+          gr05$ = #computePoints(gr05$, gr05)
+          write record (gr05)gr05$
+          break
+        case 9
+          gr05.net = 0
+          gr05.putts = 0
+          gr05$ = #computePoints(gr05$, gr05)
+          write record (gr05)gr05$
+          break
+        case default
+          read (gr05)
+          break
+      swend
     next i
     methodret #getRecentMatches()
   methodend
@@ -641,7 +652,7 @@ classend
 
 rem  Program is run from GW010
 declare scorePosting score!
-REM DT.traceOn()
+rem DT.traceOn()
 switch cgi.mode$
   case "getRecentMatches"
     score! = new scorePosting(cgi.code$)
@@ -670,6 +681,26 @@ switch cgi.mode$
     html$ = "<div class='pageHeading'>" + cvs(gr04.firstname$, 2) + " " + cvs(gr04.lastname$, 2) + "</div>" + charts!.getHtml()
     break
 swend
+
+rem HTML$ = HTML$ + "<input type='hidden' name='ts'>"
+
+rem script$ = "<script>" + $0a$
+rem  script to add ts arg with current time and redirect
+rem script$ = script$ + "const BASE_URL = '" + #dsn$ + "';" + $0a$
+rem script$ = script$ + "function redirect(extraArg) {" + $0a$
+rem script$ = script$ + "    if (extraArg.length > 0) { extraArg = ""&"" + extraArg;}" + $0a$
+rem script$ = script$ + "    const url = `${BASE_URL}&ts=${Date.now()}${extraArg}`;" + $0a$
+rem script$ = script$ + "    window.location = url;" + $0a$
+rem script$ = script$ + "}" + $0a$
+rem  Set timestamp in hidden input upon form submission to prevent re-execution
+rem script$ = script$ + "const myForm = document.getElementById('myForm');" + $0a$
+rem script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
+rem script$ = script$ + "document.getElementsByName('ts')[0].value = `${Date.now()}`;" + $0a$
+rem script$ = script$ + "});" + $0a$
+rem script$ = script$ + "</script>" + $0a$
+
+rem html$ = html$ + script$
+
 run "CDW999"
 
 recompute:
