@@ -15,7 +15,7 @@ class public weeklyLeagueProcessing
   field private BBjString  aid$ = "lk01"
   field private BBjString  g1_18$ = "js01mf01dr01ks02"; rem Jim S, Mike, Dave, Keith
   field private BBjString  g2_18$ = "rr01dn01mt01bb01"; rem Ray, Dan, Mel, Bruce
-  field private BBjString  g3_18$ = "ds01pc01jk01tf02"; rem Dave, Paul, Jerry, Tom
+  field private BBjString  g3_18$ = "ds01pc01jk01sh01"; rem Dave, Paul, Jerry, Steve
   field private BBjString  g4_18$ = ""
   field private BBjString  g5_18$ = ""
   field private BBjString  g1_9$  = "jm01jg01"; rem Jim Mindek, Jim Gardini

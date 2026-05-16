@@ -158,7 +158,7 @@ repeat
   if len(link$) then
     linkmsg$ = "<a href='" + link$ + "'>here</a>"
     if playdate then
-      message$ = "Click " + linkmsg$ + " to select your tee time."
+      message$ = "Click " + linkmsg$ + " to select your tee time (and later to post your score)."
       message$ = message$ + "<br><br>Note: new for 2026, as requested by Pine Hills, those playing 18 holes SHOULD ALSO make a late tee time for league play."
       message$ = message$ + "<br><br>Please make league dues check for $85 payable to Jim Sterley."
 REM     else

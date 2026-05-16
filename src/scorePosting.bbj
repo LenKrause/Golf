@@ -195,7 +195,7 @@ REM       if len(traceInfo$) > 4 then print (num(traceInfo$(1,4), err=*next))"le
 
       table!.addCell("Score:", bc$ + "r")
       for hole = 1 to 9
-        cell$ = "<input tabindex='" + str(tabindex + (hole - 1) * 2) + "'" + #getCell(gr04.id$, hole) + " min='0' max='9' style='text-align:center;width:3em'" + #getValue(gr05.hscore[hole]) + ">"
+        cell$ = "<input tabindex='" + str(tabindex + (hole - 1) * 2) + "'" + #getCell(gr04.id$, hole) + " min='0' max='19' style='text-align:center;width:3em'" + #getValue(gr05.hscore[hole]) + ">"
         table!.addCell(cell$, bc$ + "&")
       next hole
       value$ = iff(gr05.score, str(gr05.score), "")
