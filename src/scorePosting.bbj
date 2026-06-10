@@ -311,7 +311,14 @@ REM       if len(traceInfo$) > 4 then print (num(traceInfo$(1,4), err=*next))"le
         case 9
           gr05.net = 0
           gr05.putts = 0
-          gr05$ = #computePoints(gr05$, gr05)
+          gr05.matchpoints = 0
+          gr05.points = 0
+          for hole = 1 to 9
+            gr05.hscore[hole] = 0
+            gr05.hputts[hole] = 0
+            gr05.hpoints[hole] = 0
+            gr05.hstrokes[hole] = 0
+          next hole
           write record (gr05)gr05$
           break
         case default
