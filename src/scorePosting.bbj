@@ -711,4 +711,4 @@ rem html$ = html$ + script$
 run "CDW999"
 
 recompute:
-score! = new scorePosting("SAW", 2020)
+score! = new scorePosting("SAW", 2026)
