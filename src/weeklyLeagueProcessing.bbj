@@ -15,7 +15,7 @@ class public weeklyLeagueProcessing
   field private BBjString  aid$ = "lk01"
   field private BBjString  g1_18$ = "js01mf01dr01ks02"; rem Jim S, Mike, Dave, Keith
   field private BBjString  g2_18$ = "rr01dn01mt01lk01"; rem Ray, Dan, Mel, Len
-  field private BBjString  g3_18$ = "ds01pc01jk01sh01"; rem Dave, Paul, Jerry, Steve
+  field private BBjString  g3_18$ = "ds01pc01sm01sh01"; rem Dave, Paul, Scott, Steve H
   field private BBjString  g4_18$ = ""
   field private BBjString  g5_18$ = ""
   field private BBjString  g1_9$  = "jm01jg01"; rem Jim Mindek, Jim Gardini
@@ -90,7 +90,7 @@ class public weeklyLeagueProcessing
     fi
 
     rem  Change date below when early tee times are not available
-    if day_of_week$ = "Sat" and jul(0,0,0) <> jul(2024, 8, 3) then
+    if day_of_week$ = "Sat" and jul(0,0,0) <> jul(2026, 7, 11) then
       gr10!.setFieldValue("time", #fixTime())
       #preset(gr10File!, gr10!, #g1_18$)
 
