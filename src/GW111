@@ -28,6 +28,7 @@ repeat
   code = 0
 until 1
 
+call "SW002", cgi$, $0a$, ""
 rem  Prevent re-execution of prior submission
 ts$ = field(cgi$, "ts", err=*next)
 if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
