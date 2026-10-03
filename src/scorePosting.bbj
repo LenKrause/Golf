@@ -334,7 +334,7 @@ REM       if len(traceInfo$) > 4 then print (num(traceInfo$(1,4), err=*next))"le
   methodend
 
   method public BBjString getUrl(BBjString option$)
-    methodret #getDsn() + "&p=scorePosting.bbj&mode=" + option$
+    methodret #getDsn() + "&p=scorePosting.bbj&mode=" + option$ + "&ts=" + str(System.currentTimeMillis())
   methodend
 
   method public BBjString getDsn()
