@@ -37,7 +37,7 @@ if elapsedSecs > 3 or len(ts$) = 0 then
     if len(ts$) then
       msg$ = "Form submission expired"
     else
-      if len(cgi$) then msg$ = "Form submission missing timestamp, cgi$=" + cgi$ + " " + hta(cgi$) + " " + fattr(cgi$)
+      if len(cgi$) and cgi$ <> $00$ then msg$ = "Form submission missing timestamp, cgi$=" + cgi$ + " " + hta(cgi$) + " " + fattr(cgi$)
     fi
   fi
   dim cgi$:"empty:c(1*=)"
