@@ -36,7 +36,7 @@ if elapsedSecs > 3 or len(ts$) = 0 then
   if len(ts$) then
     msg$ = "Form submission expired"
   else
-    msg$ = "Form submission missing timestamp, cgi$=" + cgi$
+    if len(cgi$) then msg$ = "Form submission missing timestamp, cgi$=" + cgi$
   fi
 fi
 
