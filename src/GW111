@@ -26,7 +26,6 @@ repeat
   code = 5
   readrecord (gr09, knum=0, key=gr09$(1,8), dom=*break)gr09$
   code = 0
-  cgi.code$ = ""
 until 1
 
 rem  Prevent re-execution of prior submission
@@ -37,7 +36,7 @@ if elapsedSecs > 3 or len(ts$) = 0 then
     if len(ts$) then
       msg$ = "Form submission expired"
     else
-      if len(cgi$) and cgi$ <> $00$ then msg$ = "Form submission missing timestamp, cgi$=" + cgi$ + " " + hta(cgi$) + " " + fattr(cgi$)
+      if len(cgi$) and cgi$ <> code$ + $00$ then msg$ = "Form submission missing timestamp, cgi$=" + cgi$ + " " + hta(cgi$) + " " + fattr(cgi$)
     fi
   fi
   dim cgi$:"empty:c(1*=)"
