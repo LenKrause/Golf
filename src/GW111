@@ -341,7 +341,7 @@ repeat
 until 1
 
 REM IF LEN(FIELD(CGI$, "FIRSTNAME", ERR=*next)) >= 0 GOSUB STORE
-gosub TTM
+gosub build_page
 
 if len(logmsg$) then
   log = unt
@@ -438,7 +438,7 @@ IF LEN(ALLMSG$) ALLMSG$ = ALLMSG$ + "<br>"
 ALLMSG$ = ALLMSG$ + MSG$
 RETURN
 
-TTM:
+build_page:
 GOSUB TEETIMES
 REM GOSUB INFOFORM
 RETURN
