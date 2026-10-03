@@ -29,9 +29,9 @@ repeat
 until 1
 
 rem  Prevent re-execution of prior submission
-rem ts$ = field(cgi$, "ts", err=*next)
-rem if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
-rem if elapsedSecs > 3 or len(ts$) = 0 then dim cgi$:"empty:c(1*)"
+ts$ = field(cgi$, "ts", err=*next)
+if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
+if elapsedSecs > 3 or len(ts$) = 0 then dim cgi$:"empty:c(1*)"
 
 if code then
   msg$ = "Unauthorized, code=" + str(code) + " " + errmsg$
