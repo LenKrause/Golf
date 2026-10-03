@@ -32,10 +32,12 @@ rem  Prevent re-execution of prior submission
 ts$ = field(cgi$, "ts", err=*next)
 if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
 if elapsedSecs > 3 or len(ts$) = 0 then
-  if len(ts$) then
-    msg$ = "Form submission expired"
-  else
-    if len(cgi$) then msg$ = "Form submission missing timestamp, cgi$=" + cgi$ + " " + hta(cgi$)
+  if code = 0 and gr09.id$ = "lk01" then
+    if len(ts$) then
+      msg$ = "Form submission expired"
+    else
+      if len(cgi$) then msg$ = "Form submission missing timestamp, cgi$=" + cgi$ + " " + hta(cgi$)
+    fi
   fi
   dim cgi$:"empty:c(1)"
 fi
