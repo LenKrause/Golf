@@ -102,7 +102,8 @@ class public scorePosting
       
       link$ = "My Score"
       if gr05.date >= jul(0,0,0) - 6 - 14 then
-        link$ = "<a href='" + #getUrl("getScorecardForm") + "&hexkey=" + hta(gr05$(1,10) + gr03.nine$) + "'>" + link$ + "</a>"
+        url$ = #getUrl("getScorecardForm") + "&hexkey=" + hta(gr05$(1,10) + gr03.nine$)
+        link$ = "<a href='" + url$ + "' data-base='" + url$ + "' onclick='this.href=this.getAttribute(""data-base"")+""&ts=""+Date.now();'>" + link$ + "</a>"
       fi
       table!.addCell(link$, "&r" + bc$)
       table!.addCell(iff(gr05.score, str(gr05.score), ""), "c" + bc$)
@@ -111,7 +112,8 @@ class public scorePosting
       table!.addCell(iff(gr05.score, str(gr05.putts), ""), "c" + bc$)
       link$ = #getPoints(gr05.points)
       if gr05.hscore[1] then
-        link$ = "<a href='" + #getUrl("showMatch") + "&hexkey=" + hta(gr05$(1,10) + gr03.nine$) + "'>" + link$ + "</a>"
+        url$ = #getUrl("showMatch") + "&hexkey=" + hta(gr05$(1,10) + gr03.nine$)
+        link$ = "<a href='" + url$ + "' data-base='" + url$ + "' onclick='this.href=this.getAttribute(""data-base"")+""&ts=""+Date.now();'>" + link$ + "</a>"
       fi
       table!.addCell(iff(gr05.score, link$, ""), "&c" + bc$)
       table!.addRow()
@@ -334,7 +336,7 @@ REM       if len(traceInfo$) > 4 then print (num(traceInfo$(1,4), err=*next))"le
   methodend
 
   method public BBjString getUrl(BBjString option$)
-    methodret #getDsn() + "&p=scorePosting.bbj&mode=" + option$ + "&ts=" + str(System.currentTimeMillis())
+    methodret #getDsn() + "&p=scorePosting.bbj&mode=" + option$
   methodend
 
   method public BBjString getDsn()
