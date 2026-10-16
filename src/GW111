@@ -29,9 +29,18 @@ repeat
 until 1
 
 rem  Prevent re-execution of prior submission
-rem ts$ = field(cgi$, "ts", err=*next)
-rem if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
-rem if elapsedSecs > 3 or len(ts$) = 0 then dim cgi$:"empty:c(1*)"
+ts$ = field(cgi$, "ts", err=*next)
+if len(ts$) then elapsedSecs = (num(System.currentTimeMillis()) - num(ts$)) / 1000
+if elapsedSecs > 3 or len(ts$) = 0 then
+  if code = 0 and gr09.id$ = "lk01" then
+    if len(ts$) then
+      msg$ = "Form submission expired"
+    else
+      if len(cgi$) and cgi$ <> code$ + $00$ then msg$ = "Form submission missing timestamp, cgi$=" + cgi$ + " " + hta(cgi$) + " " + fattr(cgi$)
+    fi
+  fi
+  dim cgi$:"empty:c(1*=)"
+fi
 
 if code then
   msg$ = "Unauthorized, code=" + str(code) + " " + errmsg$
@@ -341,7 +350,7 @@ repeat
 until 1
 
 REM IF LEN(FIELD(CGI$, "FIRSTNAME", ERR=*next)) >= 0 GOSUB STORE
-gosub TTM
+gosub build_page
 
 if len(logmsg$) then
   log = unt
@@ -438,7 +447,7 @@ IF LEN(ALLMSG$) ALLMSG$ = ALLMSG$ + "<br>"
 ALLMSG$ = ALLMSG$ + MSG$
 RETURN
 
-TTM:
+build_page:
 GOSUB TEETIMES
 REM GOSUB INFOFORM
 RETURN
