@@ -79,6 +79,12 @@ class public WeeklyPostSeasonProcessing
     emc% = 0
     
     dim gr09$:#gr09Tpl$
+    note$ = ""
+    if #playDate% = jul(2026, 10, 21) then
+      note$ = "Note that Ridgewood Golf Course does not take tee times after 1:00pm this time of the year."
+      note$ = note$ + "<br>" + "First-come, first-served."
+    fi
+    REM   call "SW002", note$, $0a$, "<br>"
 
     for i = 0 to #gr09Recs!.size() - 1
       gr09$ = #gr09Recs!.get(i).toString()
@@ -91,8 +97,8 @@ class public WeeklyPostSeasonProcessing
       print (y6.ch)"<style>body{color:green;}</style>"
       print (y6.ch)"<body>"
       print (y6.ch)cvs(gr09.firstname$, 2) + "-<br><br>"
-    REM   call "SW002", note$, $0a$, "<br>"
-    REM   print (y6.ch)note$, "<br><br>"
+    
+      if len(note$) then print (y6.ch)note$, "<br><br>"
       print (y6.ch)"Tee Times have been made at <a href='" + cvs(gr08.url$, 2) + "'>" + cvs(gr08.name$, 2) + "</a> for " + playDate$ + ".<br><br>"
       link$ = "http://www.scoresandcharts.com/LK/cgi-bin/ttm.cgi?code=" + hta(gr09.aid$ + gr09.id$ + hsh(gr09.aid$ + gr09.id$))
       print (y6.ch)"Click <a href='" + link$ + "'>here</a> to sign up<br><br>"
