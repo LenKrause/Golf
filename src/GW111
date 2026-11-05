@@ -251,7 +251,7 @@ repeat
         gr09a.firstname$ = field(cgi$, "firstname" + gr09id$, err=*continue)
         gr09a.lastname$  = field(cgi$, "lastname"  + gr09id$, err=*continue)
         gr09a.email$     = cvs(field(cgi$, "email" + gr09id$, err=*continue),8)
-        if pos(" " = gr09a.firstname$(1,1) + gr09a.lastname$(1,1) + gr09a.email$(1,1)) continue
+        if pos(" " <> gr09a.firstname$ + gr09a.lastname$) = 0 then continue
         gr09a.phone$     = field(cgi$, "phone"     + gr09id$, err=*continue)
         active$ = ""
         active$ = field(cgi$, "active" + gr09id$, err=*next)
