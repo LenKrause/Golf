@@ -67,6 +67,11 @@ script$ = script$ + "const myForm = document.getElementById('myForm');" + $0a$
 script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
 script$ = script$ + "document.getElementsByName('ts')[0].value = `${Date.now()}`;" + $0a$
 script$ = script$ + "});" + $0a$
+rem  Fix table layout after page load and focus
+script$ = script$ + "if (document.querySelector('table')) {" + $0a$
+script$ = script$ + "  document.querySelector('table').style.tableLayout = 'fixed';" + $0a$
+script$ = script$ + "  document.querySelector('table').style.width = '100%';" + $0a$
+script$ = script$ + "}" + $0a$
 script$ = script$ + "</script>" + $0a$
 
 html$ = html$ + script$
