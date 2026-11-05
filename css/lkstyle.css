@@ -2,7 +2,7 @@ html,table tr td {
         font-size:100%;
         }
 
-media screen and (min-width: 60em) {
+@media screen and (min-width: 60em) {
     html,table tr td {font-size:100%}
     table {width:100%}
     }
