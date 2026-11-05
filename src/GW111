@@ -866,12 +866,13 @@ for i = 1 to 5
   checked$ = iff(gr09a.active$ = "Y", " checked", "")
   call "CDW000", row$, "dc", "<input type='checkbox' name='active" + gr09a.id$ + "' value='Y'" + checked$ + ">"
   call "CDW000", row$, "d", ""
+  call "CDW000", row$, "d", ""
   call "CDW000", tab$, "r", row$
 next i
 
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
 btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
-call "CDW000", row$, "dcs6", btn1$ + " " + btn2$
+call "CDW000", row$, "dcs8", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 
 call "CDW000", html$, "t", tab$
