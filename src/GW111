@@ -935,7 +935,7 @@ DEF FND(FLDNAM$) = (CVS(FIELD(CGI$, FLDNAM$), 2) <> CVS(FIELD(GR04$, FLDNAM$), 2
 
 def fnn$(rec09$) = cvs(field(rec09$,"firstname"), 2) + " " + cvs(field(rec09$,"lastname"), 2)
 
-def fni$(fldnam$, size) = "<input type='" + iff(fldnam$ = "email", "email", "text") + "' name='" + fldnam$ + gr09a.id$ + "' size=" + str(size) + " maxlength=" + str(size) + " value='" + cvs(field(gr09a$, fldnam$), 2) + "'>"
+def fni$(fldnam$, size) = "<input type='" + iff(fldnam$ = "email", "email", "text") + "' name='" + fldnam$ + gr09a.id$ + "' size=" + str(size) + " maxlength=" + str(size) + " style='width:100%;box-sizing:border-box' value='" + cvs(field(gr09a$, fldnam$), 2) + "'>"
 
 def fndatetime$(gr10$)
 if gr10.time then 
