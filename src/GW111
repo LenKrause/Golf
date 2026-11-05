@@ -642,7 +642,7 @@ call "CDW000", row$, "dcs2", "Send Emails"
 call "CDW000", tab$, "r class='title'", row$
 
 call "CDW000", row$, "d", "Name"
-call "CDW000", row$, "d", "<input type='checkbox' id='uncheck_all' onclick='Array.from(document.getElementsByName(""em"")).forEach(cb => cb.checked = false);'> Uncheck All"
+call "CDW000", row$, "d", "<input type='checkbox' id='header_em' checked onclick='Array.from(document.getElementsByName(""em"")).forEach(cb => {cb.checked = this.checked;});'> Send Email"
 call "CDW000", tab$, "r class='head'", row$
 
 read (gr09, knum=0, key=gr09.aid$, dom=*next)
@@ -651,7 +651,7 @@ repeat
   if gr09a.aid$ <> gr09.aid$ break
   call "CDW000", row$, "d", fnn$(gr09a$)
   checked$ = iff(gr09a.active$ = "Y", " checked", "")
-  call "CDW000", row$, "dc", "<input type='checkbox' name='em' value='" + gr09a.id$ + "'" + checked$ + ">"
+  call "CDW000", row$, "dc", "<input type='checkbox' name='em' value='" + gr09a.id$ + "'" + checked$ + " onchange='document.getElementById(""header_em"").checked = Array.from(document.getElementsByName(""em"")).every(cb => cb.checked);'>"
   call "CDW000", tab$, "r", row$
 until 0
 call "CDW000", row$, "ds2", "<textarea name='note' rows='4' cols='50'>Tee Times have been made.</textarea>"
