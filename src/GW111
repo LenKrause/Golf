@@ -642,7 +642,7 @@ call "CDW000", row$, "dcs2", "Send Emails"
 call "CDW000", tab$, "r class='title'", row$
 
 call "CDW000", row$, "d", "Name"
-call "CDW000", row$, "d", "<input type='checkbox' id='uncheck_all' onclick='document.querySelectorAll(""input[name='em']"").forEach(cb => cb.checked = false);'> Uncheck All"
+call "CDW000", row$, "d", "<input type='checkbox' id='uncheck_all' onclick='Array.from(document.getElementsByName(""em"")).forEach(cb => cb.checked = false);'> Uncheck All"
 call "CDW000", tab$, "r class='head'", row$
 
 read (gr09, knum=0, key=gr09.aid$, dom=*next)
