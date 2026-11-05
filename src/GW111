@@ -817,10 +817,10 @@ def fnopt$(string$, number, value) = string$ + "<option value='" + str(number) +
 def fnoptn$(xid$, xname$) = col2$ + "<option value='" + str(gr10.ttid)+"-"+str(i)+"-"+xid$ +"')>" + xname$ + "</option>" + $0a$
 
 PLAYERS_SETUP:
-call "CDW000", row$, "dcs6", "Tee Time Manager"
+call "CDW000", row$, "dcs7", "Tee Time Manager"
 call "CDW000", tab$, "r class='top'", row$
 
-call "CDW000", row$, "dcs6", "My Golf Buddies"
+call "CDW000", row$, "dcs7", "My Golf Buddies"
 call "CDW000", tab$, "r class='title'", row$
 
 call "CDW000", row$, "d", "First Name"
@@ -844,7 +844,7 @@ sort$ = ssort(sort$, 34)
 for i = 31 to len(sort$) step 34
   read record (gr09, knum=0, key=gr09.aid$ + sort$(i,4), dom=*continue)gr09a$
   id$ = "<input type='hidden' name='gr09id' value='" + gr09a.id$ + "'>"
-  call "CDW000", row$, "d", id$ + fni$("firstname", 10)
+  call "CDW000", row$, "d", fni$("firstname", 10) + id$
   call "CDW000", row$, "d", fni$("lastname", 20)
   call "CDW000", row$, "d", fni$("email", 50)
   call "CDW000", row$, "d", fni$("phone", 12) 
@@ -859,7 +859,7 @@ redim gr09a$
 for i = 1 to 5
   gr09a.id$="new" + str(i)
   id$ = "<input type='hidden' name='gr09id' value='" + gr09a.id$ + "'>"
-  call "CDW000", row$, "d", id$ + fni$("firstname", 10)
+  call "CDW000", row$, "d", fni$("firstname", 10) + id$
   call "CDW000", row$, "d", fni$("lastname", 20)
   call "CDW000", row$, "d", fni$("email", 50)
   call "CDW000", row$, "d", fni$("phone", 12) 
@@ -872,7 +872,7 @@ next i
 
 btn1$ = "<button type='submit' onclick='submit();'>Submit</button>"
 btn2$ = "<button type='button' onclick='redirect("""")'>Cancel</button>"
-call "CDW000", row$, "dcs8", btn1$ + " " + btn2$
+call "CDW000", row$, "dcs7", btn1$ + " " + btn2$
 call "CDW000", tab$, "r", row$
 
 call "CDW000", html$, "t", tab$
