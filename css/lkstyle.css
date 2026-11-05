@@ -124,6 +124,20 @@ table.menu td {
         border-radius:3px;
         }
 
+input, textarea, select {
+	max-width: 100%;
+	box-sizing: border-box;
+	}
+
+input[type='text'], input[type='email'] {
+	width: 100%;
+	box-sizing: border-box;
+	}
+
+input[type='checkbox'] {
+	margin: 0;
+	}
+
 .tooltip {
     position: relative;
     display: inline-block;
