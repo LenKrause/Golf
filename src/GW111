@@ -843,7 +843,7 @@ sort$ = ssort(sort$, 34)
 
 for i = 31 to len(sort$) step 34
   read record (gr09, knum=0, key=gr09.aid$ + sort$(i,4), dom=*continue)gr09a$
-  id$ = "<input type='hidden' name='gr09id' value='" + gr09a.id$ + "'>"
+  id$ = "<span style='display:none'><input type='hidden' name='gr09id' value='" + gr09a.id$ + "'></span>"
   call "CDW000", row$, "d", fni$("firstname", 10) + id$
   call "CDW000", row$, "d", fni$("lastname", 20)
   call "CDW000", row$, "d", fni$("email", 50)
@@ -858,7 +858,7 @@ next i
 redim gr09a$
 for i = 1 to 5
   gr09a.id$="new" + str(i)
-  id$ = "<input type='hidden' name='gr09id' value='" + gr09a.id$ + "'>"
+  id$ = "<span style='display:none'><input type='hidden' name='gr09id' value='" + gr09a.id$ + "'></span>"
   call "CDW000", row$, "d", fni$("firstname", 10) + id$
   call "CDW000", row$, "d", fni$("lastname", 20)
   call "CDW000", row$, "d", fni$("email", 50)
