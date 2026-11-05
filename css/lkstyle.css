@@ -55,8 +55,6 @@ table, td {
 
 table	{
 	border:2px solid #008000;
-	table-layout: fixed;
-	width: 100%;
 	}
 
 tr.rowodd td {

@@ -67,11 +67,6 @@ script$ = script$ + "const myForm = document.getElementById('myForm');" + $0a$
 script$ = script$ + "myForm.addEventListener('submit', function(event) {" + $0a$
 script$ = script$ + "document.getElementsByName('ts')[0].value = `${Date.now()}`;" + $0a$
 script$ = script$ + "});" + $0a$
-rem  Fix table layout after page load and focus
-script$ = script$ + "if (document.querySelector('table')) {" + $0a$
-script$ = script$ + "  document.querySelector('table').style.tableLayout = 'fixed';" + $0a$
-script$ = script$ + "  document.querySelector('table').style.width = '100%';" + $0a$
-script$ = script$ + "}" + $0a$
 script$ = script$ + "</script>" + $0a$
 
 html$ = html$ + script$
@@ -822,6 +817,7 @@ def fnopt$(string$, number, value) = string$ + "<option value='" + str(number) +
 def fnoptn$(xid$, xname$) = col2$ + "<option value='" + str(gr10.ttid)+"-"+str(i)+"-"+xid$ +"')>" + xname$ + "</option>" + $0a$
 
 PLAYERS_SETUP:
+hidden_inputs$ = ""
 call "CDW000", row$, "dcs7", "Tee Time Manager"
 call "CDW000", tab$, "r class='top'", row$
 
@@ -848,8 +844,8 @@ sort$ = ssort(sort$, 34)
 
 for i = 31 to len(sort$) step 34
   read record (gr09, knum=0, key=gr09.aid$ + sort$(i,4), dom=*continue)gr09a$
-  id$ = "<span style='display:none'><input type='hidden' name='gr09id' value='" + gr09a.id$ + "'></span>"
-  call "CDW000", row$, "d", fni$("firstname", 10) + id$
+  hidden_inputs$ = hidden_inputs$ + "<input type='hidden' name='gr09id' value='" + gr09a.id$ + "'>"
+  call "CDW000", row$, "d", fni$("firstname", 10)
   call "CDW000", row$, "d", fni$("lastname", 20)
   call "CDW000", row$, "d", fni$("email", 50)
   call "CDW000", row$, "d", fni$("phone", 12) 
@@ -863,8 +859,8 @@ next i
 redim gr09a$
 for i = 1 to 5
   gr09a.id$="new" + str(i)
-  id$ = "<span style='display:none'><input type='hidden' name='gr09id' value='" + gr09a.id$ + "'></span>"
-  call "CDW000", row$, "d", fni$("firstname", 10) + id$
+  hidden_inputs$ = hidden_inputs$ + "<input type='hidden' name='gr09id' value='" + gr09a.id$ + "'>"
+  call "CDW000", row$, "d", fni$("firstname", 10)
   call "CDW000", row$, "d", fni$("lastname", 20)
   call "CDW000", row$, "d", fni$("email", 50)
   call "CDW000", row$, "d", fni$("phone", 12) 
@@ -882,7 +878,7 @@ call "CDW000", tab$, "r", row$
 
 call "CDW000", html$, "t", tab$
 gosub hidden
-html$ = "<center><form id='myForm'>" + html$ + "</form></center>"
+html$ = "<center><form id='myForm'><div style='display:none'>" + hidden_inputs$ + "</div>" + html$ + "</form></center>"
 goto finish
 
 COURSES_SETUP:
