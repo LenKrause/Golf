@@ -4,7 +4,7 @@ html,table tr td {
 
 @media screen and (min-width: 60em) {
     html,table tr td {font-size:100%}
-    table {width:100%}
+    table {width:fit-content}
     }
 
 body	{
@@ -166,4 +166,3 @@ input[type='hidden'] {
     top:15px;
     z-index: 1;
 	}
-
