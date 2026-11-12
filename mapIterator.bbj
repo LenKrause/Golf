@@ -1,0 +1,18 @@
+use java.util.LinkedHashMap
+use java.util.Map
+use java.util.Iterator
+
+declare LinkedHashMap map!
+declare Iterator it!
+declare Map.Entry entry!
+
+map! = new LinkedHashMap()
+map!.put("Apple", 10)
+map!.put("Banana", 20)
+map!.put("Cherry", 30)
+
+it! = map!.entrySet().iterator()
+while it!.hasNext()
+    entry! = cast(Map.Entry, it!.next())
+    print str(entry!.getKey()) + " -> " + str(entry!.getValue())
+wend
